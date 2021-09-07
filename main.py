@@ -69,16 +69,13 @@ class Game:
 
         self.enemies = []
         for y in range(3):
-            for x in range(int((DRAW_SCREEN_SIZE[0] - BORDER*2) / 90)):
-                enemy = Enemy(x*100, y*40, 1)
+            for x in range(int((DRAW_SCREEN_SIZE[0] - BORDER*3) / 90)):
+                enemy = Enemy(x*100, y*75, 1, 'right')
                 self.enemies.append(enemy)
 
         self.player = Player()
 
         self.projectiles = []
-
-
-
 
         while True:
             self.check_keys()
@@ -93,7 +90,7 @@ class Game:
                 if projectile.type == '2' and projectile.colliderect(self.player):
                     self.sounds['hit'].play()
                     self.projectiles.remove(projectile)
-                    self.player.hp -= 1
+                  #  self.player.hp -= 1
                 elif projectile.type == '1':
                     for enemy in self.enemies:
                         if projectile.colliderect(enemy):
@@ -102,10 +99,18 @@ class Game:
                             self.projectiles.remove(projectile)
                             break
 
+            if self.enemies[-1].x >= SCREEN_SIZE[0] - BORDER - self.enemies[-1].w:
+                for enemy in self.enemies:
+                    enemy.direction = 'left'
+            elif self.enemies[0].x <= BORDER:
+                for enemy in self.enemies:
+                    enemy.direction = 'right'
+
+
             for enemy in self.enemies:
-                if enemy.y >= 150:
-                    self.end('GAME OVER')
-                if random.randint(1, ENEMY_SHOT_RATIO) == 1:
+               # if enemy.y >= 150: # usunąc?
+               #     self.end('GAME OVER')
+                if random.randint(1, ENEMY_SHOT_RATIO) == 0:
                     self.sounds['laser'].play()
                     projectile = Projectile(enemy.centerx, enemy.centery, '2')
                     self.projectiles.append(projectile)
@@ -132,7 +137,7 @@ class Game:
 
     def draw(self):
         self.draw_screen.blit(self.textures['background'], (0, 0))
-        self.draw_screen.blit(self.textures['player'], self.player)
+        self.draw_screen.blit(self.textures['player1'], self.player)
         for enemy in self.enemies:
             self.draw_screen.blit(self.textures['enemy' + enemy.type], enemy)
         for projectile in self.projectiles:
