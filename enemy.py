@@ -16,9 +16,9 @@ class Enemy(pygame.Rect):
             self.x -= ENEMY_SPEED
             if self.x < BORDER:
                 self.direction = 'right'
-                self.y += 30
+                self.y += 40
         else:
             self.x += ENEMY_SPEED
             if self.x >= DRAW_SCREEN_SIZE[0] - BORDER:
                 self.direction = 'left'
-                self.y += 30
+                self.y += 40
