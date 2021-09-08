@@ -2,6 +2,7 @@ import os
 import sys
 import pygame
 import random
+import operator
 
 from CONST import *
 from player import Player
@@ -10,15 +11,27 @@ from projectile import Projectile
 
 
 class Game:
+
     def __init__(self):
         pygame.init()
+
+        self.textures = {}  # Textures(png) from img directory
         self.load_textures()
+        self.sounds = {}  # Sounds(wav) from sounds directory
         self.load_sounds()
 
         self.screen = pygame.display.set_mode(SCREEN_SIZE)  # Initialize a window or screen for display => surface
-        self.draw_screen = pygame.Surface(DRAW_SCREEN_SIZE)  # pygame object for representing images => Surface
+        self.draw_screen = pygame.Surface(DRAW_SCREEN_SIZE)  # pygame object for representing images => surface
+
         self.clock = pygame.time.Clock()  # Create an object(Clock type) to help track time
-        self.dt = 1
+        self.dt = 1  # delta time
+
+        self.player = Player()
+        self.enemies = []
+        self.projectiles = []
+
+        self.ENEMYMOVE = pygame.USEREVENT  # User event
+        pygame.time.set_timer(self.ENEMYMOVE, MOVE_RATIO)
 
         self.font = pygame.font.Font('OpenSans-Bold.ttf', 20)
 
@@ -27,12 +40,10 @@ class Game:
         self.game()
 
     def load_textures(self):
-        self.textures = {}
         for img in os.listdir('img'):  # Return a list containing the names of the files in the directory
             self.textures[img.replace('.png', '')] = pygame.image.load('img/' + img)  # => surface
 
     def load_sounds(self):
-        self.sounds = {}
         for sound in os.listdir('sounds'):  # Return a list containing the names of the files in the directory
             self.sounds[sound.replace('.wav', '')] = pygame.mixer.Sound('sounds/' + sound)  # => sound
 
@@ -45,7 +56,6 @@ class Game:
                     enemy.move()
             if event.type == pygame.KEYUP:
                 self.click = False
-
 
     def check_keys(self):
         keys = pygame.key.get_pressed()
@@ -64,22 +74,30 @@ class Game:
         sys.exit(0)
 
     def game(self):
-        self.ENEMYMOVE = pygame.USEREVENT  # Eventy własne
-        pygame.time.set_timer(self.ENEMYMOVE, MOVE_RATIO)
-
-        self.enemies = []
-        for y in range(3):
+        for y in range(3):  # Generating enemie spaceships
             for x in range(int((DRAW_SCREEN_SIZE[0] - BORDER*3) / 90)):
                 enemy = Enemy(x*100, y*75, 1, 'right')
                 self.enemies.append(enemy)
 
-        self.player = Player()
-
-        self.projectiles = []
-
         while True:
             self.check_keys()
             self.check_events()
+
+            self.enemies.sort(key=operator.attrgetter('x'))
+            if self.enemies[0].x < BORDER:
+                for enemy in self.enemies:
+                    enemy.direction = 'right'
+            elif self.enemies[-1].x > DRAW_SCREEN_SIZE[0] - BORDER - self.enemies[-1].w:
+                for enemy in self.enemies:
+                    enemy.direction = 'left'
+
+            for enemy in self.enemies:
+               # if enemy.y >= 150: # usunąc?
+               #     self.end('GAME OVER')
+                if random.randint(1, ENEMY_SHOT_RATIO) == 0:
+                    self.sounds['laser'].play()
+                    projectile = Projectile(enemy.centerx, enemy.centery, '2')
+                    self.projectiles.append(projectile)
 
             for projectile in self.projectiles:
                 projectile.move()
@@ -99,21 +117,7 @@ class Game:
                             self.projectiles.remove(projectile)
                             break
 
-            if self.enemies[-1].x >= SCREEN_SIZE[0] - BORDER - self.enemies[-1].w:
-                for enemy in self.enemies:
-                    enemy.direction = 'left'
-            elif self.enemies[0].x <= BORDER:
-                for enemy in self.enemies:
-                    enemy.direction = 'right'
 
-
-            for enemy in self.enemies:
-               # if enemy.y >= 150: # usunąc?
-               #     self.end('GAME OVER')
-                if random.randint(1, ENEMY_SHOT_RATIO) == 0:
-                    self.sounds['laser'].play()
-                    projectile = Projectile(enemy.centerx, enemy.centery, '2')
-                    self.projectiles.append(projectile)
 
             if self.player.hp == 0:
                 self.end('GAME OVER')
@@ -144,6 +148,8 @@ class Game:
             self.draw_screen.blit(self.textures['projectile' + projectile.type], projectile)
 
     def refresh_screen(self):
+        pygame.draw.line(self.draw_screen, (0, 255, 255), (BORDER/2, 0), (BORDER/2, 1000), BORDER)
+        pygame.draw.line(self.draw_screen, (0, 255, 255), (DRAW_SCREEN_SIZE[0] - BORDER/2, 0), (DRAW_SCREEN_SIZE[0] - BORDER/2, 1000), BORDER)
         scaled = pygame.transform.scale(self.draw_screen, SCREEN_SIZE)  # Resize to new resolution
         self.screen.blit(scaled, (0, 0))  # Draw one image onto another
         pygame.display.update()  # Update portions of the screen for software displays
