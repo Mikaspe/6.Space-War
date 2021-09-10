@@ -6,8 +6,8 @@ class Projectile(pygame.Rect):
     def __init__(self, x, y, type):
         self.x = x
         self.y = y
-        self.h = 32
-        self.w = 32
+        self.w = 8
+        self.h = 37
         self.type = str(type)
 
     def move(self):
