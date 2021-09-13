@@ -4,6 +4,7 @@ import pygame
 import random
 import operator
 
+
 from CONST import *
 from player import Player
 from enemy import Enemy
@@ -22,6 +23,7 @@ class Game:
         self.load_sounds()
 
         self.screen = pygame.display.set_mode(SCREEN_SIZE)  # Initialize a window or screen for display => surface
+        pygame.display.set_caption('Space-War')
         self.draw_screen = pygame.Surface(DRAW_SCREEN_SIZE)  # pygame object for representing images => surface
 
         self.clock = pygame.time.Clock()  # Create an object(Clock type) to help track time
@@ -41,8 +43,7 @@ class Game:
         self.timer = 0
         self.timer2 = 0
 
-
-        self.game()
+        self.main_menu()
 
     def load_textures(self):
         for img in os.listdir('img'):  # Return a list containing the names of the files in the directory
@@ -126,9 +127,6 @@ class Game:
         else:
             self.player.direction = 'stop'
         if keys[pygame.K_SPACE] and not self.click:
-
-            #self.click = True
-            #projectile = Projectile(self.player.centerx - 3, self.player.top - 18 - 5, '1')
             self.timer += self.dt
             if self.timer > 10:
                 self.timer = 0
@@ -176,14 +174,7 @@ class Game:
                 if self.timer2 > 40:
                     self.timer2 = 0
 
-        print(self.timer2)
-
-
-
-
     def refresh_screen(self):
-        #pygame.draw.line(self.draw_screen, (0, 0, 0), (BORDER/2, 0), (BORDER/2, 1000), BORDER)
-        #pygame.draw.line(self.draw_screen, (0, 0, 0), (DRAW_SCREEN_SIZE[0] - BORDER/2, 0), (DRAW_SCREEN_SIZE[0] - BORDER/2, 1000), BORDER)
         scaled = pygame.transform.scale(self.draw_screen, SCREEN_SIZE)  # Resize to new resolution
         self.screen.blit(scaled, (0, 0))  # Draw one image onto another
         pygame.display.update()  # Update portions of the screen for software displays
@@ -205,5 +196,53 @@ class Game:
         pygame.quit()
         sys.exit(0)
 
+    def main_menu(self):
+        draw_screen_rect = self.draw_screen.get_rect()
+        frame = pygame.Rect((0, 0), (150*1.61, 150))
+        frame.center = draw_screen_rect.center
 
-Game()
+
+
+        font = pygame.font.Font('freesansbold.ttf', 40)
+        text = font.render('Start', True, (200, 200, 200))
+        text_rect = text.get_rect()
+        text_rect.center = draw_screen_rect.center
+        text_rect.y -= 1/3 * frame.h
+
+        text2 = font.render('Exit', True, (200, 200, 200))
+        text2_rect = text2.get_rect()
+        text2_rect.center = draw_screen_rect.center
+
+        while True:
+            mx, my = pygame.mouse.get_pos()
+
+            if text_rect.collidepoint((mx, my)):
+                print('tutaj')
+                if click:
+                    self.game()
+            elif text2_rect.collidepoint((mx, my)):
+                if click:
+                    self.close()
+
+            click = False
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.close()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        self.close()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        click = True
+
+            self.draw_screen.blit(self.textures['background2'], (0, 0))
+            pygame.draw.rect(self.draw_screen, (200, 200, 200), frame, 5)
+
+            self.draw_screen.blit(text, text_rect)
+            self.draw_screen.blit(text2, text2_rect)
+
+            self.refresh_screen()
+
+
+if __name__ == '__main__':
+    Game()
