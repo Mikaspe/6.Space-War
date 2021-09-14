@@ -36,7 +36,7 @@ class Game:
         self.ENEMYMOVE = pygame.USEREVENT  # User event
         pygame.time.set_timer(self.ENEMYMOVE, ENEMY_MOVE_RATIO)
 
-        self.font = pygame.font.Font('OpenSans-Bold.ttf', 20)
+        self.font = pygame.font.Font('OpenSans-Bold.ttf', 100)
 
         self.click = False
 
@@ -75,7 +75,7 @@ class Game:
             for enemy in self.enemies:  # Generating enemies projectiles
                 if random.randint(1, ENEMY_SHOT_RATIO) == 1:
                     self.sounds['laser'].play()
-                    projectile = Projectile(enemy.centerx, enemy.centery, '2')
+                    projectile = Projectile(enemy.centerx - 4, enemy.centery, '2')  # Być może zamiast -4 da się to podstawić pod zmienną
                     self.projectiles.append(projectile)
 
             for projectile in self.projectiles:
@@ -98,7 +98,7 @@ class Game:
                                 self.enemies.remove(enemy)
                             break  # One projectile hit just one enemy(coliderect sometimes detects more collisions)
 
-            if self.player.hp == 1 and played == 0:
+            if self.player.hp == 1 and played == 0:  # ogarnąć played !!!!!!!!
                 self.sounds['low-hp'].play()
                 played = 1
 
@@ -136,7 +136,7 @@ class Game:
         else:
             self.timer = 100
         if keys[pygame.K_ESCAPE]:
-            self.close()
+            self.pause_menu()
 
     def check_events(self):
         for event in pygame.event.get():
@@ -201,29 +201,75 @@ class Game:
         frame = pygame.Rect((0, 0), (150*1.61, 150))
         frame.center = draw_screen_rect.center
 
-
-
         font = pygame.font.Font('freesansbold.ttf', 40)
-        text = font.render('Start', True, (200, 200, 200))
-        text_rect = text.get_rect()
+
+        text_start = font.render('Start', True, (100, 200, 200))
+        text_start_highlighted = font.render('Start', True, (200, 200, 200))
+        text_rect = text_start.get_rect()
         text_rect.center = draw_screen_rect.center
         text_rect.y -= 1/3 * frame.h
 
-        text2 = font.render('Exit', True, (200, 200, 200))
-        text2_rect = text2.get_rect()
+        text_exit = font.render('Exit', True, (100, 200, 200))
+        text_exit_highligted = font.render('Exit', True, (200, 200, 200))
+        text2_rect = text_exit.get_rect()
         text2_rect.center = draw_screen_rect.center
 
+        self.draw_screen.blit(self.textures['background2'], (0, 0))
+        pygame.draw.rect(self.draw_screen, (200, 200, 200), frame, 5)
+
         while True:
+            click = False
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.close()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        self.close()
+                    if event.key == pygame.K_SPACE:
+                        self.game()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        click = True
+
             mx, my = pygame.mouse.get_pos()
 
             if text_rect.collidepoint((mx, my)):
-                print('tutaj')
+                self.draw_screen.blit(text_start, text_rect)
                 if click:
                     self.game()
-            elif text2_rect.collidepoint((mx, my)):
+            else:
+                self.draw_screen.blit(text_start_highlighted, text_rect)
+
+            if text2_rect.collidepoint((mx, my)):
+                self.draw_screen.blit(text_exit, text2_rect)
                 if click:
                     self.close()
+            else:
+                self.draw_screen.blit(text_exit_highligted, text2_rect)
 
+
+            self.refresh_screen()
+
+    def pause_menu(self):
+        draw_screen_rect = self.draw_screen.get_rect()
+        frame = pygame.Rect((0, 0), (150 * 1.61, 150))
+        frame.center = draw_screen_rect.center
+
+        font = pygame.font.Font('freesansbold.ttf', 40)
+        text_continue = font.render('Continue', True, (200, 200, 200))
+        text_continue_highlighted = font.render('Continue', True, (100, 200, 200))
+        text_rect = text_continue.get_rect()
+        text_rect.center = draw_screen_rect.center
+        text_rect.y -= 1 / 3 * frame.h
+
+        text_exit = font.render('Exit', True, (200, 200, 200))
+        text_exit_highlighted = font.render('Exit', True, (100, 200, 200))
+        text2_rect = text_exit.get_rect()
+        text2_rect.center = draw_screen_rect.center
+
+        pygame.draw.rect(self.draw_screen, (200, 200, 200), frame, 5)
+
+        while True:
             click = False
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -235,14 +281,23 @@ class Game:
                     if event.button == 1:
                         click = True
 
-            self.draw_screen.blit(self.textures['background2'], (0, 0))
-            pygame.draw.rect(self.draw_screen, (200, 200, 200), frame, 5)
+            mx, my = pygame.mouse.get_pos()
 
-            self.draw_screen.blit(text, text_rect)
-            self.draw_screen.blit(text2, text2_rect)
+            if text_rect.collidepoint((mx, my)):
+                self.draw_screen.blit(text_continue_highlighted, text_rect)
+                if click:
+                    break
+            else:
+                self.draw_screen.blit(text_continue, text_rect)
+
+            if text2_rect.collidepoint((mx, my)):
+                self.draw_screen.blit(text_exit_highlighted, text2_rect)
+                if click:
+                    self.close()
+            else:
+                self.draw_screen.blit(text_exit, text2_rect)
 
             self.refresh_screen()
-
 
 if __name__ == '__main__':
     Game()

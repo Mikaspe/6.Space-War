@@ -9,6 +9,7 @@ class Projectile(pygame.Rect):
         self.w = 8
         self.h = 37
         self.type = str(type)
+        #if type == 'enemy'
 
     def move(self):
         if self.type == '1':
