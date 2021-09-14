@@ -29,7 +29,7 @@ class Game:
         self.clock = pygame.time.Clock()  # Create an object(Clock type) to help track time
         self.dt = 1  # delta time
 
-        self.player = Player(1, self.textures['player' + '1'].get_rect().size)
+        self.player = Player(1)
         self.enemies = []
         self.projectiles = []
 
@@ -57,38 +57,38 @@ class Game:
         enemy_type = 1  # enemy type ZMIENIC !!!!!!!
         for y in range(3):  # Generating enemie spaceships
             for x in range(int((DRAW_SCREEN_SIZE[0] - BORDER*3) / 90)):
-                enemy = Enemy(x*100 + BORDER, y*75, enemy_type, self.textures['enemy' + str(enemy_type)].get_rect().size, 'right')
+                enemy = Enemy(x*100 + BORDER, y*75, enemy_type, 'right')
                 self.enemies.append(enemy)
 
         while True:
             self.check_keys()
             self.check_events()
 
-            self.enemies.sort(key=operator.attrgetter('x'))  # Sorting enemies by x position
-            if self.enemies[0].x < BORDER:  # Changing move direction when enemie touch border
+            self.enemies.sort(key=operator.attrgetter('rect.x'))  # Sorting enemies by x position
+            if self.enemies[0].rect.x < BORDER:  # Changing move direction when enemie touch border
                 for enemy in self.enemies:
                     enemy.direction = 'right'
-            elif self.enemies[-1].x > DRAW_SCREEN_SIZE[0] - BORDER - self.enemies[-1].w:
+            elif self.enemies[-1].rect.x > DRAW_SCREEN_SIZE[0] - BORDER - self.enemies[-1].rect.w:
                 for enemy in self.enemies:
                     enemy.direction = 'left'
 
             for enemy in self.enemies:  # Generating enemies projectiles
                 if random.randint(1, ENEMY_SHOT_RATIO) == 1:
                     self.sounds['laser'].play()
-                    projectile = Projectile(enemy.centerx - 4, enemy.centery, '2')  # Być może zamiast -4 da się to podstawić pod zmienną
+                    projectile = Projectile(enemy.rect.centerx - 4, enemy.rect.centery, 'enemy')  # Być może zamiast -4 da się to podstawić pod zmienną
                     self.projectiles.append(projectile)
 
             for projectile in self.projectiles:
                 projectile.move()
-                if projectile.y < 0 or projectile.y > DRAW_SCREEN_SIZE[1]:  # Removing projectiles if outside of screen
+                if projectile.rect.y < 0 or projectile.rect.y > DRAW_SCREEN_SIZE[1]:  # Removing projectiles if outside of screen
                     self.projectiles.remove(projectile)
-                elif projectile.type == '2' and projectile.colliderect(self.player):  # Enemy projectile hits player
+                elif projectile.type == 'enemy' and pygame.sprite.collide_mask(self.player, projectile):  # Enemy projectile hits player
                     self.sounds['hit'].play()
                     self.projectiles.remove(projectile)
                     self.player.hp -= 1
-                elif projectile.type == '1':  # Player projectile hits enemy
+                elif projectile.type == 'player':  # Player projectile hits enemy
                     for enemy in self.enemies:
-                        if projectile.colliderect(enemy):
+                        if pygame.sprite.collide_mask(enemy, projectile):
                             self.projectiles.remove(projectile)
                             enemy.hp -= 1
                             if enemy.hp > 0:
@@ -118,12 +118,12 @@ class Game:
         keys = pygame.key.get_pressed()
         if keys[pygame.K_RIGHT]:
             self.player.direction = 'right'
-            if self.player.right < DRAW_SCREEN_SIZE[0]:
-                self.player.x += round(PLAYER_SPEED * self.dt)
+            if self.player.rect.right < DRAW_SCREEN_SIZE[0]:
+                self.player.rect.x += round(PLAYER_SPEED * self.dt)
         elif keys[pygame.K_LEFT]:
             self.player.direction = 'left'
-            if self.player.left > 0:
-                self.player.x -= round(PLAYER_SPEED * self.dt)
+            if self.player.rect.left > 0:
+                self.player.rect.x -= round(PLAYER_SPEED * self.dt)
         else:
             self.player.direction = 'stop'
         if keys[pygame.K_SPACE] and not self.click:
@@ -131,7 +131,7 @@ class Game:
             if self.timer > 10:
                 self.timer = 0
                 self.sounds['laser'].play()
-                projectile = Projectile(self.player.centerx - 3, self.player.top - 18 - 5, '1')
+                projectile = Projectile(self.player.rect.centerx - 3, self.player.rect.top - 18 - 5, 'player')
                 self.projectiles.append(projectile)
         else:
             self.timer = 100
@@ -151,16 +151,16 @@ class Game:
     def draw(self):
         self.draw_screen.blit(self.textures['background1'], (0, 0))
         if self.player.direction == 'stop':
-            self.draw_screen.blit(self.textures['player1'], self.player)
+            self.draw_screen.blit(self.textures['player1'], self.player.rect)
         elif self.player.direction == 'left':
-            self.draw_screen.blit(self.textures['player1-left'], self.player)
+            self.draw_screen.blit(self.textures['player1-left'], self.player.rect)
         elif self.player.direction == 'right':
-            self.draw_screen.blit(self.textures['player1-right'], self.player)
+            self.draw_screen.blit(self.textures['player1-right'], self.player.rect)
 
         for enemy in self.enemies:
             self.draw_screen.blit(self.textures['enemy' + enemy.type], enemy)
         for projectile in self.projectiles:
-            self.draw_screen.blit(self.textures['projectile' + projectile.type], projectile)
+            self.draw_screen.blit(self.textures['projectile-' + projectile.type], projectile)
         for heart in range(self.player.hp):
             self.draw_screen.blit(self.textures['heart'], (heart*12-4, 5))
 
@@ -247,7 +247,6 @@ class Game:
             else:
                 self.draw_screen.blit(text_exit_highligted, text2_rect)
 
-
             self.refresh_screen()
 
     def pause_menu(self):
@@ -298,6 +297,7 @@ class Game:
                 self.draw_screen.blit(text_exit, text2_rect)
 
             self.refresh_screen()
+
 
 if __name__ == '__main__':
     Game()

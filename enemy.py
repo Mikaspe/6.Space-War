@@ -2,12 +2,17 @@ import pygame
 from CONST import *
 
 
-class Enemy(pygame.Rect):
-    def __init__(self, x, y, style, size, direction='right'):
-        self.x = x
-        self.y = y
-        self.w = size[0]
-        self.h = size[1]
+class Enemy(pygame.sprite.Sprite):
+    def __init__(self, x, y, style, direction='right'):
+
+        pygame.sprite.Sprite.__init__(self)  # potrzebne ? !!!!!!!!!!!
+        self.image = pygame.image.load('img/enemy1.png').convert_alpha()
+        self.mask = pygame.mask.from_surface(self.image)
+        self.rect = self.image.get_rect(topleft=(0, 0))
+
+        self.rect.x = x
+        self.rect.y = y
+
         self.type = str(style)
         self.direction = str(direction)
         self.hp = 1
@@ -23,7 +28,7 @@ class Enemy(pygame.Rect):
 
     def move(self):
         if self.direction == 'left':
-            self.x -= ENEMY_SPEED
+            self.rect.x -= ENEMY_SPEED
         else:
-            self.x += ENEMY_SPEED
+            self.rect.x += ENEMY_SPEED
 
