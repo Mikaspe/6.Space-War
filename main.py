@@ -299,5 +299,7 @@ class Game:
             self.refresh_screen()
 
 
+moving_sprites = pygame.sprite.Group()
+
 if __name__ == '__main__':
     Game()
