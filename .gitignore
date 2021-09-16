@@ -132,3 +132,6 @@ dmypy.json
 /.idea/modules.xml
 /.idea/misc.xml
 /.idea/.gitignore
+/.idea/6.Space-War.iml
+/.idea/inspectionProfiles/Project_Default.xml
+/tests.py

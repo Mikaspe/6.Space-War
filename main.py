@@ -9,6 +9,7 @@ from CONST import *
 from player import Player
 from enemy import Enemy
 from projectile import Projectile
+from explosion import Explosion
 
 
 class Game:
@@ -19,6 +20,8 @@ class Game:
 
         self.textures = {}  # Textures(png) from img directory
         self.load_textures()
+        # self.animations = {}
+        # self.load_animations()
         self.sounds = {}  # Sounds(wav) from sounds directory
         self.load_sounds()
 
@@ -43,6 +46,9 @@ class Game:
         self.timer = 0
         self.timer2 = 0
 
+        self.moving_sprites = pygame.sprite.Group()
+
+
         self.main_menu()
 
     def load_textures(self):
@@ -52,6 +58,11 @@ class Game:
     def load_sounds(self):
         for sound in os.listdir('sounds'):  # Return a list containing the names of the files in the directory
             self.sounds[sound.replace('.wav', '')] = pygame.mixer.Sound('sounds/' + sound)  # => sound
+
+    # def load_animations(self):
+    #     for animation in os.listdir('animations'):  # Return a list containing the names of the files in the directory
+    #         for frame in os.listdir('animations/' + animation):
+    #             self.animations[animation + frame.replace('.png', '')] = pygame.image.load('animations/' + animation + '/' + frame)  # => surface
 
     def game(self):
         enemy_type = 1  # enemy type ZMIENIC !!!!!!!
@@ -95,6 +106,9 @@ class Game:
                                 self.sounds['hit'].play()
                             else:
                                 self.sounds['destroyed'].play()
+                                self.explosion = Explosion(enemy.rect.x, enemy.rect.y)
+                                self.explosion.animate()
+                                self.moving_sprites.add(self.explosion)
                                 self.enemies.remove(enemy)
                             break  # One projectile hit just one enemy(coliderect sometimes detects more collisions)
 
@@ -150,12 +164,20 @@ class Game:
 
     def draw(self):
         self.draw_screen.blit(self.textures['background1'], (0, 0))
+        #self.draw_screen.blit(self.moving_sprites, self.explosion.rect)
+
         if self.player.direction == 'stop':
             self.draw_screen.blit(self.textures['player1'], self.player.rect)
         elif self.player.direction == 'left':
             self.draw_screen.blit(self.textures['player1-left'], self.player.rect)
         elif self.player.direction == 'right':
             self.draw_screen.blit(self.textures['player1-right'], self.player.rect)
+
+
+        for sprite in self.moving_sprites:
+            sprite.update(1.6)
+
+        self.moving_sprites.draw(self.draw_screen)
 
         for enemy in self.enemies:
             self.draw_screen.blit(self.textures['enemy' + enemy.type], enemy)
@@ -270,6 +292,7 @@ class Game:
 
         while True:
             click = False
+            unpause = False # może dać click i unspause w jedno !!!!!!!!!!!!!!!!!!!
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.close()
@@ -279,6 +302,9 @@ class Game:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
                         click = True
+                # if event.type == pygame.KEYDOWN:
+                #     if event.key == pygame.K_RETURN:
+                #         unpause = True
 
             mx, my = pygame.mouse.get_pos()
 
@@ -286,6 +312,8 @@ class Game:
                 self.draw_screen.blit(text_continue_highlighted, text_rect)
                 if click:
                     break
+            elif unpause:
+                break
             else:
                 self.draw_screen.blit(text_continue, text_rect)
 

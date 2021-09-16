@@ -10,7 +10,6 @@ class Player(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect(topleft=(0, 0))
 
-
         self.rect.x = int(DRAW_SCREEN_SIZE[0] / 2)
         self.rect.y = DRAW_SCREEN_SIZE[1] - self.rect.h - 20
 
