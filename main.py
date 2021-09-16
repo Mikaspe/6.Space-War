@@ -48,7 +48,7 @@ class Game:
 
         self.moving_sprites = pygame.sprite.Group()
 
-
+        self.level = 1
         self.main_menu()
 
     def load_textures(self):
@@ -65,11 +65,56 @@ class Game:
     #             self.animations[animation + frame.replace('.png', '')] = pygame.image.load('animations/' + animation + '/' + frame)  # => surface
 
     def game(self):
-        enemy_type = 1  # enemy type ZMIENIC !!!!!!!
-        for y in range(3):  # Generating enemie spaceships
-            for x in range(int((DRAW_SCREEN_SIZE[0] - BORDER*3) / 90)):
-                enemy = Enemy(x*100 + BORDER, y*75, enemy_type, 'right')
-                self.enemies.append(enemy)
+
+        if self.level == 1:
+            enemy_type = 1
+            for y in range(1, 3):  # Generating enemie spaceships
+                for x in range(6):
+                    enemy = Enemy(x*100 + BORDER, y*75, enemy_type, 'right')
+                    self.enemies.append(enemy)
+        if self.level == 2:
+            enemy_type = 1
+            for y in range(3):  # Generating enemie spaceships
+                for x in range(8):
+                    enemy = Enemy(x*100 + BORDER, y*75, enemy_type, 'right')
+                    self.enemies.append(enemy)
+        elif self.level == 3:
+            enemy_type = 2
+            for y in range(2):  # Generating enemie spaceships
+                for x in range(7):
+                    enemy = Enemy(x * 100 + BORDER, y * 75, enemy_type, 'right')
+                    self.enemies.append(enemy)
+        elif self.level == 4:
+            enemy_type = 1
+            for y in range(3):  # Generating enemie spaceships
+                if y == 2: enemy_type = 2
+                for x in range(8):
+                    enemy = Enemy(x * 100 + BORDER, y * 75, enemy_type, 'right')
+                    self.enemies.append(enemy)
+        elif self.level == 5:
+            enemy_type = 3
+            for y in range(2):  # Generating enemie spaceships
+                for x in range(1, 3):
+                    enemy = Enemy(x * 100 + BORDER, y * 75, enemy_type, 'right')
+                    self.enemies.append(enemy)
+        elif self.level == 6:
+            enemy_type = 3
+            for y in range(3):  # Generating enemie spaceships
+                if y == 2: enemy_type = 2
+                for x in range(6):
+                    enemy = Enemy(x * 100 + BORDER, y * 75 + 40, enemy_type, 'right')
+                    self.enemies.append(enemy)
+        elif self.level == 7:
+            enemy_type = 3
+            for y in range(4):  # Generating enemie spaceships
+                if y == 1: enemy_type = 1
+                elif y == 2: enemy_type = 2
+                for x in range(8):
+                    enemy = Enemy(x * 100 + BORDER, y * 75 + 40, enemy_type, 'right')
+                    self.enemies.append(enemy)
+        elif self.level == 8:
+            enemy = Enemy(100 + BORDER, 40, 4, 'right')
+            self.enemies.append(enemy)
 
         while True:
             self.check_keys()
@@ -93,11 +138,11 @@ class Game:
                 projectile.move()
                 if projectile.rect.y < 0 or projectile.rect.y > DRAW_SCREEN_SIZE[1]:  # Removing projectiles if outside of screen
                     self.projectiles.remove(projectile)
-                elif projectile.type == 'enemy' and pygame.sprite.collide_mask(self.player, projectile):  # Enemy projectile hits player
+                elif projectile.style == 'enemy' and pygame.sprite.collide_mask(self.player, projectile):  # Enemy projectile hits player
                     self.sounds['hit'].play()
                     self.projectiles.remove(projectile)
                     self.player.hp -= 1
-                elif projectile.type == 'player':  # Player projectile hits enemy
+                elif 'player' in projectile.style:  # Player projectile hits enemy
                     for enemy in self.enemies:
                         if pygame.sprite.collide_mask(enemy, projectile):
                             self.projectiles.remove(projectile)
@@ -121,9 +166,11 @@ class Game:
             if self.player.hp == 0:
                 self.sounds['game-over'].play()
                 self.end('GAME OVER')
+                break
             elif not self.enemies:
                 self.sounds['win'].play()
                 self.end('YOU WIN')
+                break
 
             self.draw()
             self.refresh_screen()
@@ -147,6 +194,12 @@ class Game:
                 self.sounds['laser'].play()
                 projectile = Projectile(self.player.rect.centerx - 3, self.player.rect.top - 18 - 5, 'player')
                 self.projectiles.append(projectile)
+                if self.player.upgrade == 2:
+                    projectile = Projectile(self.player.rect.centerx - 8, self.player.rect.top - 18 - 5, 'player-l')
+                    self.projectiles.append(projectile)
+                    projectile = Projectile(self.player.rect.centerx - 3, self.player.rect.top - 18 - 5, 'player-r')
+                    self.projectiles.append(projectile)
+
         else:
             self.timer = 100
         if keys[pygame.K_ESCAPE]:
@@ -167,12 +220,11 @@ class Game:
         #self.draw_screen.blit(self.moving_sprites, self.explosion.rect)
 
         if self.player.direction == 'stop':
-            self.draw_screen.blit(self.textures['player1'], self.player.rect)
+            self.draw_screen.blit(self.textures['player' + str(self.player.style)], self.player.rect)
         elif self.player.direction == 'left':
-            self.draw_screen.blit(self.textures['player1-left'], self.player.rect)
+            self.draw_screen.blit(self.textures['player' + str(self.player.style) + '-left'], self.player.rect)
         elif self.player.direction == 'right':
-            self.draw_screen.blit(self.textures['player1-right'], self.player.rect)
-
+            self.draw_screen.blit(self.textures['player' + str(self.player.style) + '-right'], self.player.rect)
 
         for sprite in self.moving_sprites:
             sprite.update(1.6)
@@ -182,7 +234,7 @@ class Game:
         for enemy in self.enemies:
             self.draw_screen.blit(self.textures['enemy' + enemy.type], enemy)
         for projectile in self.projectiles:
-            self.draw_screen.blit(self.textures['projectile-' + projectile.type], projectile)
+            self.draw_screen.blit(self.textures['projectile-' + projectile.style], projectile)
         for heart in range(self.player.hp):
             self.draw_screen.blit(self.textures['heart'], (heart*12-4, 5))
 
@@ -212,7 +264,11 @@ class Game:
         while timer > 0:
             timer -= self.dt
             self.refresh_screen()
-        self.close()
+
+        self.projectiles.clear()
+        self.moving_sprites.empty()
+        if self.level == 8:
+            self.close()
 
     def close(self):
         pygame.quit()
@@ -229,17 +285,22 @@ class Game:
         text_start_highlighted = font.render('Start', True, (200, 200, 200))
         text_rect = text_start.get_rect()
         text_rect.center = draw_screen_rect.center
-        text_rect.y -= 1/3 * frame.h
+        text_rect.y -= 1/3 * frame.h #+ 100
+
+        text_spacehip = font.render('Spaceship', True, (100, 200, 200))
+        text_spaceship_highligted = font.render('Spaceship', True, (200, 200, 200))
+        text2_rect = text_spacehip.get_rect()
+        text2_rect.center = draw_screen_rect.center
 
         text_exit = font.render('Exit', True, (100, 200, 200))
         text_exit_highligted = font.render('Exit', True, (200, 200, 200))
-        text2_rect = text_exit.get_rect()
-        text2_rect.center = draw_screen_rect.center
-
-        self.draw_screen.blit(self.textures['background2'], (0, 0))
-        pygame.draw.rect(self.draw_screen, (200, 200, 200), frame, 5)
+        text3_rect = text_exit.get_rect()
+        text3_rect.center = draw_screen_rect.center
+        text3_rect.y += 1/3 * frame.h
 
         while True:
+            self.draw_screen.blit(self.textures['background2'], (0, 0))
+            pygame.draw.rect(self.draw_screen, (200, 200, 200), frame, 5)
             click = False
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -248,7 +309,7 @@ class Game:
                     if event.key == pygame.K_ESCAPE:
                         self.close()
                     if event.key == pygame.K_SPACE:
-                        self.game()
+                        self.level_switch()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
                         click = True
@@ -258,16 +319,23 @@ class Game:
             if text_rect.collidepoint((mx, my)):
                 self.draw_screen.blit(text_start, text_rect)
                 if click:
-                    self.game()
+                    self.level_switch()
             else:
                 self.draw_screen.blit(text_start_highlighted, text_rect)
 
             if text2_rect.collidepoint((mx, my)):
-                self.draw_screen.blit(text_exit, text2_rect)
+                self.draw_screen.blit(text_spacehip, text2_rect)
+                if click:
+                    self.spaceship_choose()
+            else:
+                self.draw_screen.blit(text_spaceship_highligted, text2_rect)
+
+            if text3_rect.collidepoint((mx, my)):
+                self.draw_screen.blit(text_exit, text3_rect)
                 if click:
                     self.close()
             else:
-                self.draw_screen.blit(text_exit_highligted, text2_rect)
+                self.draw_screen.blit(text_exit_highligted, text3_rect)
 
             self.refresh_screen()
 
@@ -325,6 +393,73 @@ class Game:
                 self.draw_screen.blit(text_exit, text2_rect)
 
             self.refresh_screen()
+
+    def level_switch(self):
+        while True:
+            if self.player.hp == 0:
+                self.main_menu()
+            else:
+                self.game()
+                self.level += 1
+
+    def spaceship_choose(self):
+
+        spacehip1_rect = self.textures['player1-choosen'].get_rect()
+        spacehip1_rect.x = DRAW_SCREEN_SIZE[0]/2 - 50
+        spacehip1_rect.y = DRAW_SCREEN_SIZE[1]/2
+
+        spacehip2_rect = self.textures['player2-choosen'].get_rect()
+        spacehip2_rect.x = DRAW_SCREEN_SIZE[0] / 2 - 200
+        spacehip2_rect.y = DRAW_SCREEN_SIZE[1] / 2
+
+        spacehip3_rect = self.textures['player3-choosen'].get_rect()
+        spacehip3_rect.x = DRAW_SCREEN_SIZE[0] / 2 + 100
+        spacehip3_rect.y = DRAW_SCREEN_SIZE[1] / 2
+
+        while True:
+            self.draw_screen.blit(self.textures['background2'], (0, 0))
+            click = 0
+            mx, my = pygame.mouse.get_pos()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.close()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        self.close()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        click = True
+
+            if spacehip1_rect.collidepoint((mx, my)):
+                self.draw_screen.blit(self.textures['player1-choosen'], (spacehip1_rect.x, spacehip1_rect.y))
+                if click:
+                    self.player.style = 1
+                    break
+            else:
+                self.draw_screen.blit(self.textures['player1'], (spacehip1_rect.x, spacehip1_rect.y))
+
+            if spacehip2_rect.collidepoint((mx, my)):
+                self.draw_screen.blit(self.textures['player2-choosen'], (spacehip2_rect.x, spacehip2_rect.y))
+                if click:
+                    self.player.style = 2
+                    break
+            else:
+                self.draw_screen.blit(self.textures['player2'], (spacehip2_rect.x, spacehip2_rect.y))
+
+            if spacehip3_rect.collidepoint((mx, my)):
+                self.draw_screen.blit(self.textures['player3-choosen'], (spacehip3_rect.x, spacehip3_rect.y))
+                if click:
+                    self.player.style = 3
+                    break
+            else:
+                self.draw_screen.blit(self.textures['player3'], (spacehip3_rect.x, spacehip3_rect.y))
+
+            self.refresh_screen()
+
+
+
+
 
 
 moving_sprites = pygame.sprite.Group()

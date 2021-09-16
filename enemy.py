@@ -6,12 +6,13 @@ class Enemy(pygame.sprite.Sprite):
     def __init__(self, x, y, style, direction='right'):
 
         pygame.sprite.Sprite.__init__(self)  # potrzebne ? !!!!!!!!!!!
-        self.image = pygame.image.load('img/enemy1.png').convert_alpha()
+
+        self.image = pygame.image.load('img/enemy' + str(style) + '.png').convert_alpha()
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect(topleft=(0, 0))
 
-        self.rect.x = x
-        self.rect.y = y
+        self.rect.centerx = x
+        self.rect.centery = y + 40
 
         self.type = str(style)
         self.direction = str(direction)

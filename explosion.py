@@ -21,7 +21,6 @@ class Explosion(pygame.sprite.Sprite):
     def animate(self):
         self.is_animating = True
 
-
     def update(self, speed):
         if self.is_animating:
             self.image = self.sprites[int(self.current_sprite)]
