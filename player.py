@@ -14,6 +14,6 @@ class Player(pygame.sprite.Sprite):
         self.rect.y = DRAW_SCREEN_SIZE[1] - self.rect.h - 20
 
         self.style = style
-        self.upgrade = 1
+        self.upgrade = 2
         self.direction = direction
         self.hp = 3

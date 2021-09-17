@@ -14,16 +14,19 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.centerx = x
         self.rect.centery = y + 40
 
-        self.type = str(style)
+        self.style = style
         self.direction = str(direction)
         self.hp = 1
 
         if style == 1:
             self.hp = 1
+            self.shoot_ratio = 200
         elif style == 2:
             self.hp = 5
+            self.shoot_ratio = 300
         elif style == 3:
             self.hp = 3
+            self.shoot_ratio = 100
         elif style == 4:
             self.hp = 1000
 

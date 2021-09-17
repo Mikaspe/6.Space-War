@@ -15,6 +15,8 @@ class Projectile(pygame.sprite.Sprite):
         elif style == 'enemy':
             self.image = pygame.image.load('img/projectile-enemy.png').convert_alpha()
 
+
+
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect(topleft=(0, 0))
 

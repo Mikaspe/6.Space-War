@@ -48,7 +48,7 @@ class Game:
 
         self.moving_sprites = pygame.sprite.Group()
 
-        self.level = 1
+        self.level = 4
         self.main_menu()
 
     def load_textures(self):
@@ -81,7 +81,7 @@ class Game:
         elif self.level == 3:
             enemy_type = 2
             for y in range(2):  # Generating enemie spaceships
-                for x in range(7):
+                for x in range(3):
                     enemy = Enemy(x * 100 + BORDER, y * 75, enemy_type, 'right')
                     self.enemies.append(enemy)
         elif self.level == 4:
@@ -129,10 +129,30 @@ class Game:
                     enemy.direction = 'left'
 
             for enemy in self.enemies:  # Generating enemies projectiles
-                if random.randint(1, ENEMY_SHOT_RATIO) == 1:
-                    self.sounds['laser'].play()
-                    projectile = Projectile(enemy.rect.centerx - 4, enemy.rect.centery, 'enemy')  # Być może zamiast -4 da się to podstawić pod zmienną
-                    self.projectiles.append(projectile)
+
+                if enemy.style == 1:
+                    print('jestem')
+                    if random.randint(1, enemy.shoot_ratio) == 1:
+                        print(enemy.shoot_ratio)
+                        self.sounds['laser'].play()
+                        projectile = Projectile(enemy.rect.centerx - 4, enemy.rect.centery, 'enemy')  # Być może zamiast -4 da się to podstawić pod zmienną
+                        self.projectiles.append(projectile)
+                elif enemy.style == 2:
+                    if random.randint(1, enemy.shoot_ratio) == 1:
+                        self.sounds['laser'].play()
+                        projectile = Projectile(enemy.rect.centerx - 4, enemy.rect.centery, 'enemy')  # Być może zamiast -4 da się to podstawić pod zmienną
+                        self.projectiles.append(projectile)
+                elif enemy.style == 3:
+                    if random.randint(1, enemy.shoot_ratio) == 1:
+                        self.sounds['laser'].play()
+                        projectile = Projectile(enemy.rect.centerx - 4, enemy.rect.centery, 'enemy')  # Być może zamiast -4 da się to podstawić pod zmienną
+                        self.projectiles.append(projectile)
+                        projectile = Projectile(enemy.rect.centerx - 28, enemy.rect.centery + 20, 'enemy')  # Być może zamiast -4 da się to podstawić pod zmienną
+                        self.projectiles.append(projectile)
+                        projectile = Projectile(enemy.rect.centerx + 20, enemy.rect.centery + 20, 'enemy')  # Być może zamiast -4 da się to podstawić pod zmienną
+                        self.projectiles.append(projectile)
+                elif enemy.style == 4:
+                    pass
 
             for projectile in self.projectiles:
                 projectile.move()
@@ -232,7 +252,7 @@ class Game:
         self.moving_sprites.draw(self.draw_screen)
 
         for enemy in self.enemies:
-            self.draw_screen.blit(self.textures['enemy' + enemy.type], enemy)
+            self.draw_screen.blit(self.textures['enemy' + str(enemy.style)], enemy)
         for projectile in self.projectiles:
             self.draw_screen.blit(self.textures['projectile-' + projectile.style], projectile)
         for heart in range(self.player.hp):
@@ -267,6 +287,8 @@ class Game:
 
         self.projectiles.clear()
         self.moving_sprites.empty()
+        self.enemies.clear()
+
         if self.level == 8:
             self.close()
 
@@ -397,10 +419,12 @@ class Game:
     def level_switch(self):
         while True:
             if self.player.hp == 0:
+                self.player.hp = 3
                 self.main_menu()
             else:
-                self.game()
                 self.level += 1
+                self.game()
+
 
     def spaceship_choose(self):
 
