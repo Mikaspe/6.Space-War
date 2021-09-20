@@ -48,7 +48,7 @@ class Game:
 
         self.moving_sprites = pygame.sprite.Group()
 
-        self.level = 4
+        self.level = 0
         self.main_menu()
 
     def load_textures(self):
@@ -131,9 +131,7 @@ class Game:
             for enemy in self.enemies:  # Generating enemies projectiles
 
                 if enemy.style == 1:
-                    print('jestem')
                     if random.randint(1, enemy.shoot_ratio) == 1:
-                        print(enemy.shoot_ratio)
                         self.sounds['laser'].play()
                         projectile = Projectile(enemy.rect.centerx - 4, enemy.rect.centery, 'enemy')  # Być może zamiast -4 da się to podstawić pod zmienną
                         self.projectiles.append(projectile)
@@ -200,21 +198,21 @@ class Game:
         if keys[pygame.K_RIGHT]:
             self.player.direction = 'right'
             if self.player.rect.right < DRAW_SCREEN_SIZE[0]:
-                self.player.rect.x += round(PLAYER_SPEED * self.dt)
+                self.player.rect.x += round(self.player.speed * self.dt)
         elif keys[pygame.K_LEFT]:
             self.player.direction = 'left'
             if self.player.rect.left > 0:
-                self.player.rect.x -= round(PLAYER_SPEED * self.dt)
+                self.player.rect.x -= round(self.player.speed * self.dt)
         else:
             self.player.direction = 'stop'
         if keys[pygame.K_SPACE] and not self.click:
             self.timer += self.dt
-            if self.timer > 10:
+            if self.timer > self.player.shoot_ratio:
                 self.timer = 0
                 self.sounds['laser'].play()
                 projectile = Projectile(self.player.rect.centerx - 3, self.player.rect.top - 18 - 5, 'player')
                 self.projectiles.append(projectile)
-                if self.player.upgrade == 2:
+                if self.player.weapon_style == 1:
                     projectile = Projectile(self.player.rect.centerx - 8, self.player.rect.top - 18 - 5, 'player-l')
                     self.projectiles.append(projectile)
                     projectile = Projectile(self.player.rect.centerx - 3, self.player.rect.top - 18 - 5, 'player-r')
@@ -418,12 +416,15 @@ class Game:
 
     def level_switch(self):
         while True:
+            self.player.max_hp()
+            self.player.speed_update()
+            self.player.gunfire_update()
             if self.player.hp == 0:
-                self.player.hp = 3
                 self.main_menu()
             else:
                 self.level += 1
                 self.game()
+                self.upgrade_menu()
 
 
     def spaceship_choose(self):
@@ -481,7 +482,119 @@ class Game:
 
             self.refresh_screen()
 
+    def upgrade_menu(self):
+        self.draw_screen.blit(self.textures['background1'], (0, 0))
 
+        draw_screen_rect = self.draw_screen.get_rect()
+        frame = pygame.Rect((0, 0), (290, 150))
+        frame.center = draw_screen_rect.center
+        pygame.draw.rect(self.draw_screen, (200, 200, 200), frame, 5)
+
+        font = pygame.font.Font('freesansbold.ttf', 40)
+
+        text_gunfire = font.render('GUNFIRE', True, (200, 200, 200))
+        text_gunfire_highlighted = font.render('GUNFIRE', True, (100, 200, 200))
+        text_rect = text_gunfire.get_rect()
+        text_rect.center = frame.center
+        text_rect.x = frame.x + 15
+        text_rect.y -= 1/3 * frame.h - 5
+
+        upgrade_point_rect = pygame.Rect((0, 0), (15, 15*1.61))
+
+        upgrade_point_rect.center = text_rect.center
+        upgrade_point_rect.x += 100
+        upgrade_point_rect.y -= 2
+
+        for col in range(1, 4):
+            upgrade_point_rect.x += 20
+            if col <= self.player.gunfire_upgrade:
+                pygame.draw.rect(self.draw_screen, (200, 200, 200), upgrade_point_rect)
+            else:
+                pygame.draw.rect(self.draw_screen, (200, 200, 200), upgrade_point_rect, 5)
+        else:
+            upgrade_point_rect.x -= 60
+
+        text_hp = font.render('HEALTH', True, (200, 200, 200))
+        text_hp_highlighted = font.render('HEALTH', True, (100, 200, 200))
+        text2_rect = text_hp.get_rect()
+        text2_rect.center = draw_screen_rect.center
+        text2_rect.x = frame.x + 15
+
+        upgrade_point_rect.centery = text2_rect.centery
+
+        for col in range(1, 4):
+            upgrade_point_rect.x += 20
+            if col <= self.player.hp_upgrade:
+                pygame.draw.rect(self.draw_screen, (200, 200, 200), upgrade_point_rect)
+            else:
+                pygame.draw.rect(self.draw_screen, (200, 200, 200), upgrade_point_rect, 5)
+        else:
+            upgrade_point_rect.x -= 60
+
+        text_speed = font.render('SPEED', True, (200, 200, 200))
+        text_speed_highlighted = font.render('SPEED', True, (100, 200, 200))
+        text3_rect = text_speed.get_rect()
+        text3_rect.center = draw_screen_rect.center
+        text3_rect.x = frame.x + 15
+        text3_rect.y += 1 / 3 * frame.h
+
+        upgrade_point_rect.centery = text3_rect.centery
+
+
+        for col in range(1, 4):
+            upgrade_point_rect.x += 20
+            if col <= self.player.speed_upgrade:
+                pygame.draw.rect(self.draw_screen, (200, 200, 200), upgrade_point_rect)
+            else:
+                pygame.draw.rect(self.draw_screen, (200, 200, 200), upgrade_point_rect, 5)
+
+
+        while True:
+            click = False
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.close()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        self.close()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        click = True
+                # if event.type == pygame.KEYDOWN:
+                #     if event.key == pygame.K_RETURN:
+                #         unpause = True
+
+            mx, my = pygame.mouse.get_pos()
+
+            if text_rect.collidepoint((mx, my)):
+                self.draw_screen.blit(text_gunfire_highlighted, text_rect)
+                if click:
+                    if self.player.gunfire_upgrade < 3:
+                        self.player.gunfire_upgrade += 1
+                        break
+            else:
+                self.draw_screen.blit(text_gunfire, text_rect)
+
+            if text2_rect.collidepoint((mx, my)):
+                self.draw_screen.blit(text_hp_highlighted, text2_rect)
+                if click:
+                    if self.player.hp_upgrade < 3:
+                        self.player.hp_upgrade += 1
+                        break
+            else:
+                self.draw_screen.blit(text_hp, text2_rect)
+
+            if text3_rect.collidepoint((mx, my)):
+                self.draw_screen.blit(text_speed_highlighted, text3_rect)
+                if click:
+                    if self.player.speed_upgrade < 3:
+                        self.player.speed_upgrade += 1
+                        break
+            else:
+                self.draw_screen.blit(text_speed, text3_rect)
+
+            self.refresh_screen()
 
 
 
@@ -490,3 +603,4 @@ moving_sprites = pygame.sprite.Group()
 
 if __name__ == '__main__':
     Game()
+    #Game()
