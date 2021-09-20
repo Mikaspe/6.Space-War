@@ -48,8 +48,9 @@ class Game:
 
         self.moving_sprites = pygame.sprite.Group()
 
+        self.go_to_main_menu = False
         self.level = 0
-        self.main_menu()
+        self.level_switch()
 
     def load_textures(self):
         for img in os.listdir('img'):  # Return a list containing the names of the files in the directory
@@ -118,6 +119,9 @@ class Game:
 
         while True:
             self.check_keys()
+            if self.go_to_main_menu:
+                break
+
             self.check_events()
 
             self.enemies.sort(key=operator.attrgetter('rect.x'))  # Sorting enemies by x position
@@ -188,6 +192,7 @@ class Game:
             elif not self.enemies:
                 self.sounds['win'].play()
                 self.end('YOU WIN')
+                self.upgrade_menu()
                 break
 
             self.draw()
@@ -288,10 +293,6 @@ class Game:
             timer -= self.dt
             self.refresh_screen()
 
-        self.projectiles.clear()
-        self.moving_sprites.empty()
-        self.enemies.clear()
-
         if self.level == 8:
             self.close()
 
@@ -300,6 +301,7 @@ class Game:
         sys.exit(0)
 
     def main_menu(self):
+
         draw_screen_rect = self.draw_screen.get_rect()
         frame = pygame.Rect((0, 0), (150*1.61, 150))
         frame.center = draw_screen_rect.center
@@ -334,7 +336,7 @@ class Game:
                     if event.key == pygame.K_ESCAPE:
                         self.close()
                     if event.key == pygame.K_SPACE:
-                        self.level_switch()
+                        pass
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
                         click = True
@@ -344,7 +346,7 @@ class Game:
             if text_rect.collidepoint((mx, my)):
                 self.draw_screen.blit(text_start, text_rect)
                 if click:
-                    self.level_switch()
+                    break
             else:
                 self.draw_screen.blit(text_start_highlighted, text_rect)
 
@@ -376,10 +378,16 @@ class Game:
         text_rect.center = draw_screen_rect.center
         text_rect.y -= 1 / 3 * frame.h
 
+        text_main_menu = font.render('Main menu', True, (200, 200, 200))
+        text_main_menu_highlighted = font.render('Main menu', True, (100, 200, 200))
+        text2_rect = text_main_menu.get_rect()
+        text2_rect.center = draw_screen_rect.center
+
         text_exit = font.render('Exit', True, (200, 200, 200))
         text_exit_highlighted = font.render('Exit', True, (100, 200, 200))
-        text2_rect = text_exit.get_rect()
-        text2_rect.center = draw_screen_rect.center
+        text3_rect = text_exit.get_rect()
+        text3_rect.center = draw_screen_rect.center
+        text3_rect.y += 1 / 3 * frame.h
 
         pygame.draw.rect(self.draw_screen, (200, 200, 200), frame, 5)
 
@@ -411,25 +419,39 @@ class Game:
                 self.draw_screen.blit(text_continue, text_rect)
 
             if text2_rect.collidepoint((mx, my)):
-                self.draw_screen.blit(text_exit_highlighted, text2_rect)
+                self.draw_screen.blit(text_main_menu_highlighted, text2_rect)
+                if click:
+                    self.go_to_main_menu = True
+                    break
+            else:
+                self.draw_screen.blit(text_main_menu, text2_rect)
+
+            if text3_rect.collidepoint((mx, my)):
+                self.draw_screen.blit(text_exit_highlighted, text3_rect)
                 if click:
                     self.close()
             else:
-                self.draw_screen.blit(text_exit, text2_rect)
+                self.draw_screen.blit(text_exit, text3_rect)
 
             self.refresh_screen()
 
     def level_switch(self):
+
         while True:
-            self.player.max_hp()
-            self.player.speed_update()
-            self.player.gunfire_update()
-            if self.player.hp == 0:
-                self.main_menu()
-            else:
+            self.go_to_main_menu = False
+            self.main_menu()
+            self.level = 0
+            while True:
+                self.player.max_hp()
+                self.player.speed_update()
+                self.player.gunfire_update()
                 self.level += 1
                 self.game()
-                self.upgrade_menu()
+                self.projectiles.clear()
+                self.moving_sprites.empty()
+                self.enemies.clear()
+                if self.go_to_main_menu:
+                    break
 
 
     def spaceship_choose(self):
