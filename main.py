@@ -153,7 +153,7 @@ class Game:
                     pass
 
             for projectile in self.projectiles:
-                projectile.move()
+
                 if projectile.rect.y < 0 or projectile.rect.y > DRAW_SCREEN_SIZE[1]:  # Removing projectiles if outside of screen
                     self.projectiles.remove(projectile)
                 elif projectile.style.startswith('enemy') and pygame.sprite.collide_mask(self.player, projectile):  # Enemy projectile hits player
@@ -223,6 +223,7 @@ class Game:
         if keys[pygame.K_ESCAPE]:
             self.pause_menu()
 
+
     def check_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -230,12 +231,14 @@ class Game:
             if event.type == self.ENEMYMOVE:
                 for enemy in self.enemies:
                     enemy.move()
+                for projectile in self.projectiles:
+                    projectile.move()
             if event.type == pygame.KEYUP:
                 self.click = False
 
     def draw(self):
-        self.draw_screen.blit(self.textures['background1'], (0, 0))
-        #self.draw_screen.blit(self.moving_sprites, self.explosion.rect)
+
+        self.draw_screen.blit(self.textures['background' + str(self.level)], (0, 0))
 
         if self.player.direction == 'stop':
             self.draw_screen.blit(self.textures['player' + str(self.player.style)], self.player.rect)
@@ -322,7 +325,7 @@ class Game:
         text3_rect.y += 1/3 * frame.h
 
         while True:
-            self.draw_screen.blit(self.textures['background2'], (0, 0))
+            self.draw_screen.blit(self.textures['background1'], (0, 0))
             pygame.draw.rect(self.draw_screen, (200, 200, 200), frame, 5)
             click = False
             for event in pygame.event.get():
