@@ -223,7 +223,6 @@ class Game:
         if keys[pygame.K_ESCAPE]:
             self.pause_menu()
 
-
     def check_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
