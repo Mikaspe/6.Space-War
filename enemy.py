@@ -20,10 +20,10 @@ class Enemy(pygame.sprite.Sprite):
 
         if style == 1:
             self.hp = 1
-            self.shoot_ratio = 200
+            self.shoot_ratio = 150
         elif style == 2:
             self.hp = 5
-            self.shoot_ratio = 300
+            self.shoot_ratio = 200
         elif style == 3:
             self.hp = 3
             self.shoot_ratio = 100

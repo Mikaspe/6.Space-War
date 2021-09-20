@@ -12,10 +12,8 @@ class Projectile(pygame.sprite.Sprite):
             self.image = pygame.image.load('img/projectile-player-l.png').convert_alpha()
         elif style == 'player-r':
             self.image = pygame.image.load('img/projectile-player-r.png').convert_alpha()
-        elif style == 'enemy':
+        elif style.startswith('enemy'):
             self.image = pygame.image.load('img/projectile-enemy.png').convert_alpha()
-
-
 
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect(topleft=(0, 0))
@@ -35,5 +33,11 @@ class Projectile(pygame.sprite.Sprite):
         elif self.style == 'player-r':
             self.rect.y -= PROJECTILE_SPEED
             self.rect.x += PROJECTILE_SPEED * SPEED_X
-        else:
+        elif self.style == 'enemy1':
             self.rect.y += PROJECTILE_SPEED
+        elif self.style == 'enemy2':
+            self.rect.y += PROJECTILE_SPEED - 5
+        elif self.style == 'enemy3':
+            self.rect.y += PROJECTILE_SPEED + 5
+        elif self.style == 'enemy4':
+            pass

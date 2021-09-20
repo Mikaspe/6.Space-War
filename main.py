@@ -133,21 +133,21 @@ class Game:
                 if enemy.style == 1:
                     if random.randint(1, enemy.shoot_ratio) == 1:
                         self.sounds['laser'].play()
-                        projectile = Projectile(enemy.rect.centerx - 4, enemy.rect.centery, 'enemy')  # Być może zamiast -4 da się to podstawić pod zmienną
+                        projectile = Projectile(enemy.rect.centerx - 4, enemy.rect.centery, 'enemy1')  # Być może zamiast -4 da się to podstawić pod zmienną
                         self.projectiles.append(projectile)
                 elif enemy.style == 2:
                     if random.randint(1, enemy.shoot_ratio) == 1:
                         self.sounds['laser'].play()
-                        projectile = Projectile(enemy.rect.centerx - 4, enemy.rect.centery, 'enemy')  # Być może zamiast -4 da się to podstawić pod zmienną
+                        projectile = Projectile(enemy.rect.centerx - 4, enemy.rect.centery, 'enemy2')  # Być może zamiast -4 da się to podstawić pod zmienną
                         self.projectiles.append(projectile)
                 elif enemy.style == 3:
                     if random.randint(1, enemy.shoot_ratio) == 1:
                         self.sounds['laser'].play()
-                        projectile = Projectile(enemy.rect.centerx - 4, enemy.rect.centery, 'enemy')  # Być może zamiast -4 da się to podstawić pod zmienną
+                        projectile = Projectile(enemy.rect.centerx - 4, enemy.rect.centery, 'enemy3')  # Być może zamiast -4 da się to podstawić pod zmienną
                         self.projectiles.append(projectile)
-                        projectile = Projectile(enemy.rect.centerx - 28, enemy.rect.centery + 20, 'enemy')  # Być może zamiast -4 da się to podstawić pod zmienną
+                        projectile = Projectile(enemy.rect.centerx - 28, enemy.rect.centery + 20, 'enemy3')  # Być może zamiast -4 da się to podstawić pod zmienną
                         self.projectiles.append(projectile)
-                        projectile = Projectile(enemy.rect.centerx + 20, enemy.rect.centery + 20, 'enemy')  # Być może zamiast -4 da się to podstawić pod zmienną
+                        projectile = Projectile(enemy.rect.centerx + 20, enemy.rect.centery + 20, 'enemy3')  # Być może zamiast -4 da się to podstawić pod zmienną
                         self.projectiles.append(projectile)
                 elif enemy.style == 4:
                     pass
@@ -156,7 +156,7 @@ class Game:
                 projectile.move()
                 if projectile.rect.y < 0 or projectile.rect.y > DRAW_SCREEN_SIZE[1]:  # Removing projectiles if outside of screen
                     self.projectiles.remove(projectile)
-                elif projectile.style == 'enemy' and pygame.sprite.collide_mask(self.player, projectile):  # Enemy projectile hits player
+                elif projectile.style.startswith('enemy') and pygame.sprite.collide_mask(self.player, projectile):  # Enemy projectile hits player
                     self.sounds['hit'].play()
                     self.projectiles.remove(projectile)
                     self.player.hp -= 1
@@ -252,7 +252,10 @@ class Game:
         for enemy in self.enemies:
             self.draw_screen.blit(self.textures['enemy' + str(enemy.style)], enemy)
         for projectile in self.projectiles:
-            self.draw_screen.blit(self.textures['projectile-' + projectile.style], projectile)
+            if projectile.style.startswith('player'):
+                self.draw_screen.blit(self.textures['projectile-' + projectile.style], projectile)
+            else:
+                self.draw_screen.blit(self.textures['projectile-' + projectile.style[:-1]], projectile)
         for heart in range(self.player.hp):
             self.draw_screen.blit(self.textures['heart'], (heart*12-4, 5))
 
