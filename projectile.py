@@ -1,6 +1,6 @@
 import pygame
 from CONST import *
-
+import random
 
 class Projectile(pygame.sprite.Sprite):
     def __init__(self, x, y, style):
@@ -14,6 +14,10 @@ class Projectile(pygame.sprite.Sprite):
             self.image = pygame.image.load('img/projectile-player-r.png').convert_alpha()
         elif style.startswith('enemy'):
             self.image = pygame.image.load('img/projectile-enemy.png').convert_alpha()
+        elif style.startswith('ball'):
+            self.image = pygame.image.load('img/projectile-bal.png').convert_alpha()
+        elif style.startswith('smallball'):
+            self.image = pygame.image.load('img/projectile-smallbal.png').convert_alpha()
 
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect(topleft=(0, 0))
@@ -40,4 +44,12 @@ class Projectile(pygame.sprite.Sprite):
         elif self.style == 'enemy3':
             self.rect.y += PROJECTILE_SPEED + 5
         elif self.style == 'enemy4':
-            pass
+            self.rect.y += PROJECTILE_SPEED + 5
+        elif self.style == 'ball':
+            self.rect.y += PROJECTILE_SPEED - 5
+
+            #self.rect.x += PROJECTILE_SPEED * random.randint(-3, 3) * 0.2
+
+
+        elif self.style == 'smallball':
+            self.rect.y += PROJECTILE_SPEED

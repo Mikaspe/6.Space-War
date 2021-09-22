@@ -15,18 +15,14 @@ class Player(pygame.sprite.Sprite):
 
         self.style = style
 
-        self.gunfire_upgrade = 0
+        self.gunfire_upgrade = 3
         self.hp_upgrade = 0
         self.speed_upgrade = 0
 
-        self.weapon_style = 0
-
-        self.speed = 6
-        self.shoot_ratio = 10
         self.direction = direction
         self.hp = 3
 
-    def max_hp(self):
+    def hp_update(self):
         self.hp = 3 + self.hp_upgrade
 
     def speed_update(self):
@@ -45,3 +41,8 @@ class Player(pygame.sprite.Sprite):
         elif self.gunfire_upgrade == 3:
             self.shoot_ratio = 20
             self.weapon_style = 1
+
+    def reset(self):
+        self.gunfire_upgrade = 3
+        self.hp_upgrade = 0
+        self.speed_upgrade = 0
