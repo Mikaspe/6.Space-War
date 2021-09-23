@@ -30,8 +30,9 @@ class Enemy(pygame.sprite.Sprite):
             self.hp = 3
             self.shoot_ratio = 100
         elif style == 4:
-            self.hp = 3
+            self.hp = 400
             self.shoot_ratio = 100
+            self.speed = 4
 
     def move(self):
         if self.direction == 'left':

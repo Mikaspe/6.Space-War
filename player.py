@@ -15,7 +15,7 @@ class Player(pygame.sprite.Sprite):
 
         self.style = style
 
-        self.gunfire_upgrade = 3
+        self.gunfire_upgrade = 0
         self.hp_upgrade = 0
         self.speed_upgrade = 0
 
@@ -43,6 +43,6 @@ class Player(pygame.sprite.Sprite):
             self.weapon_style = 1
 
     def reset(self):
-        self.gunfire_upgrade = 3
+        self.gunfire_upgrade = 0
         self.hp_upgrade = 0
         self.speed_upgrade = 0

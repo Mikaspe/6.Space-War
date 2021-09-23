@@ -16,7 +16,7 @@ class Game:
 
     def __init__(self):
         pygame.init()
-        pygame.mixer.set_num_channels(20)
+        pygame.mixer.set_num_channels(30)
 
         self.textures = {}  # Textures(png) from img directory
         self.load_textures()
@@ -121,6 +121,7 @@ class Game:
             self.border = 10
             enemy = Enemy(DRAW_SCREEN_SIZE[0]/2, 170, enemy_type, 'right')
             self.enemies.append(enemy)
+            enemy.shoot_ratio = 50
 
         timer = 0
         timer2 = 0
@@ -164,13 +165,13 @@ class Game:
                         projectile = Projectile(enemy.rect.centerx + 20, enemy.rect.centery + 20, 'enemy3')  # Być może zamiast -4 da się to podstawić pod zmienną
                         self.projectiles.append(projectile)
                 elif enemy.style == 4:
-                    enemy.speed = 0
-                    enemy.shoot_ratio = 50
-                    self.player.hp = 10
+                    #enemy.speed = 0
 
-                    if enemy.hp < 50:
+
+
+                    if enemy.hp < 300:
                         start_seq = True
-                    elif random.randint(1, 1) == 2:
+                    elif random.randint(1, enemy.shoot_ratio + 100) == 1:
                         self.sounds['ball'].play()
                         projectile = Projectile(enemy.rect.centerx - 60, enemy.rect.centery + 80, 'ball')
                         self.projectiles.append(projectile)
@@ -190,22 +191,22 @@ class Game:
 
 
                     if start_seq:
-
                         if not sound_played:
                             self.sounds['enemy-berserker'].play()
+                            self.sounds['enemy-berserker2'].play()
                             sound_played = True
-
                         timer2 += self.dt
                         timer3 += self.dt
-                        enemy.speed += 10
+                        enemy.speed = 12
 
-                        if timer3 < 800:
+                        if 200 < timer3 < 800:
+
                             if timer2 > 60:
                                 timer2 = 0
                                 self.sounds['ball'].play()
                                 projectile = Projectile(enemy.rect.centerx - 60, enemy.rect.centery + 80, 'ball')
                                 self.projectiles.append(projectile)
-                        elif timer3 < 1500:
+                        elif 850 < timer3 < 1500:
                             if timer2 > 40:
                                 timer2 = 0
                                 self.sounds['laser'].play()
@@ -214,23 +215,25 @@ class Game:
                                 projectile = Projectile(enemy.rect.centerx + 135, enemy.rect.centery - 3, 'smallball')
                                 self.projectiles.append(projectile)
                         elif 1600 < timer3 < 3000:
-                            if timer2 < 120:
+                            if timer2 < 100:
 
-                                self.sounds['laser'].play()
-                                projectile = Projectile(enemy.rect.centerx - 120, enemy.rect.centery + 150, 'enemy4')
-                                self.projectiles.append(projectile)
-                                projectile = Projectile(enemy.rect.centerx + 110, enemy.rect.centery + 150, 'enemy4')
-                                self.projectiles.append(projectile)
+                                    self.sounds['laser'].play()
+                                    projectile = Projectile(enemy.rect.centerx - 120, enemy.rect.centery - 105, 'enemy4')
+                                    self.projectiles.append(projectile)
+                                    projectile = Projectile(enemy.rect.centerx + 110, enemy.rect.centery - 105, 'enemy4')
+                                    self.projectiles.append(projectile)
+                                #
+                                # self.sounds['laser'].play()
+                                # projectile = Projectile(enemy.rect.centerx - 120, enemy.rect.centery + 150, 'enemy4')
+                                # self.projectiles.append(projectile)
+                                # projectile = Projectile(enemy.rect.centerx + 110, enemy.rect.centery + 150, 'enemy4')
+                                # self.projectiles.append(projectile)
 
-                            elif 200 < timer2 < 320:
+                            # elif 200 < timer2 < 320:
+                            #
 
-                                self.sounds['laser'].play()
-                                projectile = Projectile(enemy.rect.centerx - 120, enemy.rect.centery - 105, 'enemy4')
-                                self.projectiles.append(projectile)
-                                projectile = Projectile(enemy.rect.centerx + 110, enemy.rect.centery - 105, 'enemy4')
-                                self.projectiles.append(projectile)
 
-                            elif timer2 > 400:
+                            elif timer2 > 200:
                                 timer2 = 0
                         elif timer3 > 3000:
                             timer3 = 0
@@ -268,11 +271,11 @@ class Game:
                 elif projectile.style.startswith('bal') and pygame.sprite.collide_mask(self.player, projectile):
                     self.sounds['ball-hit'].play()
                     self.projectiles.remove(projectile)
-                    self.player.hp -= 3
+                    self.player.hp -= 1
                 elif projectile.style.startswith('smallbal') and pygame.sprite.collide_mask(self.player, projectile):
                     self.sounds['ball-hit'].play()
                     self.projectiles.remove(projectile)
-                    self.player.hp -= 2
+                    self.player.hp -= 1
                 elif 'player' in projectile.style:  # Player projectile hits enemy
                     for enemy in self.enemies:
                         if pygame.sprite.collide_mask(enemy, projectile):
@@ -302,7 +305,8 @@ class Game:
                 self.end('YOU WIN')
                 self.go_to_main_menu = True
                 break
-            elif self.player.hp == 0:
+
+            if self.player.hp <= 0:
                 self.sounds['game-over'].play()
                 self.end('GAME OVER')
                 break
@@ -629,7 +633,7 @@ class Game:
         while True:
             self.go_to_main_menu = False
             self.main_menu()
-            self.level = 8
+            self.level = 1
             self.player.reset()
             while True:
                 self.player.hp_update()
@@ -672,7 +676,6 @@ class Game:
             self.draw_screen.blit(self.textures['background1'], (0, 0))
             self.draw_screen.blit(text_spaceship, text_rect)
             click = 0
-            mx, my = pygame.mouse.get_pos()
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -871,7 +874,7 @@ class Game:
 
         if self.level == 8:
             self.sounds['start_monster'].play()
-            timer = 400
+            timer = 350
         else:
             self.sounds['start'].play()
             timer = START_TIME
