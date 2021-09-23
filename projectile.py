@@ -1,31 +1,21 @@
 import pygame
 from CONST import *
-import random
+
 
 class Projectile(pygame.sprite.Sprite):
     def __init__(self, x, y, style):
 
+        self.style = style
         pygame.sprite.Sprite.__init__(self)  # potrzebne ? !!!!!!!!!!!
-        if style == 'player':
-            self.image = pygame.image.load('img/projectile-player.png').convert_alpha()
-        elif style == 'player-l':
-            self.image = pygame.image.load('img/projectile-player-l.png').convert_alpha()
-        elif style == 'player-r':
-            self.image = pygame.image.load('img/projectile-player-r.png').convert_alpha()
-        elif style.startswith('enemy'):
-            self.image = pygame.image.load('img/projectile-enemy.png').convert_alpha()
-        elif style.startswith('ball'):
-            self.image = pygame.image.load('img/projectile-bal.png').convert_alpha()
-        elif style.startswith('smallball'):
-            self.image = pygame.image.load('img/projectile-smallbal.png').convert_alpha()
+
+        pygame.image.load('img/projectile/' + self.style).convert_alpha()
 
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect(topleft=(0, 0))
 
-        self.rect.x = x
-        self.rect.y = y
+        self.rect.centerx = x
+        self.rect.centery = y
 
-        self.style = style
 
     def move(self):
         SPEED_X = 0.3
@@ -45,11 +35,7 @@ class Projectile(pygame.sprite.Sprite):
             self.rect.y += PROJECTILE_SPEED + 5
         elif self.style == 'enemy4':
             self.rect.y += PROJECTILE_SPEED + 5
-        elif self.style == 'ball':
+        elif self.style == 'enemy-ball':
             self.rect.y += PROJECTILE_SPEED - 5
-
-            #self.rect.x += PROJECTILE_SPEED * random.randint(-3, 3) * 0.2
-
-
-        elif self.style == 'smallball':
+        elif self.style == 'enemy-smallball':
             self.rect.y += PROJECTILE_SPEED

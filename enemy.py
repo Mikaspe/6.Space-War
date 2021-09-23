@@ -1,5 +1,4 @@
 import pygame
-from CONST import *
 
 
 class Enemy(pygame.sprite.Sprite):
@@ -18,7 +17,6 @@ class Enemy(pygame.sprite.Sprite):
         self.direction = str(direction)
         self.hp = 1
         self.speed = 2
-
 
         if style == 1:
             self.hp = 1
