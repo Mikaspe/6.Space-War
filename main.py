@@ -12,6 +12,11 @@ from projectile import Projectile
 from explosion import Explosion
 
 
+def close():
+    pygame.quit()
+    sys.exit(0)
+
+
 class Game:
 
     def __init__(self):
@@ -27,6 +32,7 @@ class Game:
         self.screen = pygame.display.set_mode(SCREEN_SIZE)  # Initialize a window or screen for display => surface
         pygame.display.set_caption('Space-War')
         self.draw_screen = pygame.Surface(DRAW_SCREEN_SIZE)  # pygame object for representing images => surface
+        self.draw_screen_rect = self.draw_screen.get_rect()
 
         self.clock = pygame.time.Clock()  # Create an object(Clock type) to help track time
         self.dt = 1  # delta time
@@ -53,8 +59,12 @@ class Game:
         self.level_switch()
 
     def load_textures(self):
-        self.textures['heart'] = pygame.image.load('img/heart.png')  # => surface
-        self.textures['heart-black'] = pygame.image.load('img/heart-black.png')  # => surface
+        for img in os.listdir('img/'):  # Return a list containing the names of the files in the directory
+            if img.endswith('.png'):
+                self.textures[img.replace('.png', '')] = pygame.image.load('img/' + img)  # => surface
+
+        for img in os.listdir('img/background'):  # Return a list containing the names of the files in the directory
+            self.textures[img.replace('.png', '')] = pygame.image.load('img/background/' + img)  # => surface
 
     def load_sounds(self):
         for sound in os.listdir('sounds'):  # Return a list containing the names of the files in the directory
@@ -71,6 +81,7 @@ class Game:
                 self.player.hp_update()
                 self.player.speed_update()
                 self.player.gunfire_update()
+
                 self.start('Level ' + str(self.level))
                 self.game()
                 self.projectiles.clear()
@@ -148,6 +159,9 @@ class Game:
         while True:
             self.check_keys()
             self.check_events()
+
+            if self.go_to_main_menu:
+                break
 
             # Changing enemies move direction when reach self.border
             self.enemies.sort(key=operator.attrgetter('rect.x'))  # Sorting enemies by x position
@@ -276,7 +290,7 @@ class Game:
                                 self.animations.add(self.explosion)
                                 self.enemies.remove(enemy)
                                 for enemy in self.enemies:  # Speed of enemies increases when number of them decrease
-                                    enemy.speed += 0.1
+                                    enemy.speed += 0.2
                             break  # One projectile hits just one enemy(.collide_mask sometimes detects more collisions)
 
             if self.player.hp == 1 and play_lowhp_sound:
@@ -298,7 +312,7 @@ class Game:
                 self.level += 1
                 break
 
-            self.draw()
+            self.draw_game()
             self.refresh_screen()
 
     def check_keys(self):
@@ -334,17 +348,15 @@ class Game:
     def check_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                self.close()
+                close()
             if event.type == self.ENEMYMOVE:
                 for enemy in self.enemies:
                     enemy.move()
                 for projectile in self.projectiles:
                     projectile.move()
 
-    def draw(self):
-
+    def draw_game(self):
         self.draw_screen.blit(self.textures['background' + str(self.level)], (0, 0))
-
         self.draw_screen.blit(self.player.get_image(), self.player.rect)
 
         for sprite in self.animations:
@@ -370,7 +382,6 @@ class Game:
                     self.timer2 = 0
 
         font = pygame.font.Font('freesansbold.ttf', 15)
-
         text_level = font.render(str(self.level) + '/8', True, (200, 200, 200))
         text_rect = text_level.get_rect()
         text_rect.right = DRAW_SCREEN_SIZE[0] - 5
@@ -384,65 +395,55 @@ class Game:
         self.dt = self.clock.tick(FRAMERATE) * FRAMERATE / 1000
 
     def end(self, text):
-        self.draw()
-        surf = self.font.render(text, False, (255, 255, 255))
-        rect = surf.get_rect(center=(int(DRAW_SCREEN_SIZE[0]/2), int(DRAW_SCREEN_SIZE[1]/2)))
-        self.draw_screen.blit(surf, rect)
-        self.refresh_screen()
-        timer = END_TIME
+        self.draw_game()
+
+        text_surf = self.font.render(text, False, (255, 255, 255))
+        text_rect = text_surf.get_rect()
+        text_rect.center = (DRAW_SCREEN_SIZE[0]/2, DRAW_SCREEN_SIZE[1]/2)
+        self.draw_screen.blit(text_surf, text_rect)
 
         if self.level == 8:
             timer = 200
+        else:
+            timer = END_TIME
 
         while timer > 0:
-            timer -= self.dt
             self.refresh_screen()
-
-    def close(self):
-        pygame.quit()
-        sys.exit(0)
+            timer -= self.dt
 
     def main_menu(self):
 
-        draw_screen_rect = self.draw_screen.get_rect()
-        frame = pygame.Rect((0, 0), (150*1.61, 150))
-        frame.center = draw_screen_rect.center
+        frame_rect = pygame.Rect((0, 0), (150*1.61, 150))
+        frame_rect.center = self.draw_screen_rect.center
 
         font = pygame.font.Font('freesansbold.ttf', 40)
-
         text_start = font.render('Start', True, (200, 200, 200))
         text_start_highlighted = font.render('Start', True, (100, 200, 200))
-        text_rect = text_start.get_rect()
-        text_rect.center = draw_screen_rect.center
-        text_rect.y -= 1/3 * frame.h #+ 100
+        text_start_rect = text_start.get_rect(center=self.draw_screen_rect.center)
+        text_start_rect.y -= 1/3 * frame_rect.h
 
         text_spaceship = font.render('Spaceship', True, (200, 200, 200))
         text_spaceship_highlighted = font.render('Spaceship', True, (100, 200, 200))
-        text2_rect = text_spaceship.get_rect()
-        text2_rect.center = draw_screen_rect.center
+        text_spaceship_rect = text_spaceship.get_rect(center=self.draw_screen_rect.center)
 
         text_exit = font.render('Exit', True, (200, 200, 200))
         text_exit_highligted = font.render('Exit', True, (100, 200, 200))
-        text3_rect = text_exit.get_rect()
-        text3_rect.center = draw_screen_rect.center
-        text3_rect.y += 1/3 * frame.h
+        text_exit_rect = text_exit.get_rect(center=self.draw_screen_rect.center)
+        text_exit_rect.y += 1/3 * frame_rect.h
+
         menu_pos = 1
-
-        m1 = True
-        m2 = True
-        m3 = True
-
+        m1 = m2 = m3 = True
         while True:
             self.draw_screen.blit(self.textures['background1'], (0, 0))
-            pygame.draw.rect(self.draw_screen, (200, 200, 200), frame, 5)
+            pygame.draw.rect(self.draw_screen, (200, 200, 200), frame_rect, 5)
 
             click = False
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.close()
+                    close()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        self.close()
+                        close()
                     if event.key == pygame.K_RETURN:
                         click = True
                     if event.key == pygame.K_DOWN:
@@ -458,85 +459,76 @@ class Game:
                         click = True
 
             mx, my = pygame.mouse.get_pos()
-
-            if text_rect.collidepoint((mx, my)) and m1:
+            if text_start_rect.collidepoint((mx, my)) and m1:
                 menu_pos = 1
                 m1 = False
                 m2 = True
                 m3 = True
-
-            if text2_rect.collidepoint((mx, my)) and m2:
+            elif text_spaceship_rect.collidepoint((mx, my)) and m2:
                 menu_pos = 2
                 m1 = True
                 m2 = False
                 m3 = True
-
-            if text3_rect.collidepoint((mx, my)) and m3:
+            elif text_exit_rect.collidepoint((mx, my)) and m3:
                 menu_pos = 3
                 m1 = True
                 m2 = True
                 m3 = False
 
             if menu_pos == 1:
-                self.draw_screen.blit(text_start_highlighted, text_rect)
+                self.draw_screen.blit(text_start_highlighted, text_start_rect)
                 if click:
-                    break
+                    break  # Leave main menu, start the game
             else:
-                self.draw_screen.blit(text_start, text_rect)
+                self.draw_screen.blit(text_start, text_start_rect)
 
             if menu_pos == 2:
-                self.draw_screen.blit(text_spaceship_highlighted, text2_rect)
+                self.draw_screen.blit(text_spaceship_highlighted, text_spaceship_rect)
                 if click:
                     self.spaceship_choose()
             else:
-                self.draw_screen.blit(text_spaceship, text2_rect)
+                self.draw_screen.blit(text_spaceship, text_spaceship_rect)
 
             if menu_pos == 3:
-                self.draw_screen.blit(text_exit_highligted, text3_rect)
+                self.draw_screen.blit(text_exit_highligted, text_exit_rect)
                 if click:
-                    self.close()
+                    close()
             else:
-                self.draw_screen.blit(text_exit, text3_rect)
+                self.draw_screen.blit(text_exit, text_exit_rect)
 
             self.refresh_screen()
 
     def pause_menu(self):
-        draw_screen_rect = self.draw_screen.get_rect()
-        frame = pygame.Rect((0, 0), (150 * 1.61, 150))
-        frame.center = draw_screen_rect.center
+        frame_rect = pygame.Rect((0, 0), (150 * 1.61, 150))
+        frame_rect.center = self.draw_screen_rect.center
 
         font = pygame.font.Font('freesansbold.ttf', 40)
         text_continue = font.render('Continue', True, (200, 200, 200))
         text_continue_highlighted = font.render('Continue', True, (100, 200, 200))
-        text_rect = text_continue.get_rect()
-        text_rect.center = draw_screen_rect.center
-        text_rect.y -= 1 / 3 * frame.h
+        text_continue_rect = text_continue.get_rect(center=self.draw_screen_rect.center)
+        text_continue_rect.y -= 1/3 * frame_rect.h
 
         text_main_menu = font.render('Main menu', True, (200, 200, 200))
         text_main_menu_highlighted = font.render('Main menu', True, (100, 200, 200))
-        text2_rect = text_main_menu.get_rect()
-        text2_rect.center = draw_screen_rect.center
+        text_main_menu_rect = text_main_menu.get_rect(center=self.draw_screen_rect.center)
 
         text_exit = font.render('Exit', True, (200, 200, 200))
         text_exit_highlighted = font.render('Exit', True, (100, 200, 200))
-        text3_rect = text_exit.get_rect()
-        text3_rect.center = draw_screen_rect.center
-        text3_rect.y += 1 / 3 * frame.h
+        text_exit_rect = text_exit.get_rect(center=self.draw_screen_rect.center)
+        text_exit_rect.y += 1/3 * frame_rect.h
 
-        pygame.draw.rect(self.draw_screen, (200, 200, 200), frame, 5)
+        pygame.draw.rect(self.draw_screen, (200, 200, 200), frame_rect, 5)
 
-        m1 = True
-        m2 = True
-        m3 = True
         menu_pos = 1
+        m1 = m2 = m3 = True
         while True:
             click = False
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.close()
+                    close()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        self.close()
+                        close()
                     if event.key == pygame.K_RETURN:
                         click = True
                     if event.key == pygame.K_DOWN:
@@ -552,49 +544,45 @@ class Game:
                         click = True
 
             mx, my = pygame.mouse.get_pos()
-
-            if text_rect.collidepoint((mx, my)) and m1:
+            if text_continue_rect.collidepoint((mx, my)) and m1:
                 menu_pos = 1
                 m1 = False
                 m2 = True
                 m3 = True
-
-            if text2_rect.collidepoint((mx, my)) and m2:
+            elif text_main_menu_rect.collidepoint((mx, my)) and m2:
                 menu_pos = 2
                 m1 = True
                 m2 = False
                 m3 = True
-
-            if text3_rect.collidepoint((mx, my)) and m3:
+            elif text_exit_rect.collidepoint((mx, my)) and m3:
                 menu_pos = 3
                 m1 = True
                 m2 = True
                 m3 = False
 
             if menu_pos == 1:
-                self.draw_screen.blit(text_continue_highlighted, text_rect)
+                self.draw_screen.blit(text_continue_highlighted, text_continue_rect)
                 if click:
-                    break
+                    break  # Continue game
             else:
-                self.draw_screen.blit(text_continue, text_rect)
+                self.draw_screen.blit(text_continue, text_continue_rect)
 
             if menu_pos == 2:
-                self.draw_screen.blit(text_main_menu_highlighted, text2_rect)
+                self.draw_screen.blit(text_main_menu_highlighted, text_main_menu_rect)
                 if click:
-                    self.main_menu()
+                    self.go_to_main_menu = True
+                    break
             else:
-                self.draw_screen.blit(text_main_menu, text2_rect)
+                self.draw_screen.blit(text_main_menu, text_main_menu_rect)
 
             if menu_pos == 3:
-                self.draw_screen.blit(text_exit_highlighted, text3_rect)
+                self.draw_screen.blit(text_exit_highlighted, text_exit_rect)
                 if click:
-                    self.close()
+                    close()
             else:
-                self.draw_screen.blit(text_exit, text3_rect)
+                self.draw_screen.blit(text_exit, text_exit_rect)
 
             self.refresh_screen()
-
-
 
     def spaceship_choose(self):
 
@@ -604,34 +592,32 @@ class Game:
         text_rect.center = DRAW_SCREEN_SIZE[0]/2, DRAW_SCREEN_SIZE[1]/2
         text_rect.y -= 60
 
-        spacehip1_rect = self.textures['player1-choosen'].get_rect()
+        spacehip1_rect = self.player.textures['player1-choosen'].get_rect()
         spacehip1_rect.x = DRAW_SCREEN_SIZE[0]/2 - 50
         spacehip1_rect.y = DRAW_SCREEN_SIZE[1]/2
 
-        spacehip2_rect = self.textures['player2-choosen'].get_rect()
-        spacehip2_rect.x = DRAW_SCREEN_SIZE[0] / 2 - 200
-        spacehip2_rect.y = DRAW_SCREEN_SIZE[1] / 2
+        spacehip2_rect = self.player.textures['player2-choosen'].get_rect()
+        spacehip2_rect.x = DRAW_SCREEN_SIZE[0]/2 - 200
+        spacehip2_rect.y = DRAW_SCREEN_SIZE[1]/2
 
-        spacehip3_rect = self.textures['player3-choosen'].get_rect()
-        spacehip3_rect.x = DRAW_SCREEN_SIZE[0] / 2 + 100
-        spacehip3_rect.y = DRAW_SCREEN_SIZE[1] / 2
+        spacehip3_rect = self.player.textures['player3-choosen'].get_rect()
+        spacehip3_rect.x = DRAW_SCREEN_SIZE[0]/2 + 100
+        spacehip3_rect.y = DRAW_SCREEN_SIZE[1]/2
 
-        m1 = True
-        m2 = True
-        m3 = True
+        self.draw_screen.blit(text_spaceship, text_rect)
+
         menu_pos = 1
-
+        m1 = m2 = m3 = True
         while True:
             self.draw_screen.blit(self.textures['background1'], (0, 0))
-            self.draw_screen.blit(text_spaceship, text_rect)
-            click = 0
 
+            click = False
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.close()
+                    close()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        self.close()
+                        close()
                     if event.key == pygame.K_RETURN:
                         click = True
                     if event.key == pygame.K_LEFT:
@@ -647,48 +633,45 @@ class Game:
                         click = True
 
             mx, my = pygame.mouse.get_pos()
-
             if spacehip1_rect.collidepoint((mx, my)) and m1:
                 menu_pos = 1
                 m1 = False
                 m2 = True
                 m3 = True
-
-            if spacehip2_rect.collidepoint((mx, my)) and m2:
+            elif spacehip2_rect.collidepoint((mx, my)) and m2:
                 menu_pos = 2
                 m1 = True
                 m2 = False
                 m3 = True
-
-            if spacehip3_rect.collidepoint((mx, my)) and m3:
+            elif spacehip3_rect.collidepoint((mx, my)) and m3:
                 menu_pos = 3
                 m1 = True
                 m2 = True
                 m3 = False
 
             if menu_pos == 1:
-                self.draw_screen.blit(self.textures['player1-choosen'], (spacehip1_rect.x, spacehip1_rect.y))
+                self.draw_screen.blit(self.player.textures['player1-choosen'], (spacehip1_rect.x, spacehip1_rect.y))
                 if click:
-                    self.player.style = 1
-                    break
+                    self.player.style = 'player1'
+                    break  # Go back to main menu
             else:
-                self.draw_screen.blit(self.textures['player1-stop'], (spacehip1_rect.x, spacehip1_rect.y))
+                self.draw_screen.blit(self.player.textures['player1-stop'], (spacehip1_rect.x, spacehip1_rect.y))
 
             if menu_pos == 2:
-                self.draw_screen.blit(self.textures['player2-choosen'], (spacehip2_rect.x, spacehip2_rect.y))
+                self.draw_screen.blit(self.player.textures['player2-choosen'], (spacehip2_rect.x, spacehip2_rect.y))
                 if click:
-                    self.player.style = 2
-                    break
+                    self.player.style = 'player2'
+                    break  # Go back to main menu
             else:
-                self.draw_screen.blit(self.textures['player2-stop'], (spacehip2_rect.x, spacehip2_rect.y))
+                self.draw_screen.blit(self.player.textures['player2-stop'], (spacehip2_rect.x, spacehip2_rect.y))
 
             if menu_pos == 3:
-                self.draw_screen.blit(self.textures['player3-choosen'], (spacehip3_rect.x, spacehip3_rect.y))
+                self.draw_screen.blit(self.player.textures['player3-choosen'], (spacehip3_rect.x, spacehip3_rect.y))
                 if click:
-                    self.player.style = 3
-                    break
+                    self.player.style = 'player3'
+                    break  # Go back to main menu
             else:
-                self.draw_screen.blit(self.textures['player3-stop'], (spacehip3_rect.x, spacehip3_rect.y))
+                self.draw_screen.blit(self.player.textures['player3-stop'], (spacehip3_rect.x, spacehip3_rect.y))
 
             self.refresh_screen()
 
@@ -696,30 +679,27 @@ class Game:
         self.draw_screen.blit(self.textures['background1'], (0, 0))
 
         font = pygame.font.Font('freesansbold.ttf', 15)
-
         text_level = font.render(str(self.level) + '/8', True, (200, 200, 200))
-        text_rect = text_level.get_rect()
-        text_rect.right = DRAW_SCREEN_SIZE[0] - 5
-        text_rect.y = 8
-        self.draw_screen.blit(text_level, text_rect)
+        text_level_rect = text_level.get_rect()
+        text_level_rect.right = DRAW_SCREEN_SIZE[0] - 5
+        text_level_rect.y = 8
+        self.draw_screen.blit(text_level, text_level_rect)
 
-        draw_screen_rect = self.draw_screen.get_rect()
-        frame = pygame.Rect((0, 0), (290, 150))
-        frame.center = draw_screen_rect.center
-        pygame.draw.rect(self.draw_screen, (200, 200, 200), frame, 5)
+        frame_rect = pygame.Rect((0, 0), (290, 150))
+        frame_rect.center = self.draw_screen_rect.center
+        pygame.draw.rect(self.draw_screen, (200, 200, 200), frame_rect, 5)
 
         font = pygame.font.Font('freesansbold.ttf', 40)
-
         text_gunfire = font.render('GUNFIRE', True, (200, 200, 200))
         text_gunfire_highlighted = font.render('GUNFIRE', True, (100, 200, 200))
-        text_rect = text_gunfire.get_rect()
-        text_rect.center = frame.center
-        text_rect.x = frame.x + 15
-        text_rect.y -= 1/3 * frame.h - 5
+        text_gunfire_rect = text_gunfire.get_rect()
+        text_gunfire_rect.center = frame_rect.center
+        text_gunfire_rect.x = frame_rect.x + 15
+        text_gunfire_rect.y -= 1/3 * frame_rect.h - 5
 
         upgrade_point_rect = pygame.Rect((0, 0), (15, 15*1.61))
 
-        upgrade_point_rect.center = text_rect.center
+        upgrade_point_rect.center = text_gunfire_rect.center
         upgrade_point_rect.x += 100
         upgrade_point_rect.y -= 2
 
@@ -735,8 +715,8 @@ class Game:
         text_hp = font.render('HEALTH', True, (200, 200, 200))
         text_hp_highlighted = font.render('HEALTH', True, (100, 200, 200))
         text2_rect = text_hp.get_rect()
-        text2_rect.center = draw_screen_rect.center
-        text2_rect.x = frame.x + 15
+        text2_rect.center = self.draw_screen_rect.center
+        text2_rect.x = frame_rect.x + 15
 
         upgrade_point_rect.centery = text2_rect.centery
 
@@ -752,9 +732,9 @@ class Game:
         text_speed = font.render('SPEED', True, (200, 200, 200))
         text_speed_highlighted = font.render('SPEED', True, (100, 200, 200))
         text3_rect = text_speed.get_rect()
-        text3_rect.center = draw_screen_rect.center
-        text3_rect.x = frame.x + 15
-        text3_rect.y += 1 / 3 * frame.h
+        text3_rect.center = self.draw_screen_rect.center
+        text3_rect.x = frame_rect.x + 15
+        text3_rect.y += 1 / 3 * frame_rect.h
 
         upgrade_point_rect.centery = text3_rect.centery
 
@@ -770,10 +750,10 @@ class Game:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.close()
+                    close()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        self.close()
+                        close()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
                         click = True
@@ -783,14 +763,14 @@ class Game:
 
             mx, my = pygame.mouse.get_pos()
 
-            if text_rect.collidepoint((mx, my)):
-                self.draw_screen.blit(text_gunfire_highlighted, text_rect)
+            if text_gunfire_rect.collidepoint((mx, my)):
+                self.draw_screen.blit(text_gunfire_highlighted, text_gunfire_rect)
                 if click:
                     if self.player.gunfire_upgrade < 3:
                         self.player.gunfire_upgrade += 1
                         break
             else:
-                self.draw_screen.blit(text_gunfire, text_rect)
+                self.draw_screen.blit(text_gunfire, text_gunfire_rect)
 
             if text2_rect.collidepoint((mx, my)):
                 self.draw_screen.blit(text_hp_highlighted, text2_rect)
@@ -813,7 +793,7 @@ class Game:
             self.refresh_screen()
 
     def start(self, text):
-        self.draw()
+        self.draw_game()
         surf = self.font.render(text, False, (255, 255, 255))
         rect = surf.get_rect(center=(int(DRAW_SCREEN_SIZE[0]/2), int(DRAW_SCREEN_SIZE[1]/2)))
         self.draw_screen.blit(surf, rect)
@@ -831,11 +811,7 @@ class Game:
             self.refresh_screen()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.close()
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        self.close()
-
+                    close()
 
 moving_sprites = pygame.sprite.Group()
 

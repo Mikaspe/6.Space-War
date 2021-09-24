@@ -5,6 +5,7 @@ import pygame
 class Explosion(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):
         super().__init__()
+
         self.sprites = []
         self.is_animating = False
 
@@ -21,10 +22,10 @@ class Explosion(pygame.sprite.Sprite):
     def animate(self):
         self.is_animating = True
 
-    def update(self, speed):
+    def update(self, speed_of_animation):
         if self.is_animating:
             self.image = self.sprites[int(self.current_sprite)]
-            self.current_sprite += speed  # Here is possible to change speed of animation, ex. += 0.5
+            self.current_sprite += speed_of_animation  # Here is possible to change speed of animation, ex. += 0.5
 
             if self.current_sprite >= len(self.sprites):
                 self.current_sprite = 0

@@ -3,20 +3,17 @@ import pygame
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, x, y, style, direction='right'):
-
-        pygame.sprite.Sprite.__init__(self)  # potrzebne ? !!!!!!!!!!!
-
-        self.image = pygame.image.load('img/enemy' + str(style) + '.png').convert_alpha()
-        self.mask = pygame.mask.from_surface(self.image)
-        self.rect = self.image.get_rect(topleft=(0, 0))
-
-        self.rect.centerx = x
-        self.rect.centery = y + 40
+        super().__init__()
 
         self.style = style
         self.direction = str(direction)
         self.hp = 1
         self.speed = 2
+
+        self.image = pygame.image.load('img/enemy/enemy' + str(self.style) + '.png').convert_alpha()
+        self.mask = pygame.mask.from_surface(self.image)
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y + 40)
 
         if style == 1:
             self.hp = 1
@@ -34,7 +31,7 @@ class Enemy(pygame.sprite.Sprite):
 
     def move(self):
         if self.direction == 'left':
-            self.rect.x -= self.speed
-        else:
-            self.rect.x += self.speed
+            self.rect.x -= round(self.speed)
+        elif self.direction == 'right':
+            self.rect.x += round(self.speed)
 
