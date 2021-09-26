@@ -74,9 +74,11 @@ class Game:
 
         while True:
             self.go_to_main_menu = False
+            self.upgrade_menu()
             self.main_menu()
             self.level = 1
             self.player.reset()
+
             while True:
                 self.player.hp_update()
                 self.player.speed_update()
@@ -678,48 +680,45 @@ class Game:
     def upgrade_menu(self):
         self.draw_screen.blit(self.textures['background1'], (0, 0))
 
-        font = pygame.font.Font('freesansbold.ttf', 15)
+        # Display actual level in top-right corner
+        font = pygame.font.SysFont('swiss721', 17)
         text_level = font.render(str(self.level) + '/8', True, (200, 200, 200))
         text_level_rect = text_level.get_rect()
         text_level_rect.right = DRAW_SCREEN_SIZE[0] - 5
         text_level_rect.y = 8
         self.draw_screen.blit(text_level, text_level_rect)
 
-        frame_rect = pygame.Rect((0, 0), (290, 150))
+        # Frame of upgrade menu
+        frame_rect = pygame.Rect((0, 0), (290, 160))
         frame_rect.center = self.draw_screen_rect.center
-        pygame.draw.rect(self.draw_screen, (200, 200, 200), frame_rect, 5)
+        pygame.draw.rect(self.draw_screen, (200, 200, 200), frame_rect, 1)
 
-        font = pygame.font.Font('freesansbold.ttf', 40)
+        # Gunfire text
+        font = pygame.font.SysFont('swiss721', 38)
         text_gunfire = font.render('GUNFIRE', True, (200, 200, 200))
         text_gunfire_highlighted = font.render('GUNFIRE', True, (100, 200, 200))
-        text_gunfire_rect = text_gunfire.get_rect()
-        text_gunfire_rect.center = frame_rect.center
-        text_gunfire_rect.x = frame_rect.x + 15
-        text_gunfire_rect.y -= 1/3 * frame_rect.h - 5
+        text_gunfire_rect = text_gunfire.get_rect(left=frame_rect.left + 15, centery=frame_rect.centery - 45)
 
+        # Gunfire points
         upgrade_point_rect = pygame.Rect((0, 0), (15, 15*1.61))
-
-        upgrade_point_rect.center = text_gunfire_rect.center
-        upgrade_point_rect.x += 100
-        upgrade_point_rect.y -= 2
-
+        upgrade_point_rect.center = (frame_rect.centerx + 50, text_gunfire_rect.centery)
+        space_beetwen_points = 20
         for col in range(1, 4):
-            upgrade_point_rect.x += 20
+            upgrade_point_rect.x += space_beetwen_points
             if col <= self.player.gunfire_upgrade:
                 pygame.draw.rect(self.draw_screen, (200, 200, 200), upgrade_point_rect)
             else:
                 pygame.draw.rect(self.draw_screen, (200, 200, 200), upgrade_point_rect, 5)
         else:
-            upgrade_point_rect.x -= 60
+            upgrade_point_rect.x -= space_beetwen_points*3
 
+        # Health text
         text_hp = font.render('HEALTH', True, (200, 200, 200))
         text_hp_highlighted = font.render('HEALTH', True, (100, 200, 200))
-        text2_rect = text_hp.get_rect()
-        text2_rect.center = self.draw_screen_rect.center
-        text2_rect.x = frame_rect.x + 15
+        text_hp_rect = text_hp.get_rect(left=frame_rect.left + 15, centery=frame_rect.centery)
 
-        upgrade_point_rect.centery = text2_rect.centery
-
+        # Health points
+        upgrade_point_rect.centery = text_hp_rect.centery
         for col in range(1, 4):
             upgrade_point_rect.x += 20
             if col <= self.player.hp_upgrade:
@@ -727,17 +726,15 @@ class Game:
             else:
                 pygame.draw.rect(self.draw_screen, (200, 200, 200), upgrade_point_rect, 5)
         else:
-            upgrade_point_rect.x -= 60
+            upgrade_point_rect.x -= space_beetwen_points*3
 
+        # Speed text
         text_speed = font.render('SPEED', True, (200, 200, 200))
         text_speed_highlighted = font.render('SPEED', True, (100, 200, 200))
-        text3_rect = text_speed.get_rect()
-        text3_rect.center = self.draw_screen_rect.center
-        text3_rect.x = frame_rect.x + 15
-        text3_rect.y += 1 / 3 * frame_rect.h
+        text_speed_rect = text_speed.get_rect(left=frame_rect.left + 15, centery=frame_rect.centery + 45)
 
-        upgrade_point_rect.centery = text3_rect.centery
-
+        # Speed points
+        upgrade_point_rect.centery = text_speed_rect.centery
         for col in range(1, 4):
             upgrade_point_rect.x += 20
             if col <= self.player.speed_upgrade:
@@ -747,7 +744,6 @@ class Game:
 
         while True:
             click = False
-
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     close()
@@ -772,23 +768,23 @@ class Game:
             else:
                 self.draw_screen.blit(text_gunfire, text_gunfire_rect)
 
-            if text2_rect.collidepoint((mx, my)):
-                self.draw_screen.blit(text_hp_highlighted, text2_rect)
+            if text_hp_rect.collidepoint((mx, my)):
+                self.draw_screen.blit(text_hp_highlighted, text_hp_rect)
                 if click:
                     if self.player.hp_upgrade < 3:
                         self.player.hp_upgrade += 1
                         break
             else:
-                self.draw_screen.blit(text_hp, text2_rect)
+                self.draw_screen.blit(text_hp, text_hp_rect)
 
-            if text3_rect.collidepoint((mx, my)):
-                self.draw_screen.blit(text_speed_highlighted, text3_rect)
+            if text_speed_rect.collidepoint((mx, my)):
+                self.draw_screen.blit(text_speed_highlighted, text_speed_rect)
                 if click:
                     if self.player.speed_upgrade < 3:
                         self.player.speed_upgrade += 1
                         break
             else:
-                self.draw_screen.blit(text_speed, text3_rect)
+                self.draw_screen.blit(text_speed, text_speed_rect)
 
             self.refresh_screen()
 
@@ -812,6 +808,7 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     close()
+
 
 moving_sprites = pygame.sprite.Group()
 
