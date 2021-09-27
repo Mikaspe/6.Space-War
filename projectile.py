@@ -2,7 +2,7 @@ import pygame
 
 
 class Projectile(pygame.sprite.Sprite):
-    def __init__(self, x, y, style):
+    def __init__(self, pos_x, pos_y, style):
         super().__init__()
 
         self.style = style
@@ -10,8 +10,7 @@ class Projectile(pygame.sprite.Sprite):
 
         self.image = pygame.image.load(f'img/projectile/projectile-{self.style}.png').convert_alpha()
         self.mask = pygame.mask.from_surface(self.image)
-        self.rect = self.image.get_rect()
-        self.rect.center = (x, y)
+        self.rect = self.image.get_rect(center=(pos_x, pos_y))
 
     def move(self):
         speed_x_ratio = 0.3

@@ -4,7 +4,6 @@ import pygame
 import random
 import operator
 
-
 from CONST import *
 from player import Player
 from enemy import Enemy
@@ -29,72 +28,72 @@ class Game:
         self.sounds = {}  # Sounds(wav) from sounds directory
         self.load_sounds()
 
-        self.screen = pygame.display.set_mode(SCREEN_SIZE)  # Initialize a window or screen for display => surface
+        self.screen = pygame.display.set_mode(SCREEN_SIZE)  # Screen for display => surface
         pygame.display.set_caption('Space-War')
-        self.draw_screen = pygame.Surface(DRAW_SCREEN_SIZE)  # pygame object for representing images => surface
+        # draw_screen is a surface which'll be scaled and drawn on display screen
+        self.draw_screen = pygame.Surface(DRAW_SCREEN_SIZE)
         self.draw_screen_rect = self.draw_screen.get_rect()
 
-        self.clock = pygame.time.Clock()  # Create an object(Clock type) to help track time
+        self.clock = pygame.time.Clock()  # Helps track time
         self.dt = 1  # delta time
 
         self.player = Player('player1')
         self.enemies = []
         self.projectiles = []
+        self.animations = pygame.sprite.Group()
 
         self.ENEMYMOVE = pygame.USEREVENT  # User event for moving enemy
         pygame.time.set_timer(self.ENEMYMOVE, ENEMY_MOVE_RATIO)
+        self.PROJECTILEMOVE = pygame.USEREVENT  # User event for moving projectiles
+        pygame.time.set_timer(self.PROJECTILEMOVE, PROJECTILE_MOVE_RATIO)
 
         self.start_end_title_font = pygame.font.Font('OpenSans-Bold.ttf', 100)
 
-        self.timer = 0
-        self.timer2 = 0
+        self.timer = 0  # Used for player shooting ratio
+        self.timer2 = 0  # Used for heart beating when hp is low
         
-        self.border = 70
+        self.border = 70  # Border of moving enemies
 
-        self.animations = pygame.sprite.Group()
-
-        self.go_to_main_menu = False
         self.level = 1
         self.max_level = 8
+        self.go_to_main_menu = False
 
         self.level_switch()
 
     def load_textures(self):
-        for img in os.listdir('img'):  # Return a list containing the names of the files in the directory
+        for img in os.listdir('img'):
             if img.endswith('.png'):
                 self.textures[img.replace('.png', '')] = pygame.image.load(f'img/{img}')  # => surface
 
-        for img in os.listdir('img/background'):  # Return a list containing the names of the files in the directory
+        for img in os.listdir('img/background'):
             self.textures[img.replace('.png', '')] = pygame.image.load(f'img/background/{img}')  # => surface
 
     def load_sounds(self):
-        for sound in os.listdir('sounds'):  # Return a list containing the names of the files in the directory
+        for sound in os.listdir('sounds'):
             self.sounds[sound.replace('.wav', '')] = pygame.mixer.Sound(f'sounds/{sound}')  # => sound
 
     def level_switch(self):
 
         while True:
             self.go_to_main_menu = False
-            self.upgrade_menu()
             self.main_menu()
             self.level = 1
             self.player.reset()
-
             while True:
                 self.player.hp_update()
                 self.player.speed_update()
                 self.player.gunfire_update()
-                self.start(f'Level {self.level}')
+                self.start(f'Level {self.level}')  # Draw start title
                 self.game()
+                self.enemies.clear()
                 self.projectiles.clear()
                 self.animations.empty()
-                self.enemies.clear()
                 if self.go_to_main_menu:
                     break
 
     def game(self):
 
-        # Generating enemie spaceships depends on actual level
+        # Generating enemies spaceships
         if self.level == 1:
             enemy_style = 1
             for y in range(1, 3):
@@ -124,25 +123,26 @@ class Game:
         elif self.level == 5:
             enemy_style = 3
             for y in range(2):
-                for x in range(1, 3):
+                for x in range(1, 5):
                     enemy = Enemy(x*100 + self.border, y*75, enemy_style)
                     self.enemies.append(enemy)
         elif self.level == 6:
             enemy_style = 3
-            for y in range(3):
-                if y == 2:
+            for y in range(4):
+                if y >= 2:
                     enemy_style = 2
                 for x in range(6):
                     enemy = Enemy(x*100 + self.border, y*75 + 40, enemy_style)
                     self.enemies.append(enemy)
         elif self.level == 7:
-            enemy_style = 3
             for y in range(4):
-                if y == 1:
-                    enemy_style = 1
-                elif y == 2:
-                    enemy_style = 2
                 for x in range(8):
+                    if y <= 2:
+                        enemy_style = 3
+                    elif y > 2 and x in range(3, 5):
+                        enemy_style = 3
+                    else:
+                        enemy_style = 2
                     enemy = Enemy(x*100 + self.border, y*75 + 40, enemy_style)
                     self.enemies.append(enemy)
         elif self.level == 8:
@@ -152,20 +152,17 @@ class Game:
             enemy.shoot_ratio = 50
             self.enemies.append(enemy)
 
-        timer = 0
-        timer2 = 0
-        start_seq = False  # Boss fight(lvl 8) sequence
+        start_seq = False  # Boss fight(lvl 8) berserker sequence
+        timer = 0  # Used in boss berserker sequence
+        timer2 = 0  # Used for shot ratio in boss berserker sequence
         play_berserker_sound = True
-        play_lowhp_sound = True
+        play_bosslowhp_sound = True
 
-        while True:
+        while not self.go_to_main_menu:
             self.check_keys()
             self.check_events()
 
-            if self.go_to_main_menu:
-                break
-
-            # Changing enemies move direction when reach self.border
+            # Changing enemies move direction when farthest reach self.border
             self.enemies.sort(key=operator.attrgetter('rect.x'))  # Sorting enemies by x position
             if self.enemies[0].rect.x < self.border:  # Left border
                 for enemy in self.enemies:
@@ -174,8 +171,8 @@ class Game:
                 for enemy in self.enemies:
                     enemy.direction = 'left'
 
-            for enemy in self.enemies:  # Generating enemies projectiles
-
+            # Generating enemies projectiles
+            for enemy in self.enemies:
                 if enemy.style == 1:
                     if random.randint(1, enemy.shoot_ratio) == 1:
                         self.sounds['laser'].play()
@@ -229,7 +226,6 @@ class Game:
 
                         timer += self.dt
                         timer2 += self.dt
-
                         enemy.speed = 12
 
                         if 200 < timer < 800:
@@ -287,20 +283,19 @@ class Game:
                                 self.sounds['hit'].play()
                             elif enemy.hp == 0:
                                 self.sounds['destroyed'].play()
-                                self.explosion = Explosion(enemy.rect.x, enemy.rect.y)
+                                self.explosion = Explosion(*enemy.rect.center)
                                 self.explosion.animate()
                                 self.animations.add(self.explosion)
                                 self.enemies.remove(enemy)
-                                for enemy in self.enemies:  # Speed of enemies increases when number of them decrease
+                                for enemy in self.enemies:  # Speed of enemies increase when number of them decrease
                                     enemy.speed += 0.2
-                            break  # One projectile hits just one enemy(.collide_mask sometimes detects more collisions)
 
-            if self.player.hp == 1 and play_lowhp_sound:
+            if self.player.hp == 1 and play_bosslowhp_sound:
                 self.sounds['low-hp'].play()
-                play_lowhp_sound = False
+                play_bosslowhp_sound = False
             elif self.player.hp <= 0:
                 self.sounds['game-over'].play()
-                self.end('GAME OVER')
+                self.end('TRY AGAIN')
                 break
             elif self.level == 8 and not self.enemies:
                 self.sounds['killed-monster'].play()
@@ -309,7 +304,7 @@ class Game:
                 break
             elif not self.enemies:
                 self.sounds['win'].play()
-                self.end('YOU WIN')
+                self.end('LEVEL COMPLETED')
                 self.upgrade_menu()
                 self.level += 1
                 break
@@ -354,6 +349,7 @@ class Game:
             if event.type == self.ENEMYMOVE:
                 for enemy in self.enemies:
                     enemy.move()
+            if event.type == self.PROJECTILEMOVE:
                 for projectile in self.projectiles:
                     projectile.move()
 
@@ -361,9 +357,9 @@ class Game:
         self.draw_screen.blit(self.textures[f'background{self.level}'], (0, 0))
         self.draw_screen.blit(self.player.get_image(), self.player.rect)
 
+        # Explosion animation
         for sprite in self.animations:
             sprite.update(1.6)
-
         self.animations.draw(self.draw_screen)
 
         for enemy in self.enemies:
@@ -374,29 +370,24 @@ class Game:
             self.draw_screen.blit(self.textures['heart'], (heart*12-4, 5))
 
         if self.player.hp == 1:
+            self.timer2 += self.dt
             if self.timer2 < 20:
                 self.draw_screen.blit(self.textures['heart-black'], (-4, 5))
-                self.timer2 += self.dt
             else:
                 self.draw_screen.blit(self.textures['heart'], (-4, 5))
-                self.timer2 += self.dt
                 if self.timer2 > 40:
                     self.timer2 = 0
 
-        font = pygame.font.Font('freesansbold.ttf', 15)
-        text_level = font.render(f'{self.level}/{self.max_level}', True, (200, 200, 200))
-        text_rect = text_level.get_rect()
-        text_rect.right = DRAW_SCREEN_SIZE[0] - 5
-        text_rect.y = 8
-        self.draw_screen.blit(text_level, text_rect)
+        self.draw_current_level()  # Draw current level in top-right corner
 
     def refresh_screen(self):
         scaled = pygame.transform.scale(self.draw_screen, SCREEN_SIZE)  # Resize to new resolution
-        self.screen.blit(scaled, (0, 0))  # Draw one image onto another
+        self.screen.blit(scaled, (0, 0))  # Draw onto display screen
         pygame.display.update()  # Update portions of the screen for software displays
         self.dt = self.clock.tick(FRAMERATE) * FRAMERATE / 1000
 
     def end(self, text):
+        """Draw end title"""
         self.draw_game()
 
         text_surf = self.start_end_title_font.render(text, False, (255, 255, 255))
@@ -418,6 +409,7 @@ class Game:
         frame_rect = pygame.Rect((0, 0), (150*1.61, 150))
         frame_rect.center = self.draw_screen_rect.center
 
+        # Menu items
         font = pygame.font.Font('freesansbold.ttf', 40)
         text_start = font.render('Start', True, (200, 200, 200))
         text_start_highlighted = font.render('Start', True, (100, 200, 200))
@@ -433,12 +425,12 @@ class Game:
         text_exit_rect = text_exit.get_rect(center=self.draw_screen_rect.center)
         text_exit_rect.y += 1/3 * frame_rect.h
 
+        # Main menu navigation(keyboard and mouse)
         menu_pos = 1
         m1 = m2 = m3 = True
         while True:
             self.draw_screen.blit(self.textures['background1'], (0, 0))
             pygame.draw.rect(self.draw_screen, (200, 200, 200), frame_rect, 5)
-
             click = False
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -504,6 +496,7 @@ class Game:
         frame_rect = pygame.Rect((0, 0), (150 * 1.61, 150))
         frame_rect.center = self.draw_screen_rect.center
 
+        # Menu items
         font = pygame.font.Font('freesansbold.ttf', 40)
         text_continue = font.render('Continue', True, (200, 200, 200))
         text_continue_highlighted = font.render('Continue', True, (100, 200, 200))
@@ -521,6 +514,7 @@ class Game:
 
         pygame.draw.rect(self.draw_screen, (200, 200, 200), frame_rect, 5)
 
+        # Pause menu navigation(keyboard and mouse)
         menu_pos = 1
         m1 = m2 = m3 = True
         while True:
@@ -529,9 +523,6 @@ class Game:
                 if event.type == pygame.QUIT:
                     close()
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        self.go_to_main_menu = True
-                        break
                     if event.key == pygame.K_RETURN:
                         click = True
                     if event.key == pygame.K_DOWN:
@@ -588,13 +579,15 @@ class Game:
             self.refresh_screen()
 
     def spaceship_choose(self):
-
+        """Player can choose spaceship model"""
+        # Title
         font = pygame.font.Font('freesansbold.ttf', 40)
         text_spaceship = font.render('Choose spaceship:', True, (200, 200, 200))
         text_rect = text_spaceship.get_rect()
         text_rect.center = DRAW_SCREEN_SIZE[0]/2, DRAW_SCREEN_SIZE[1]/2
         text_rect.y -= 60
 
+        # Spaceships
         spacehip1_rect = self.player.textures['player1-choosen'].get_rect()
         spacehip1_rect.x = DRAW_SCREEN_SIZE[0]/2 - 50
         spacehip1_rect.y = DRAW_SCREEN_SIZE[1]/2
@@ -609,6 +602,7 @@ class Game:
 
         self.draw_screen.blit(text_spaceship, text_rect)
 
+        # Spaceship choose navigation(keyboard and mouse)
         menu_pos = 1
         m1 = m2 = m3 = True
         while True:
@@ -679,69 +673,49 @@ class Game:
             self.refresh_screen()
 
     def upgrade_menu(self):
+        """Upgrade menu is displayed after finishing each level.
+        Player can upgrade one of the abilities"""
         self.draw_screen.blit(self.textures['background1'], (0, 0))
-
-        # Display actual level in top-right corner
-        font = pygame.font.SysFont('swiss721', 17)
-        text_level = font.render(f'{self.level}/{self.max_level}', True, (200, 200, 200))
-        text_level_rect = text_level.get_rect()
-        text_level_rect.center = (DRAW_SCREEN_SIZE[0] - 5, 5)
-        self.draw_screen.blit(text_level, text_level_rect)
+        self.draw_current_level()  # Draw current level in top-right corner
 
         # Frame of upgrade menu
         frame_rect = pygame.Rect((0, 0), (290, 160))
         frame_rect.center = self.draw_screen_rect.center
-        pygame.draw.rect(self.draw_screen, (200, 200, 200), frame_rect, 1)
+        pygame.draw.rect(self.draw_screen, (200, 200, 200), frame_rect, 5)
 
         # Gunfire text
         font = pygame.font.SysFont('swiss721', 38)
         text_gunfire = font.render('GUNFIRE', True, (200, 200, 200))
         text_gunfire_highlighted = font.render('GUNFIRE', True, (100, 200, 200))
-        text_gunfire_rect = text_gunfire.get_rect(left=frame_rect.left + 15, centery=frame_rect.centery - 45)
-
-        # Gunfire points
-        upgrade_point_rect = pygame.Rect((0, 0), (15, 15*1.61))
-        upgrade_point_rect.center = (frame_rect.centerx + 50, text_gunfire_rect.centery)
-        space_beetwen_points = 20
-        for col in range(1, 4):
-            upgrade_point_rect.x += space_beetwen_points
-            if col <= self.player.gunfire_upgrade:
-                pygame.draw.rect(self.draw_screen, (200, 200, 200), upgrade_point_rect)
-            else:
-                pygame.draw.rect(self.draw_screen, (200, 200, 200), upgrade_point_rect, 5)
-        else:
-            upgrade_point_rect.x -= space_beetwen_points * 3
+        left_pos_of_text = frame_rect.left + 15
+        text_gunfire_rect = text_gunfire.get_rect(left=left_pos_of_text, centery=frame_rect.centery - 45)
 
         # Health text
         text_hp = font.render('HEALTH', True, (200, 200, 200))
         text_hp_highlighted = font.render('HEALTH', True, (100, 200, 200))
-        text_hp_rect = text_hp.get_rect(left=frame_rect.left + 15, centery=frame_rect.centery)
-
-        # Health points
-        upgrade_point_rect.centery = text_hp_rect.centery
-        for col in range(1, 4):
-            upgrade_point_rect.x += 20
-            if col <= self.player.hp_upgrade:
-                pygame.draw.rect(self.draw_screen, (200, 200, 200), upgrade_point_rect)
-            else:
-                pygame.draw.rect(self.draw_screen, (200, 200, 200), upgrade_point_rect, 5)
-        else:
-            upgrade_point_rect.x -= space_beetwen_points * 3
+        text_hp_rect = text_hp.get_rect(left=left_pos_of_text, centery=frame_rect.centery)
 
         # Speed text
         text_speed = font.render('SPEED', True, (200, 200, 200))
         text_speed_highlighted = font.render('SPEED', True, (100, 200, 200))
-        text_speed_rect = text_speed.get_rect(left=frame_rect.left + 15, centery=frame_rect.centery + 45)
+        text_speed_rect = text_speed.get_rect(left=left_pos_of_text, centery=frame_rect.centery + 45)
 
-        # Speed points
-        upgrade_point_rect.centery = text_speed_rect.centery
-        for col in range(1, 4):
-            upgrade_point_rect.x += 20
-            if col <= self.player.speed_upgrade:
-                pygame.draw.rect(self.draw_screen, (200, 200, 200), upgrade_point_rect)
+        # Drawing points of upgrades
+        upgrade_point_rect = pygame.Rect((0, 0), (15, 15*1.61))
+        upgrade_point_rect.center = (frame_rect.centerx + 50, text_gunfire_rect.centery)
+        space_beetwen_points = 20
+        for upgrade in (self.player.gunfire_upgrade, self.player.hp_upgrade, self.player.speed_upgrade):
+            for col in range(1, 4):
+                upgrade_point_rect.x += space_beetwen_points
+                if col <= upgrade:
+                    pygame.draw.rect(self.draw_screen, (200, 200, 200), upgrade_point_rect)
+                else:
+                    pygame.draw.rect(self.draw_screen, (200, 200, 200), upgrade_point_rect, 5)
             else:
-                pygame.draw.rect(self.draw_screen, (200, 200, 200), upgrade_point_rect, 5)
+                upgrade_point_rect.x -= space_beetwen_points * 3
+            upgrade_point_rect.y += 45
 
+        # Menu navigation(keyboard and mouse)
         menu_pos = 1
         m1 = m2 = m3 = True
         while True:
@@ -766,9 +740,6 @@ class Game:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
                         click = True
-                # if event.type == pygame.KEYDOWN:
-                #     if event.key == pygame.K_RETURN:
-                #         unpause = True
 
             mx, my = pygame.mouse.get_pos()
             if text_gunfire_rect.collidepoint((mx, my)) and m1:
@@ -817,6 +788,7 @@ class Game:
             self.refresh_screen()
 
     def start(self, title):
+        """Draw title and play sound at the beginning of level"""
         self.draw_game()
         text_title = self.start_end_title_font.render(title, False, (255, 255, 255))
         text_title_rect = text_title.get_rect(center=self.draw_screen_rect.center)
@@ -830,15 +802,25 @@ class Game:
             self.sounds['start'].play()
             timer = START_TIME
 
-        while timer > 0:
+        break_loop = False
+        while timer > 0 and not break_loop:
             timer -= self.dt
             self.refresh_screen()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     close()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        break_loop = True
+                        break
 
-
-moving_sprites = pygame.sprite.Group()
+    def draw_current_level(self):
+        """Draw current level in top-right corner"""
+        font = pygame.font.SysFont('swiss721', 17)
+        text_level = font.render(f'{self.level}/{self.max_level}', True, (200, 200, 200))
+        text_level_rect = text_level.get_rect()
+        text_level_rect.center = (DRAW_SCREEN_SIZE[0] - 20, 15)
+        self.draw_screen.blit(text_level, text_level_rect)
 
 if __name__ == '__main__':
     Game()

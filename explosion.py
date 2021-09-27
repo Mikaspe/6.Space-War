@@ -16,8 +16,7 @@ class Explosion(pygame.sprite.Sprite):
         self.current_sprite = 4
         self.image = self.sprites[self.current_sprite]
 
-        self.rect = self.image.get_rect()
-        self.rect.topleft = [pos_x, pos_y]
+        self.rect = self.image.get_rect(center=(pos_x, pos_y))
 
     def animate(self):
         self.is_animating = True

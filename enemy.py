@@ -2,18 +2,17 @@ import pygame
 
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, x, y, style, direction='right'):
+    def __init__(self, pos_x, pos_y, style, direction='right'):
         super().__init__()
 
         self.style = style
-        self.direction = str(direction)
+        self.direction = direction
         self.hp = 1
         self.speed = 2
 
         self.image = pygame.image.load(f'img/enemy/enemy{self.style}.png').convert_alpha()
-        self.mask = pygame.mask.from_surface(self.image)
-        self.rect = self.image.get_rect()
-        self.rect.center = (x, y + 40)
+        self.mask = pygame.mask.from_surface(self.image)  # Useful for fast pixel perfect collision detection
+        self.rect = self.image.get_rect(center=(pos_x, pos_y + 40))
 
         if style == 1:
             self.hp = 1
