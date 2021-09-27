@@ -10,7 +10,7 @@ class Enemy(pygame.sprite.Sprite):
         self.hp = 1
         self.speed = 2
 
-        self.image = pygame.image.load('img/enemy/enemy' + str(self.style) + '.png').convert_alpha()
+        self.image = pygame.image.load(f'img/enemy/enemy{self.style}.png').convert_alpha()
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
         self.rect.center = (x, y + 40)

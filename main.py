@@ -21,7 +21,7 @@ class Game:
 
     def __init__(self):
         pygame.init()
-        pygame.mixer.set_num_channels(30)
+        pygame.mixer.set_num_channels(50)
 
         self.textures = {}  # Textures(png) from img directory
         self.load_textures()
@@ -44,7 +44,7 @@ class Game:
         self.ENEMYMOVE = pygame.USEREVENT  # User event for moving enemy
         pygame.time.set_timer(self.ENEMYMOVE, ENEMY_MOVE_RATIO)
 
-        self.font = pygame.font.Font('OpenSans-Bold.ttf', 100)
+        self.start_end_title_font = pygame.font.Font('OpenSans-Bold.ttf', 100)
 
         self.timer = 0
         self.timer2 = 0
@@ -55,20 +55,21 @@ class Game:
 
         self.go_to_main_menu = False
         self.level = 1
+        self.max_level = 8
 
         self.level_switch()
 
     def load_textures(self):
-        for img in os.listdir('img/'):  # Return a list containing the names of the files in the directory
+        for img in os.listdir('img'):  # Return a list containing the names of the files in the directory
             if img.endswith('.png'):
-                self.textures[img.replace('.png', '')] = pygame.image.load('img/' + img)  # => surface
+                self.textures[img.replace('.png', '')] = pygame.image.load(f'img/{img}')  # => surface
 
         for img in os.listdir('img/background'):  # Return a list containing the names of the files in the directory
-            self.textures[img.replace('.png', '')] = pygame.image.load('img/background/' + img)  # => surface
+            self.textures[img.replace('.png', '')] = pygame.image.load(f'img/background/{img}')  # => surface
 
     def load_sounds(self):
         for sound in os.listdir('sounds'):  # Return a list containing the names of the files in the directory
-            self.sounds[sound.replace('.wav', '')] = pygame.mixer.Sound('sounds/' + sound)  # => sound
+            self.sounds[sound.replace('.wav', '')] = pygame.mixer.Sound(f'sounds/{sound}')  # => sound
 
     def level_switch(self):
 
@@ -83,8 +84,7 @@ class Game:
                 self.player.hp_update()
                 self.player.speed_update()
                 self.player.gunfire_update()
-
-                self.start('Level ' + str(self.level))
+                self.start(f'Level {self.level}')
                 self.game()
                 self.projectiles.clear()
                 self.animations.empty()
@@ -358,7 +358,7 @@ class Game:
                     projectile.move()
 
     def draw_game(self):
-        self.draw_screen.blit(self.textures['background' + str(self.level)], (0, 0))
+        self.draw_screen.blit(self.textures[f'background{self.level}'], (0, 0))
         self.draw_screen.blit(self.player.get_image(), self.player.rect)
 
         for sprite in self.animations:
@@ -384,7 +384,7 @@ class Game:
                     self.timer2 = 0
 
         font = pygame.font.Font('freesansbold.ttf', 15)
-        text_level = font.render(str(self.level) + '/8', True, (200, 200, 200))
+        text_level = font.render(f'{self.level}/{self.max_level}', True, (200, 200, 200))
         text_rect = text_level.get_rect()
         text_rect.right = DRAW_SCREEN_SIZE[0] - 5
         text_rect.y = 8
@@ -399,7 +399,7 @@ class Game:
     def end(self, text):
         self.draw_game()
 
-        text_surf = self.font.render(text, False, (255, 255, 255))
+        text_surf = self.start_end_title_font.render(text, False, (255, 255, 255))
         text_rect = text_surf.get_rect()
         text_rect.center = (DRAW_SCREEN_SIZE[0]/2, DRAW_SCREEN_SIZE[1]/2)
         self.draw_screen.blit(text_surf, text_rect)
@@ -530,7 +530,8 @@ class Game:
                     close()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        close()
+                        self.go_to_main_menu = True
+                        break
                     if event.key == pygame.K_RETURN:
                         click = True
                     if event.key == pygame.K_DOWN:
@@ -682,10 +683,9 @@ class Game:
 
         # Display actual level in top-right corner
         font = pygame.font.SysFont('swiss721', 17)
-        text_level = font.render(str(self.level) + '/8', True, (200, 200, 200))
+        text_level = font.render(f'{self.level}/{self.max_level}', True, (200, 200, 200))
         text_level_rect = text_level.get_rect()
-        text_level_rect.right = DRAW_SCREEN_SIZE[0] - 5
-        text_level_rect.y = 8
+        text_level_rect.center = (DRAW_SCREEN_SIZE[0] - 5, 5)
         self.draw_screen.blit(text_level, text_level_rect)
 
         # Frame of upgrade menu
@@ -710,7 +710,7 @@ class Game:
             else:
                 pygame.draw.rect(self.draw_screen, (200, 200, 200), upgrade_point_rect, 5)
         else:
-            upgrade_point_rect.x -= space_beetwen_points*3
+            upgrade_point_rect.x -= space_beetwen_points * 3
 
         # Health text
         text_hp = font.render('HEALTH', True, (200, 200, 200))
@@ -726,7 +726,7 @@ class Game:
             else:
                 pygame.draw.rect(self.draw_screen, (200, 200, 200), upgrade_point_rect, 5)
         else:
-            upgrade_point_rect.x -= space_beetwen_points*3
+            upgrade_point_rect.x -= space_beetwen_points * 3
 
         # Speed text
         text_speed = font.render('SPEED', True, (200, 200, 200))
@@ -742,6 +742,8 @@ class Game:
             else:
                 pygame.draw.rect(self.draw_screen, (200, 200, 200), upgrade_point_rect, 5)
 
+        menu_pos = 1
+        m1 = m2 = m3 = True
         while True:
             click = False
             for event in pygame.event.get():
@@ -749,7 +751,18 @@ class Game:
                     close()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        close()
+                        self.go_to_main_menu = True
+                        break
+                    if event.key == pygame.K_RETURN:
+                        click = True
+                    if event.key == pygame.K_DOWN:
+                        menu_pos += 1
+                        if menu_pos == 4:
+                            menu_pos = 1
+                    if event.key == pygame.K_UP:
+                        menu_pos -= 1
+                        if menu_pos == 0:
+                            menu_pos = 3
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
                         click = True
@@ -758,8 +771,23 @@ class Game:
                 #         unpause = True
 
             mx, my = pygame.mouse.get_pos()
+            if text_gunfire_rect.collidepoint((mx, my)) and m1:
+                menu_pos = 1
+                m1 = False
+                m2 = True
+                m3 = True
+            elif text_hp_rect.collidepoint((mx, my)) and m2:
+                menu_pos = 2
+                m1 = True
+                m2 = False
+                m3 = True
+            elif text_speed_rect.collidepoint((mx, my)) and m3:
+                menu_pos = 3
+                m1 = True
+                m2 = True
+                m3 = False
 
-            if text_gunfire_rect.collidepoint((mx, my)):
+            if menu_pos == 1:
                 self.draw_screen.blit(text_gunfire_highlighted, text_gunfire_rect)
                 if click:
                     if self.player.gunfire_upgrade < 3:
@@ -768,7 +796,7 @@ class Game:
             else:
                 self.draw_screen.blit(text_gunfire, text_gunfire_rect)
 
-            if text_hp_rect.collidepoint((mx, my)):
+            if menu_pos == 2:
                 self.draw_screen.blit(text_hp_highlighted, text_hp_rect)
                 if click:
                     if self.player.hp_upgrade < 3:
@@ -777,7 +805,7 @@ class Game:
             else:
                 self.draw_screen.blit(text_hp, text_hp_rect)
 
-            if text_speed_rect.collidepoint((mx, my)):
+            if menu_pos == 3:
                 self.draw_screen.blit(text_speed_highlighted, text_speed_rect)
                 if click:
                     if self.player.speed_upgrade < 3:
@@ -788,11 +816,11 @@ class Game:
 
             self.refresh_screen()
 
-    def start(self, text):
+    def start(self, title):
         self.draw_game()
-        surf = self.font.render(text, False, (255, 255, 255))
-        rect = surf.get_rect(center=(int(DRAW_SCREEN_SIZE[0]/2), int(DRAW_SCREEN_SIZE[1]/2)))
-        self.draw_screen.blit(surf, rect)
+        text_title = self.start_end_title_font.render(title, False, (255, 255, 255))
+        text_title_rect = text_title.get_rect(center=self.draw_screen_rect.center)
+        self.draw_screen.blit(text_title, text_title_rect)
         self.refresh_screen()
 
         if self.level == 8:

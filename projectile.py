@@ -8,7 +8,7 @@ class Projectile(pygame.sprite.Sprite):
         self.style = style
         self.base_projectile_speed = 15
 
-        self.image = pygame.image.load('img/projectile/projectile-' + self.style + '.png').convert_alpha()
+        self.image = pygame.image.load(f'img/projectile/projectile-{self.style}.png').convert_alpha()
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)

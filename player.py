@@ -21,9 +21,9 @@ class Player(pygame.sprite.Sprite):
 
         self.textures = {}
         for img in os.listdir('img/player'):  # Loading all player spaceships images
-            self.textures[img.replace('.png', '')] = pygame.image.load('img/player/' + img)  # => surface
+            self.textures[img.replace('.png', '')] = pygame.image.load(f'img/player/{img}')  # => surface
 
-        self.image = self.textures[self.style + '-' + self.direction]
+        self.image = self.textures[f'{self.style}-{self.direction}']
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
         self.rect.center = (DRAW_SCREEN_SIZE[0] / 2, DRAW_SCREEN_SIZE[1] - 75)
@@ -54,5 +54,5 @@ class Player(pygame.sprite.Sprite):
         self.speed_upgrade = 0
 
     def get_image(self):
-        self.image = self.textures[self.style + '-' + self.direction]
+        self.image = self.textures[f'{self.style}-{self.direction}']
         return self.image

@@ -10,8 +10,8 @@ class Explosion(pygame.sprite.Sprite):
         self.is_animating = False
 
         for animation in os.listdir('animations'):  # Return a list containing the names of the files in the directory
-            for frame in os.listdir('animations/' + animation):
-                self.sprites.append(pygame.image.load('animations/' + animation + '/' + frame))  # => surface
+            for frame in os.listdir(f'animations/{animation}'):
+                self.sprites.append(pygame.image.load(f'animations/{animation}/{frame}'))  # => surface
 
         self.current_sprite = 4
         self.image = self.sprites[self.current_sprite]
