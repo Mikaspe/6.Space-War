@@ -92,7 +92,7 @@ class Game:
                     break
 
     def game(self):
-        """Generation of levels and game"""
+        """Generation of levels and game processing"""
         # Generating enemies spaceships
         if self.level == 1:
             enemy_style = 1
@@ -155,8 +155,8 @@ class Game:
         start_seq = False  # Boss fight(lvl 8) berserker sequence
         timer = 0  # Used in boss berserker sequence
         timer2 = 0  # Used for shot ratio in boss berserker sequence
-        play_berserker_sound = True
-        play_bosslowhp_sound = True
+        played_berserker_sound = False
+        played_bosslowhp_sound = False
 
         while True:
             self.check_keys()
@@ -219,10 +219,10 @@ class Game:
                         self.projectiles.append(projectile)
 
                     if start_seq:  # Boss sequence in berserker mode
-                        if play_berserker_sound:
+                        if not played_berserker_sound:
                             self.sounds['enemy-berserker'].play()
                             self.sounds['enemy-berserker2'].play()
-                            play_berserker_sound = False
+                            played_berserker_sound = True
 
                         timer += self.dt
                         timer2 += self.dt
@@ -290,9 +290,9 @@ class Game:
                                     enemy.speed += 0.2
                             break
 
-            if self.player.hp == 1 and play_bosslowhp_sound:
+            if self.player.hp == 1 and not played_bosslowhp_sound:
                 self.sounds['low-hp'].play()
-                play_bosslowhp_sound = False
+                played_bosslowhp_sound = True
             elif self.player.hp <= 0:
                 self.sounds['game-over'].play()
                 self.end('TRY AGAIN')
@@ -664,7 +664,7 @@ class Game:
             if menu_pos == 1:
                 self.draw_screen.blit(self.player.textures['player1-choosen'], (spacehip1_rect.x, spacehip1_rect.y))
                 if click:
-                    self.player.style = 'player1'
+                    self.player.change_spaceship('player1')
                     break  # Go back to main menu
             else:
                 self.draw_screen.blit(self.player.textures['player1-stop'], (spacehip1_rect.x, spacehip1_rect.y))
@@ -672,7 +672,7 @@ class Game:
             if menu_pos == 2:
                 self.draw_screen.blit(self.player.textures['player2-choosen'], (spacehip2_rect.x, spacehip2_rect.y))
                 if click:
-                    self.player.style = 'player2'
+                    self.player.change_spaceship('player2')
                     break  # Go back to main menu
             else:
                 self.draw_screen.blit(self.player.textures['player2-stop'], (spacehip2_rect.x, spacehip2_rect.y))
@@ -680,7 +680,7 @@ class Game:
             if menu_pos == 3:
                 self.draw_screen.blit(self.player.textures['player3-choosen'], (spacehip3_rect.x, spacehip3_rect.y))
                 if click:
-                    self.player.style = 'player3'
+                    self.player.change_spaceship('player3')
                     break  # Go back to main menu
             else:
                 self.draw_screen.blit(self.player.textures['player3-stop'], (spacehip3_rect.x, spacehip3_rect.y))

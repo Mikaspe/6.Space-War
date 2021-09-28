@@ -52,6 +52,12 @@ class Player(pygame.sprite.Sprite):
         self.hp_upgrade = 0
         self.speed_upgrade = 0
 
+    def change_spaceship(self, style):
+        self.style = style
+        self.image = self.textures[f'{self.style}-{self.direction}']
+        self.mask = pygame.mask.from_surface(self.image)
+        self.rect = self.image.get_rect(center=(DRAW_SCREEN_SIZE[0]/2, DRAW_SCREEN_SIZE[1]-75))
+
     def get_image(self):
         self.image = self.textures[f'{self.style}-{self.direction}']
         return self.image
