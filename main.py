@@ -73,7 +73,7 @@ class Game:
             self.sounds[sound.replace('.wav', '')] = pygame.mixer.Sound(f'sounds/{sound}')  # => sound
 
     def level_switch(self):
-
+        """Main loop"""
         while True:
             self.go_to_main_menu = False
             self.main_menu()
@@ -92,7 +92,7 @@ class Game:
                     break
 
     def game(self):
-
+        """Generation of levels and game"""
         # Generating enemies spaceships
         if self.level == 1:
             enemy_style = 1
@@ -158,7 +158,7 @@ class Game:
         play_berserker_sound = True
         play_bosslowhp_sound = True
 
-        while not self.go_to_main_menu:
+        while True:
             self.check_keys()
             self.check_events()
 
@@ -175,17 +175,17 @@ class Game:
             for enemy in self.enemies:
                 if enemy.style == 1:
                     if random.randint(1, enemy.shoot_ratio) == 1:
-                        self.sounds['laser'].play()
+                        self.sounds['laser-enemy'].play()
                         projectile = Projectile(enemy.rect.centerx, enemy.rect.centery, 'enemy1')
                         self.projectiles.append(projectile)
                 elif enemy.style == 2:
                     if random.randint(1, enemy.shoot_ratio) == 1:
-                        self.sounds['laser'].play()
+                        self.sounds['laser-enemy'].play()
                         projectile = Projectile(enemy.rect.centerx, enemy.rect.centery, 'enemy2')
                         self.projectiles.append(projectile)
                 elif enemy.style == 3:
                     if random.randint(1, enemy.shoot_ratio) == 1:
-                        self.sounds['laser'].play()
+                        self.sounds['laser-enemy'].play()
                         projectile = Projectile(enemy.rect.centerx, enemy.rect.centery, 'enemy3')
                         self.projectiles.append(projectile)
                         projectile = Projectile(enemy.rect.centerx - 24, enemy.rect.centery + 20, 'enemy3')
@@ -200,25 +200,25 @@ class Game:
                         projectile = Projectile(enemy.rect.centerx, enemy.rect.centery + 100, 'enemy-ball')
                         self.projectiles.append(projectile)
                     elif random.randint(1, enemy.shoot_ratio) == 1:
-                        self.sounds['laser'].play()
+                        self.sounds['laser-enemy'].play()
                         projectile = Projectile(enemy.rect.centerx - 155, enemy.rect.centery, 'enemy-smallball')
                         self.projectiles.append(projectile)
                         projectile = Projectile(enemy.rect.centerx + 155, enemy.rect.centery, 'enemy-smallball')
                         self.projectiles.append(projectile)
                     elif random.randint(1, enemy.shoot_ratio) == 1:
-                        self.sounds['laser'].play()
+                        self.sounds['laser-enemy'].play()
                         projectile = Projectile(enemy.rect.centerx - 115, enemy.rect.centery + 145, 'enemy4')
                         self.projectiles.append(projectile)
                         projectile = Projectile(enemy.rect.centerx + 115, enemy.rect.centery + 145, 'enemy4')
                         self.projectiles.append(projectile)
                     elif random.randint(1, enemy.shoot_ratio) == 1:
-                        self.sounds['laser'].play()
+                        self.sounds['laser-enemy'].play()
                         projectile = Projectile(enemy.rect.centerx - 120, enemy.rect.centery - 105, 'enemy4')
                         self.projectiles.append(projectile)
                         projectile = Projectile(enemy.rect.centerx + 120, enemy.rect.centery - 105, 'enemy4')
                         self.projectiles.append(projectile)
 
-                    if start_seq:
+                    if start_seq:  # Boss sequence in berserker mode
                         if play_berserker_sound:
                             self.sounds['enemy-berserker'].play()
                             self.sounds['enemy-berserker2'].play()
@@ -237,14 +237,14 @@ class Game:
                         elif 850 < timer < 1500:
                             if timer2 > 40:
                                 timer2 = 0
-                                self.sounds['laser'].play()
+                                self.sounds['laser-enemy'].play()
                                 projectile = Projectile(enemy.rect.centerx - 155, enemy.rect.centery, 'enemy-smallball')
                                 self.projectiles.append(projectile)
                                 projectile = Projectile(enemy.rect.centerx + 155, enemy.rect.centery, 'enemy-smallball')
                                 self.projectiles.append(projectile)
                         elif 1600 < timer < 3000:
                             if timer2 < 100:
-                                self.sounds['laser'].play()
+                                self.sounds['laser-enemy'].play()
                                 projectile = Projectile(enemy.rect.centerx - 120, enemy.rect.centery - 105, 'enemy4')
                                 self.projectiles.append(projectile)
                                 projectile = Projectile(enemy.rect.centerx + 120, enemy.rect.centery - 105, 'enemy4')
@@ -255,7 +255,6 @@ class Game:
                             timer = 0
 
             for projectile in self.projectiles:
-
                 # Removing projectiles if outside of screen
                 if projectile.rect.y < 0 or projectile.rect.y > DRAW_SCREEN_SIZE[1]:
                     self.projectiles.remove(projectile)
@@ -289,6 +288,7 @@ class Game:
                                 self.enemies.remove(enemy)
                                 for enemy in self.enemies:  # Speed of enemies increase when number of them decrease
                                     enemy.speed += 0.2
+                            break
 
             if self.player.hp == 1 and play_bosslowhp_sound:
                 self.sounds['low-hp'].play()
@@ -311,8 +311,11 @@ class Game:
 
             self.draw_game()
             self.refresh_screen()
+            if self.go_to_main_menu:
+                break
 
     def check_keys(self):
+        """Check keyboard keys"""
         # Moving and shooting player spaceship
         keys = pygame.key.get_pressed()
         if keys[pygame.K_RIGHT]:
@@ -328,7 +331,7 @@ class Game:
         if keys[pygame.K_SPACE]:
             self.timer += self.dt
             if self.timer > self.player.shoot_ratio:
-                self.sounds['laser'].play()
+                self.sounds['laser-player'].play()
                 projectile = Projectile(self.player.rect.centerx, self.player.rect.top, 'player')
                 self.projectiles.append(projectile)
                 self.timer = 0
@@ -343,6 +346,7 @@ class Game:
             self.pause_menu()
 
     def check_events(self):
+        """Built-in and user events"""
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 close()
@@ -354,6 +358,7 @@ class Game:
                     projectile.move()
 
     def draw_game(self):
+        """Drawing game images"""
         self.draw_screen.blit(self.textures[f'background{self.level}'], (0, 0))
         self.draw_screen.blit(self.player.get_image(), self.player.rect)
 
@@ -364,6 +369,11 @@ class Game:
 
         for enemy in self.enemies:
             self.draw_screen.blit(enemy.image, enemy)
+            if self.level == 8:
+                frame_rect = pygame.Rect((0, 10), (enemy.hp, 3))
+                frame_rect.centerx = self.draw_screen_rect.centerx
+                pygame.draw.rect(self.draw_screen, (200, 0, 0), frame_rect, 2)
+
         for projectile in self.projectiles:
             self.draw_screen.blit(projectile.image, projectile)
         for heart in range(self.player.hp):
@@ -381,6 +391,7 @@ class Game:
         self.draw_current_level()  # Draw current level in top-right corner
 
     def refresh_screen(self):
+        """Scale resolution, update display and delta time"""
         scaled = pygame.transform.scale(self.draw_screen, SCREEN_SIZE)  # Resize to new resolution
         self.screen.blit(scaled, (0, 0))  # Draw onto display screen
         pygame.display.update()  # Update portions of the screen for software displays
@@ -405,21 +416,23 @@ class Game:
             timer -= self.dt
 
     def main_menu(self):
-
+        # Frame
         frame_rect = pygame.Rect((0, 0), (150*1.61, 150))
         frame_rect.center = self.draw_screen_rect.center
 
-        # Menu items
+        # Text Start
         font = pygame.font.Font('freesansbold.ttf', 40)
         text_start = font.render('Start', True, (200, 200, 200))
         text_start_highlighted = font.render('Start', True, (100, 200, 200))
         text_start_rect = text_start.get_rect(center=self.draw_screen_rect.center)
         text_start_rect.y -= 1/3 * frame_rect.h
 
+        # Text Spaceship
         text_spaceship = font.render('Spaceship', True, (200, 200, 200))
         text_spaceship_highlighted = font.render('Spaceship', True, (100, 200, 200))
         text_spaceship_rect = text_spaceship.get_rect(center=self.draw_screen_rect.center)
 
+        # Text Exit
         text_exit = font.render('Exit', True, (200, 200, 200))
         text_exit_highligted = font.render('Exit', True, (100, 200, 200))
         text_exit_rect = text_exit.get_rect(center=self.draw_screen_rect.center)
@@ -431,6 +444,7 @@ class Game:
         while True:
             self.draw_screen.blit(self.textures['background1'], (0, 0))
             pygame.draw.rect(self.draw_screen, (200, 200, 200), frame_rect, 5)
+
             click = False
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -479,45 +493,48 @@ class Game:
             if menu_pos == 2:
                 self.draw_screen.blit(text_spaceship_highlighted, text_spaceship_rect)
                 if click:
-                    self.spaceship_choose()
+                    self.spaceship_choose()  # Choose spaceship model
             else:
                 self.draw_screen.blit(text_spaceship, text_spaceship_rect)
 
             if menu_pos == 3:
                 self.draw_screen.blit(text_exit_highligted, text_exit_rect)
                 if click:
-                    close()
+                    close()  # Close window
             else:
                 self.draw_screen.blit(text_exit, text_exit_rect)
 
             self.refresh_screen()
 
     def pause_menu(self):
+        # Frame
         frame_rect = pygame.Rect((0, 0), (150 * 1.61, 150))
         frame_rect.center = self.draw_screen_rect.center
 
-        # Menu items
+        # Text continue
         font = pygame.font.Font('freesansbold.ttf', 40)
         text_continue = font.render('Continue', True, (200, 200, 200))
         text_continue_highlighted = font.render('Continue', True, (100, 200, 200))
         text_continue_rect = text_continue.get_rect(center=self.draw_screen_rect.center)
         text_continue_rect.y -= 1/3 * frame_rect.h
 
+        # Text Main menu
         text_main_menu = font.render('Main menu', True, (200, 200, 200))
         text_main_menu_highlighted = font.render('Main menu', True, (100, 200, 200))
         text_main_menu_rect = text_main_menu.get_rect(center=self.draw_screen_rect.center)
 
+        # Text exit
         text_exit = font.render('Exit', True, (200, 200, 200))
         text_exit_highlighted = font.render('Exit', True, (100, 200, 200))
         text_exit_rect = text_exit.get_rect(center=self.draw_screen_rect.center)
         text_exit_rect.y += 1/3 * frame_rect.h
 
-        pygame.draw.rect(self.draw_screen, (200, 200, 200), frame_rect, 5)
-
         # Pause menu navigation(keyboard and mouse)
         menu_pos = 1
         m1 = m2 = m3 = True
         while True:
+            self.draw_game()
+            pygame.draw.rect(self.draw_screen, (200, 200, 200), frame_rect, 5)
             click = False
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -584,8 +601,7 @@ class Game:
         font = pygame.font.Font('freesansbold.ttf', 40)
         text_spaceship = font.render('Choose spaceship:', True, (200, 200, 200))
         text_rect = text_spaceship.get_rect()
-        text_rect.center = DRAW_SCREEN_SIZE[0]/2, DRAW_SCREEN_SIZE[1]/2
-        text_rect.y -= 60
+        text_rect.center = DRAW_SCREEN_SIZE[0]/2, DRAW_SCREEN_SIZE[1]/2 - 60
 
         # Spaceships
         spacehip1_rect = self.player.textures['player1-choosen'].get_rect()
@@ -600,13 +616,12 @@ class Game:
         spacehip3_rect.x = DRAW_SCREEN_SIZE[0]/2 + 100
         spacehip3_rect.y = DRAW_SCREEN_SIZE[1]/2
 
-        self.draw_screen.blit(text_spaceship, text_rect)
-
         # Spaceship choose navigation(keyboard and mouse)
         menu_pos = 1
         m1 = m2 = m3 = True
         while True:
             self.draw_screen.blit(self.textures['background1'], (0, 0))
+            self.draw_screen.blit(text_spaceship, text_rect)
 
             click = False
             for event in pygame.event.get():
@@ -677,7 +692,6 @@ class Game:
         Player can upgrade one of the abilities"""
         self.draw_screen.blit(self.textures['background1'], (0, 0))
         self.draw_current_level()  # Draw current level in top-right corner
-
         # Frame of upgrade menu
         frame_rect = pygame.Rect((0, 0), (290, 160))
         frame_rect.center = self.draw_screen_rect.center
@@ -719,6 +733,7 @@ class Game:
         menu_pos = 1
         m1 = m2 = m3 = True
         while True:
+
             click = False
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -788,7 +803,7 @@ class Game:
             self.refresh_screen()
 
     def start(self, title):
-        """Draw title and play sound at the beginning of level"""
+        """Draw level number and play sound at the beginning of level"""
         self.draw_game()
         text_title = self.start_end_title_font.render(title, False, (255, 255, 255))
         text_title_rect = text_title.get_rect(center=self.draw_screen_rect.center)
@@ -821,6 +836,7 @@ class Game:
         text_level_rect = text_level.get_rect()
         text_level_rect.center = (DRAW_SCREEN_SIZE[0] - 20, 15)
         self.draw_screen.blit(text_level, text_level_rect)
+
 
 if __name__ == '__main__':
     Game()
