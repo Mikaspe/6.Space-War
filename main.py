@@ -469,19 +469,13 @@ class Game:
             mx, my = pygame.mouse.get_pos()
             if text_start_rect.collidepoint((mx, my)) and m1:
                 menu_pos = 1
-                m1 = False
-                m2 = True
-                m3 = True
+                m1, m2, m3 = False, True, True
             elif text_spaceship_rect.collidepoint((mx, my)) and m2:
                 menu_pos = 2
-                m1 = True
-                m2 = False
-                m3 = True
+                m1, m2, m3 = True, False, True
             elif text_exit_rect.collidepoint((mx, my)) and m3:
                 menu_pos = 3
-                m1 = True
-                m2 = True
-                m3 = False
+                m1, m2, m3 = True, True, False
 
             if menu_pos == 1:
                 self.draw_screen.blit(text_start_highlighted, text_start_rect)
@@ -557,19 +551,13 @@ class Game:
             mx, my = pygame.mouse.get_pos()
             if text_continue_rect.collidepoint((mx, my)) and m1:
                 menu_pos = 1
-                m1 = False
-                m2 = True
-                m3 = True
+                m1, m2, m3 = False, True, True
             elif text_main_menu_rect.collidepoint((mx, my)) and m2:
                 menu_pos = 2
-                m1 = True
-                m2 = False
-                m3 = True
+                m1, m2, m3 = True, False, True
             elif text_exit_rect.collidepoint((mx, my)) and m3:
                 menu_pos = 3
-                m1 = True
-                m2 = True
-                m3 = False
+                m1, m2, m3 = True, True, False
 
             if menu_pos == 1:
                 self.draw_screen.blit(text_continue_highlighted, text_continue_rect)
@@ -647,19 +635,13 @@ class Game:
             mx, my = pygame.mouse.get_pos()
             if spacehip1_rect.collidepoint((mx, my)) and m1:
                 menu_pos = 1
-                m1 = False
-                m2 = True
-                m3 = True
+                m1, m2, m3 = False, True, True
             elif spacehip2_rect.collidepoint((mx, my)) and m2:
                 menu_pos = 2
-                m1 = True
-                m2 = False
-                m3 = True
+                m1, m2, m3 = True, False, True
             elif spacehip3_rect.collidepoint((mx, my)) and m3:
                 menu_pos = 3
-                m1 = True
-                m2 = True
-                m3 = False
+                m1, m2, m3 = True, True, False
 
             if menu_pos == 1:
                 self.draw_screen.blit(self.player.textures['player1-choosen'], (spacehip1_rect.x, spacehip1_rect.y))
@@ -759,19 +741,13 @@ class Game:
             mx, my = pygame.mouse.get_pos()
             if text_gunfire_rect.collidepoint((mx, my)) and m1:
                 menu_pos = 1
-                m1 = False
-                m2 = True
-                m3 = True
+                m1, m2, m3 = False, True, True
             elif text_hp_rect.collidepoint((mx, my)) and m2:
                 menu_pos = 2
-                m1 = True
-                m2 = False
-                m3 = True
+                m1, m2, m3 = True, False, True
             elif text_speed_rect.collidepoint((mx, my)) and m3:
                 menu_pos = 3
-                m1 = True
-                m2 = True
-                m3 = False
+                m1, m2, m3 = True, True, False
 
             if menu_pos == 1:
                 self.draw_screen.blit(text_gunfire_highlighted, text_gunfire_rect)
