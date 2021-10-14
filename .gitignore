@@ -134,4 +134,4 @@ dmypy.json
 /.idea/.gitignore
 /.idea/6.Space-War.iml
 /.idea/inspectionProfiles/Project_Default.xml
-/tests.py
+/space_war/game_level_generator.py

@@ -1,10 +1,13 @@
-import pygame
 import os
+
+import pygame
+
 from CONST import *
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, style, hp_base=3, speed_base=4, shoot_ratio=20):
+    """Player's spaceship object"""
+    def __init__(self, style: str, hp_base: int = 3, speed_base: float = 4, shoot_ratio: float = 20) -> None:
         super().__init__()
 
         self.style = style
@@ -18,16 +21,19 @@ class Player(pygame.sprite.Sprite):
         self.gunfire_upgrade = 0
         self.hp_upgrade = 0
         self.speed_upgrade = 0
+        self.projectiles = []
 
         self.textures = {}
-        for img in os.listdir('img/player'):  # Loading all player spaceships images
-            self.textures[img.replace('.png', '')] = pygame.image.load(f'img/player/{img}').convert_alpha()
+        for img in os.listdir('../resources/img/Player'):  # Loading all player spaceships images
+            self.textures[img.replace('.png', '')] = pygame.image.load(f'../resources/img/player/{img}').convert_alpha()
 
         self.image = self.textures[f'{self.style}-{self.direction}']
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect(center=(DRAW_SCREEN_SIZE[0]/2, DRAW_SCREEN_SIZE[1]-75))
 
-    def gunfire_update(self):
+    def gunfire_update(self) -> None:
+        """Updates player shoot ratio and weapon style depending on actual 'gunfire_upgrade' level.
+        Called before each game level."""
         if self.gunfire_upgrade == 0:
             self.shoot_ratio = 25
             self.weapon_style = 0
@@ -41,23 +47,33 @@ class Player(pygame.sprite.Sprite):
             self.shoot_ratio = 20
             self.weapon_style = 1
 
-    def hp_update(self):
+    def hp_update(self) -> None:
+        """Updates player HP.
+        Called before each game level."""
         self.hp = self.hp_base + self.hp_upgrade
 
-    def speed_update(self):
+    def speed_update(self) -> None:
+        """Updates player speed.
+        Called before each game level."""
         self.speed = self.speed_base + 2*self.speed_upgrade
 
-    def reset(self):
+    def reset(self) -> None:
+        """Resets all upgrades.
+        Called before starting a game."""
         self.gunfire_upgrade = 0
         self.hp_upgrade = 0
         self.speed_upgrade = 0
 
-    def change_spaceship(self, style):
+    def change_spaceship(self, style: str) -> None:
+        """Changes spacheship model.
+        Called when player decide to change model in 'Spaceship choose' menu before game"""
         self.style = style
         self.image = self.textures[f'{self.style}-{self.direction}']
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect(center=(DRAW_SCREEN_SIZE[0]/2, DRAW_SCREEN_SIZE[1]-75))
 
-    def get_image(self):
+    def get_image(self) -> pygame.Surface:
+        """Returns and updates current spaceship image with proper direction(left, right or stop).
+        Called in 'draw_game' method"""
         self.image = self.textures[f'{self.style}-{self.direction}']
         return self.image
