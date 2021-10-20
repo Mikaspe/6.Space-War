@@ -3,12 +3,12 @@ import operator
 
 import pygame
 
-from CONST import *
-from player import Player
-from enemy import Enemy
-from projectile import Projectile
-from explosion import Explosion
-from game_data import GameData
+from prepare import *
+from space_war.game_objects.player import Player
+from space_war.game_objects.enemy import Enemy
+from space_war.game_objects.projectile import Projectile
+from space_war.game_objects.explosion import Explosion
+from control import GameData
 
 
 def close() -> None:
@@ -43,7 +43,7 @@ class Game:
         self.PROJECTILEMOVE = pygame.USEREVENT  # User event for moving projectiles
         pygame.time.set_timer(self.PROJECTILEMOVE, PROJECTILE_MOVE_RATIO)
 
-        self.start_end_title_font = pygame.font.Font('../resources/fonts/OpenSans-Bold.ttf', 100)
+        self.start_end_title_font = pygame.font.Font('resources/fonts/OpenSans-Bold.ttf', 100)
 
         self.timer = 0  # Used for player shooting ratio
         self.timer2 = 0  # Used for heart beating when hp is low
@@ -223,10 +223,11 @@ class Game:
         for enemy in self.enemies:
             self.draw_screen.blit(enemy.image, enemy)
 
-            for projectile in self.projectiles:
-                self.draw_screen.blit(projectile.image, projectile)
-            for heart in range(self.player.hp):
-                self.draw_screen.blit(self.game_data.textures['heart'], (heart*12-4, 5))
+        for projectile in self.projectiles:
+            self.draw_screen.blit(projectile.image, projectile)
+
+        for heart in range(self.player.hp):
+            self.draw_screen.blit(self.game_data.textures['heart'], (heart*12-4, 5))
 
             if self.level == 8:
                 frame_rect = pygame.Rect((0, 10), (enemy.hp, 3))
