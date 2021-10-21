@@ -4,6 +4,7 @@ import os
 import pygame
 import pickle
 
+from state_mainmenu import MainMenu
 from state_game import Game
 from state_start import Start
 from state_end import End
@@ -18,11 +19,11 @@ class Control:
         self.data = ShareData()
         # All game states
         self.state_dict = {
-            #'main-menu': Menu(self.screen_rect),
+            'mainmenu': MainMenu(self.data),
             'game': Game(self.data),
             'start': Start(self.data),
-            'end': End(self.data),
-            'upgrade': Upgrade(self.data)
+            'end': End(self.data)
+            #'upgrade': Upgrade(self.data)
         }
 
         self.state_name = start_state  # Name of current state
@@ -131,7 +132,7 @@ class ShareData:
 
 
 pygame.init()
-app = Control('start')  # Sets the initial state of the program
+app = Control('mainmenu')  # Sets the initial state of the program
 app.main_game_loop()
 pygame.quit()
 sys.exit()
