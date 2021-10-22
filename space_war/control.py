@@ -8,6 +8,7 @@ from state_mainmenu import MainMenu
 from state_game import Game
 from state_start import Start
 from state_end import End
+from state_pause import Pause
 from state_upgrade import Upgrade
 
 class Control:
@@ -20,10 +21,11 @@ class Control:
         # All game states
         self.state_dict = {
             'mainmenu': MainMenu(self.data),
-            'game': Game(self.data),
             'start': Start(self.data),
-            'end': End(self.data)
-            #'upgrade': Upgrade(self.data)
+            'game': Game(self.data),
+            'pause': Pause(self.data),
+            'end': End(self.data),
+            'upgrade': Upgrade(self.data)
         }
 
         self.state_name = start_state  # Name of current state
@@ -35,8 +37,8 @@ class Control:
         previous, self.state_name = self.state_name, self.state.next  # Podmiana starego stanu na nowy
         self.state.cleanup()  # Czyści poprzedni stan
         self.state = self.state_dict[self.state_name]  # Podmienia aktualny stan na nowy
-        self.state.startup()  # Uruchamia nowy stan, jego startup
         self.state.previous = previous  # Podmienia self.previous
+        self.state.startup()  # Uruchamia nowy stan, jego startup
 
     def update(self, dt):  # W petli. Słuzy do updatowania samego controla jak i aktualnego stanu
         """Updates 'Control' and current state"""
@@ -77,6 +79,7 @@ class ShareData:
         self.END_TIME = 180  # Time of 'outro' after each level
         pygame.init()  ## !! TUTAJ !?
         self.FONT = pygame.font.Font('../resources/fonts/OpenSans-Bold.ttf', 100)
+        self.menu_frame_width = 150*1.61
 
         self.__GFX = {}
         self.__SFX = {}
@@ -93,9 +96,9 @@ class ShareData:
         self.level = 1
         self.max_level = 8
         self.hp = None
-        self.gunfire_upgrade = 3
+        self.gunfire_upgrade = 2
         self.hp_upgrade = 0
-        self.speed_upgrade = 3
+        self.speed_upgrade = 2
 
     @property
     def GFX(self):

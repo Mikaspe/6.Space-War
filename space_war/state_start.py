@@ -3,12 +3,9 @@ from state import State
 
 class Start(State):
     def __init__(self, data):
-        State.__init__(self)
         self.data = data
-
+        State.__init__(self)
         self.next = 'game'
-
-        self.startup()  # !!! to będzie do usunięcia !!
 
     def cleanup(self):  # Wywołane raz przed przejsciem do next stanu
         pass

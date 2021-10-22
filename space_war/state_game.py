@@ -10,8 +10,8 @@ from game_objects.explosion import Explosion
 
 class Game(State):
     def __init__(self, data):
-        State.__init__(self)
         self.data = data
+        State.__init__(self)
         self.next = 'end'
 
         self.player = Player(self.data, 'player1')
@@ -20,21 +20,29 @@ class Game(State):
         self.animations = pygame.sprite.Group()
 
     def cleanup(self):  # Wywołane raz przed przejsciem do next stanu
-        self.enemies.empty()
-        self.enemy_projectiles.empty()
-        self.player.projectiles.empty()
-        self.animations.empty()
+        pass  # Tutaj nie dalem czyszczenia bo po przejsciu w pause czyscilo
 
     def startup(self):  # Wywołane raz na początku tego stanu
-        self.player.hp_update()
-        self.player.speed_update()
-        self.player.gunfire_update()
-        self.enemies.add(*[Enemy(self.data, *enemy_arg) for enemy_arg in self.data.enemies_args[self.data.level]])  # Można uprościć aby było bardziej czytelne
-        self.timer_heart_beating = 0
-        self.played_lowhp_sound = False
+        if self.previous != 'pause':
+            self.enemies.empty()
+            self.enemy_projectiles.empty()
+            self.player.projectiles.empty()
+            self.animations.empty()
+            self.player.hp_update()
+            self.player.speed_update()
+            self.player.gunfire_update()
+            self.enemies.add(*[Enemy(self.data, *enemy_arg) for enemy_arg in
+                               self.data.enemies_args[self.data.level]])  # Można uprościć aby było bardziej czytelne
+            self.timer_heart_beating = 0
+            self.played_lowhp_sound = False
 
     def get_event(self, event):  # Zbiera eventy z control i reaguje na nie w swoj sposob
         self.player.get_event(event)
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                self.next = 'pause'
+                self.done = True
 
         # if event.type == MOVE:  # UWAGA, tutaj jest opcja przesłania evantu do każdego obiektu enemy i tam wykonanie move
         #     self.enemies.update()
@@ -49,6 +57,7 @@ class Game(State):
             self.__enemy_projectiles_remove()
             self.__player_projectiles_remove()
         else:
+            self.next = 'end'
             self.done = True
 
         self.draw(dt)  # Rysuje
