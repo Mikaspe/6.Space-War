@@ -30,7 +30,6 @@ class Upgrade(State, MenuManager):
     def update(self, keys, dt):  # Updatuje to co sie dzieje w tym stanie
         self.update_menu()
         if self.done == True:
-            print(f'Tutaj jestem: {self.next_list}')
             if self.next == 'gunfire_upg':
                 self.data.gunfire_upgrade += 1
             elif self.next == 'health_upg':

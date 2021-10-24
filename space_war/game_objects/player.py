@@ -111,7 +111,7 @@ class Player(pygame.sprite.Sprite):
 
     def change_spaceship(self, style: str) -> None:
         """Changes spacheship model.
-        Called when player decide to change model in 'Spaceship choose' menu before game"""
+        Called when player decide to change model in 'Spaceship choose' menu before game""" # doc_string do zmiany
         self.style = style
         self.image = self.textures[f'{self.style}-{self.direction}']
         self.mask = pygame.mask.from_surface(self.image)

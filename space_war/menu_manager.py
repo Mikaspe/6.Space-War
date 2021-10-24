@@ -60,7 +60,7 @@ class MenuManager:
                 self.current_menu_pos = option_pos
             if self.current_menu_pos == option_pos:
                 if self.click:
-                    if option_pos == self.num_of_options - 1:  # Last options is always Quit
+                    if self.next_list[option_pos] == 'quit':  # Last options is always Quit
                         self.quit = True
                     else:
                         self.next = self.next_list[option_pos]

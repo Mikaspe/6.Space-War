@@ -10,7 +10,7 @@ class Pause(State, MenuManager):
         State.__init__(self)
         MenuManager.__init__(self, self.data.menu_frame_width, ['Continue', 'Main menu', 'Exit'])  # Rozmiar okna dać do stałej
 
-        self.next_list = ['game', 'mainmenu']
+        self.next_list = ['game', 'mainmenu', 'quit']
 
     def cleanup(self):  # Wywołane raz przed przejsciem do next stanu
         pass

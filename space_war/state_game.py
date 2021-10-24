@@ -31,6 +31,7 @@ class Game(State):
             self.player.hp_update()
             self.player.speed_update()
             self.player.gunfire_update()
+            self.player.style = self.data.player_spaceship_style
             self.enemies.add(*[Enemy(self.data, *enemy_arg) for enemy_arg in
                                self.data.enemies_args[self.data.level]])  # Można uprościć aby było bardziej czytelne
             self.timer_heart_beating = 0
@@ -67,6 +68,10 @@ class Game(State):
         self.player.draw()
         self.enemies.draw(self.data.SCREEN)
         self.enemy_projectiles.draw(self.data.SCREEN)
+        # Explosion animation
+        for animation in self.animations:
+            animation.update(1.6)
+        self.animations.draw(self.data.SCREEN)  # Draw all explosion animations
         self.__draw_current_level()
         self.__draw_player_hearts(dt)
 

@@ -10,6 +10,8 @@ from state_start import Start
 from state_end import End
 from state_pause import Pause
 from state_upgrade import Upgrade
+from state_spaceshipsmenu import Spaceshipsmenu
+
 
 class Control:
     """Control and switch between game states."""
@@ -25,7 +27,8 @@ class Control:
             'game': Game(self.data),
             'pause': Pause(self.data),
             'end': End(self.data),
-            'upgrade': Upgrade(self.data)
+            'upgrade': Upgrade(self.data),
+            'spaceshipsmenu': Spaceshipsmenu(self.data)
         }
 
         self.state_name = start_state  # Name of current state
@@ -71,6 +74,7 @@ class ShareData:
         self.WIN_SIZE = (1024, 768)
         self.FRAMERATE = 80
         self.SCREEN = pygame.display.set_mode(self.WIN_SIZE)
+        pygame.display.set_caption('Space-War')
         self.SCREEN_RECT = self.SCREEN.get_rect()
         self.MOVE_RATIO = 30
         self.BORDER = 60
@@ -99,6 +103,7 @@ class ShareData:
         self.gunfire_upgrade = 2
         self.hp_upgrade = 0
         self.speed_upgrade = 2
+        self.player_spaceship_style = 'player1'
 
     @property
     def GFX(self):
@@ -122,6 +127,9 @@ class ShareData:
         for img in os.listdir('../resources/img/Background'):
             self.__GFX[img.replace('.png', '')] = pygame.image.load(
                 f'../resources/img/background/{img}')  # => surface
+        for img in os.listdir('../resources/img/player'):
+            self.__GFX[img.replace('.png', '')] = pygame.image.load(
+                f'../resources/img/player/{img}')  # => surface
 
     def __load_sounds(self) -> None:
         """Loads sounds"""

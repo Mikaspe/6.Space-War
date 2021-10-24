@@ -12,7 +12,7 @@ class MainMenu(State, MenuManager):
         State.__init__(self)
         MenuManager.__init__(self, self.data.menu_frame_width, ['Start', 'Spaceship', 'Exit'])
 
-        self.next_list = ['start', 'spaceship']
+        self.next_list = ['start', 'spaceshipsmenu', 'quit']
 
     def cleanup(self):  # Wywołane raz przed przejsciem do next stanu
         pass
