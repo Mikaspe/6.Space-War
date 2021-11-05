@@ -29,8 +29,8 @@ class MenuManager:
     def cleanup(self):  # Wywołane raz przed przejsciem do next stanu
         pass
 
-    def startup_menu(self):  # Wywołane raz na początku tego stanu
-        self.current_menu_pos = 0
+    def startup_menu(self,  initial_menu_pos=0):  # Wywołane raz na początku tego stanu
+        self.current_menu_pos = initial_menu_pos
         self.click = False
 
     def get_event_menu(self, event):  # Zbiera eventy z control i reaguje na nie w swoj sposob

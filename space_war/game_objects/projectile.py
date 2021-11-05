@@ -29,12 +29,12 @@ class Projectile(pygame.sprite.Sprite):
         elif self.style == 'enemy1':
             self.rect.y += self.base_projectile_speed * dt
         elif self.style == 'enemy2':
-            self.rect.y += (self.base_projectile_speed - 5) * dt
+            self.rect.y += (self.base_projectile_speed - 0.2) * dt
         elif self.style == 'enemy3':
             self.rect.y += self.base_projectile_speed * dt
         elif self.style == 'enemy4':
             self.rect.y += self.base_projectile_speed * dt
         elif self.style == 'enemy-ball':
-            self.rect.y += (self.base_projectile_speed - 10) * dt
+            self.rect.y += (self.base_projectile_speed - 0.3) * dt
         elif self.style == 'enemy-smallball':
-            self.rect.y += (self.base_projectile_speed - 5) * dt
+            self.rect.y += (self.base_projectile_speed - 0.2) * dt

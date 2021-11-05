@@ -18,6 +18,8 @@ class MainMenu(State, MenuManager):
         pass
 
     def startup(self):  # Wywołane raz na początku tego stanu
+        self.data.level = 1
+        self.data.gunfire_upgrade = self.data.hp_upgrade = self.data.speed_upgrade = 0
         self.startup_menu()
 
     def get_event(self, event):  # Zbiera eventy z control i reaguje na nie w swoj sposob

@@ -32,7 +32,7 @@ class Enemy(pygame.sprite.Sprite):
         elif style == 4:
             self.hp = 400
             self.shoot_ratio = 50
-            self.speed = 4
+            self.speed = 0.2
 
         self.played_berserker_sound = False
 
@@ -50,7 +50,7 @@ class Enemy(pygame.sprite.Sprite):
         projectiles = []
         if self.style < 4:
             if random.randint(1, self.shoot_ratio) == 1:
-                #self.sounds['laser-enemy'].play()  ## Zastanowić się jak to zrobić !!!
+                self.data.SFX['laser-enemy'].play()
                 projectile = Projectile(self.rect.centerx, self.rect.centery, f'enemy{self.style}')
                 projectiles.append(projectile)
                 if self.style == 3:
@@ -60,24 +60,24 @@ class Enemy(pygame.sprite.Sprite):
                     projectiles.append(projectile)
         elif self.style == 4:
             if self.hp > 300:
-                if random.randint(1, self.shoot_ratio + 100) == 1:
-                    #self.sounds['ball'].play()
+                if random.randint(1, self.shoot_ratio + 20) == 1:
+                    self.data.SFX['ball'].play()
                     projectile = Projectile(self.rect.centerx, self.rect.centery + 100, 'enemy-ball')
                     projectiles.append(projectile)
                 elif random.randint(1, self.shoot_ratio) == 1:
-                    #self.sounds['laser-enemy'].play()
+                    self.data.SFX['laser-enemy'].play()
                     projectile = Projectile(self.rect.centerx - 155, self.rect.centery, 'enemy-smallball')
                     projectiles.append(projectile)
                     projectile = Projectile(self.rect.centerx + 155, self.rect.centery, 'enemy-smallball')
                     projectiles.append(projectile)
                 elif random.randint(1, self.shoot_ratio) == 1:
-                    #self.sounds['laser-enemy'].play()
+                    self.data.SFX['laser-enemy'].play()
                     projectile = Projectile(self.rect.centerx - 115, self.rect.centery + 145, 'enemy4')
                     projectiles.append(projectile)
                     projectile = Projectile(self.rect.centerx + 115, self.rect.centery + 145, 'enemy4')
                     projectiles.append(projectile)
                 elif random.randint(1, self.shoot_ratio) == 1:
-                    #self.sounds['laser-enemy'].play()
+                    self.data.SFX['laser-enemy'].play()
                     projectile = Projectile(self.rect.centerx - 120, self.rect.centery - 105, 'enemy4')
                     projectiles.append(projectile)
                     projectile = Projectile(self.rect.centerx + 120, self.rect.centery - 105, 'enemy4')
@@ -98,7 +98,7 @@ class Enemy(pygame.sprite.Sprite):
 
         timer += dt
         timer2 += dt
-        self.speed = 12
+        self.speed = 0.4
         projectiles = []
 
         if 200 < timer < 800:

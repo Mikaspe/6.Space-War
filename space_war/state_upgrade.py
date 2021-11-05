@@ -10,14 +10,15 @@ class Upgrade(State, MenuManager):
     def __init__(self, data):
         self.data = data
         State.__init__(self)
-        MenuManager.__init__(self, 290, ['GUNFIRE', 'HEALTH', 'SPEED'], -50)
+        MenuManager.__init__(self, 290, ['GUNFIRE', 'HEALTH', 'SPEED'], xpos_menu_offset=-50)
         self.next_list = ['gunfire_upg', 'health_upg', 'speed_upg']
+        self.initial_menu_pos = 0
 
     def cleanup(self):  # Wywołane raz przed przejsciem do next stanu
         pass
 
     def startup(self):  # Wywołane raz na początku tego stanu
-        self.startup_menu()
+        self.startup_menu(initial_menu_pos=self.initial_menu_pos)
         self.draw()
 
     def get_event(self, event):  # Zbiera eventy z control i reaguje na nie w swoj sposob
@@ -29,14 +30,29 @@ class Upgrade(State, MenuManager):
 
     def update(self, keys, dt):  # Updatuje to co sie dzieje w tym stanie
         self.update_menu()
-        if self.done == True:
+        if self.done:
+            self.initial_menu_pos = 0
             if self.next == 'gunfire_upg':
-                self.data.gunfire_upgrade += 1
+                if self.data.gunfire_upgrade < 3:
+                    self.data.gunfire_upgrade += 1
+                    self.next = 'start'
+                else:
+                    self.next = 'upgrade'
+                    self.initial_menu_pos = 0
             elif self.next == 'health_upg':
-                self.data.hp_upgrade += 1
+                if self.data.hp_upgrade < 3:
+                    self.data.hp_upgrade += 1
+                    self.next = 'start'
+                else:
+                    self.next = 'upgrade'
+                    self.initial_menu_pos = 1
             elif self.next == 'speed_upg':
-                self.data.speed_upgrade += 1
-            self.next = 'start'
+                if self.data.speed_upgrade < 3:
+                    self.data.speed_upgrade += 1
+                    self.next = 'start'
+                else:
+                    self.next = 'upgrade'
+                    self.initial_menu_pos = 2
 
     def draw(self):  # Rysowanie
         self.data.SCREEN.blit(self.data.GFX[f'background{self.data.level}'], (0, 0))

@@ -97,12 +97,12 @@ class ShareData:
         self.__load_sounds()
         self.__load_level_enemies()
 
-        self.level = 1
+        self.level = 7
         self.max_level = 8
         self.hp = None
-        self.gunfire_upgrade = 2
+        self.gunfire_upgrade = 0
         self.hp_upgrade = 0
-        self.speed_upgrade = 2
+        self.speed_upgrade = 0
         self.player_spaceship_style = 'player1'
 
     @property

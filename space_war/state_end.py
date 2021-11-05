@@ -20,7 +20,7 @@ class End(State):
             self.data.SFX['killed-monster'].play()
             self.sound_length_ms = self.data.SFX['killed-monster'].get_length() * 1000
             text = 'YOU WIN'
-            self.next = 'main-menu'
+            self.next = 'mainmenu'
         else:
             self.data.SFX['win'].play()
             self.sound_length_ms = self.data.SFX['win'].get_length() * 1000

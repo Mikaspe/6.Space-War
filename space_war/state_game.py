@@ -31,6 +31,7 @@ class Game(State):
             self.player.hp_update()
             self.player.speed_update()
             self.player.gunfire_update()
+            self.player.gunfire_update()
             self.player.style = self.data.player_spaceship_style
             self.enemies.add(*[Enemy(self.data, *enemy_arg) for enemy_arg in
                                self.data.enemies_args[self.data.level]])  # Można uprościć aby było bardziej czytelne
@@ -58,6 +59,10 @@ class Game(State):
             self.__enemy_projectiles_remove()
             self.__player_projectiles_remove()
         else:
+            self.next = 'end'
+            self.done = True
+
+        if keys[pygame.K_n]:
             self.next = 'end'
             self.done = True
 
