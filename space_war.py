@@ -174,7 +174,7 @@ class Game:
             self.player.direction = 'stop'
         if keys[pygame.K_SPACE]:
             self.timer += self.dt
-            if self.timer > self.player.shoot_ratio:
+            if self.timer > self.player.shoot_delay:
                 self.game_data.sounds['laser-player'].play()
                 projectile = Projectile(self.player.rect.centerx, self.player.rect.top, 'player')
                 self.player.projectiles.append(projectile)

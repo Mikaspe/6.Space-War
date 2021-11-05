@@ -71,12 +71,13 @@ class Game(State):
     def draw(self, dt):  # Rysowanie
         self.data.SCREEN.blit(self.data.GFX[f'background{self.data.level}'], (0, 0))
         self.player.draw()
-        self.enemies.draw(self.data.SCREEN)
-        self.enemy_projectiles.draw(self.data.SCREEN)
         # Explosion animation
         for animation in self.animations:
             animation.update(1.6)
         self.animations.draw(self.data.SCREEN)  # Draw all explosion animations
+
+        self.enemies.draw(self.data.SCREEN)
+        self.enemy_projectiles.draw(self.data.SCREEN)
         self.__draw_current_level()
         self.__draw_player_hearts(dt)
 
@@ -154,7 +155,7 @@ class Game(State):
                         self.animations.add(self.explosion)
                         self.enemies.remove(enemy)
                         for enemy in self.enemies:  # Speed of enemies increase when number of them decrease
-                            enemy.speed += 0.02
+                            enemy.speed += 0.01
                     break
 
 

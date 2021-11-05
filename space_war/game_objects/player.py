@@ -7,7 +7,7 @@ from space_war.game_objects.projectile import Projectile
 
 class Player(pygame.sprite.Sprite):
     """Player's spaceship object"""
-    def __init__(self, data, style: str, hp_base: int = 3, speed_base: float = 0.5, shoot_ratio: float = 20) -> None:
+    def __init__(self, data, style: str, hp_base: int = 3, speed_base: float = 0.4, shoot_delay: float = 20) -> None:
         super().__init__()
         self.data = data
 
@@ -16,13 +16,12 @@ class Player(pygame.sprite.Sprite):
         self.data.hp = hp_base
         self.speed_base = speed_base
         self.speed = speed_base
-        self.shoot_ratio = shoot_ratio
         self.direction = 'stop'
         self.weapon_style = 0
 
         self.projectiles = pygame.sprite.Group()
         self.timer = 0.0
-        self.projectile_delay = 500
+        self.shoot_delay = shoot_delay
         self.add_laser = False
 
         self.textures = {}
@@ -49,7 +48,7 @@ class Player(pygame.sprite.Sprite):
         else:
             self.direction = 'stop'
 
-        if pygame.time.get_ticks() - self.timer > self.projectile_delay:
+        if pygame.time.get_ticks() - self.timer > self.shoot_delay:
             self.add_laser = True
 
         if keys[pygame.K_SPACE]:
@@ -80,16 +79,16 @@ class Player(pygame.sprite.Sprite):
         """Updates player shoot ratio and weapon style depending on actual 'gunfire_upgrade' level.
         Called before each game level."""
         if self.data.gunfire_upgrade == 0:
-            self.shoot_ratio = 25
+            self.shoot_delay = 500
             self.weapon_style = 0
         elif self.data.gunfire_upgrade == 1:
-            self.shoot_ratio = 17
+            self.shoot_delay = 350
             self.weapon_style = 0
         elif self.data.gunfire_upgrade == 2:
-            self.shoot_ratio = 10
+            self.shoot_delay = 200
             self.weapon_style = 0
         elif self.data.gunfire_upgrade == 3:
-            self.shoot_ratio = 20
+            self.shoot_delay = 350
             self.weapon_style = 1
 
     def hp_update(self) -> None:
@@ -100,7 +99,7 @@ class Player(pygame.sprite.Sprite):
     def speed_update(self) -> None:
         """Updates player speed.
         Called before each game level."""
-        self.speed = self.speed_base + 0.3*self.data.speed_upgrade
+        self.speed = self.speed_base + 0.15*self.data.speed_upgrade
 
     def reset(self) -> None:
         """Resets all upgrades.

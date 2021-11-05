@@ -97,7 +97,7 @@ class ShareData:
         self.__load_sounds()
         self.__load_level_enemies()
 
-        self.level = 7
+        self.level = 8
         self.max_level = 8
         self.hp = None
         self.gunfire_upgrade = 0
