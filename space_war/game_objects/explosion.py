@@ -22,17 +22,17 @@ class Explosion(pygame.sprite.Sprite):
 
     def animate(self) -> None:
         """Change flag value which allows updates of animation image.
-        Called when enemy spaceship has been destroyed.
+        Called when enemy spaceship has been destroyed in the 'state_game' module.
         """
         self.is_animating = True
 
     def update(self, speed_of_animation: float = 1) -> None:
-        """Updates current explosion frame. Each call updates 'self.image' with next frame image.
+        """Updates current explosion frame. Each call updates 'self.image' sprite with next frame image.
         Called in 'draw_game' method.
 
         Parameters:
             speed_of_animation: Speed of changing frames(default=1). For example if speed_of_animation=0.5 frame
-                                       changes after 2 calls.
+                                changes after 2 calls.
         """
         if self.is_animating:
             self.image = self.sprites[int(self.current_sprite)]

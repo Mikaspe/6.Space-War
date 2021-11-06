@@ -15,7 +15,7 @@ from state_spaceshipsmenu import Spaceshipsmenu
 
 class Control:
     """Control and switch between game states."""
-    def __init__(self, start_state):
+    def __init__(self, start_state: str) -> None:
         self.done = False  # When True game closes
         self.clock = pygame.time.Clock()
 
@@ -34,8 +34,17 @@ class Control:
         self.state_name = start_state  # Name of current state
         self.state = self.state_dict[self.state_name]  # Instance of current state
 
-    def flip_state(self):  # Przerzuca stan z poprzedniego na kolejny
-        """Change current state to another."""
+    def main_game_loop(self) -> None:
+        # Gra sie wylaczy gdy self.done = True. Czyli w event loop gdy QUIT lub w update gdy self.state.quit
+        # (nie mylic z self.done stanow, ktore koncza stan)
+        while not self.done:
+            delta_time = self.clock.tick(self.data.FRAMERATE)
+            self.__event_loop()
+            self.__update(delta_time)
+            pygame.display.update()
+
+    def __flip_state(self) -> None:  # Przerzuca stan z poprzedniego na kolejny
+        """Changes current state to another."""
         self.state.done = False  # Resetuje flage ktora sprawiła wywołanie flipa
         previous, self.state_name = self.state_name, self.state.next  # Podmiana starego stanu na nowy
         self.state.cleanup()  # Czyści poprzedni stan
@@ -43,34 +52,25 @@ class Control:
         self.state.previous = previous  # Podmienia self.previous
         self.state.startup()  # Uruchamia nowy stan, jego startup
 
-    def update(self, dt):  # W petli. Słuzy do updatowania samego controla jak i aktualnego stanu
+    def __update(self, dt: int) -> None:  # W petli. Słuzy do updatowania samego controla jak i aktualnego stanu
         """Updates 'Control' and current state"""
         keys = pygame.key.get_pressed()
         if self.state.quit:  # Jezeli atrybut quit aktualnego stanu jest True to self.done Controla to True wiec wychodzi z pelti i wyłącza gre
             self.done = True
         elif self.state.done:  # Jeżeli atrybut done aktualnego stanu jest True to Control przerzuca stan na kolejny
-            self.flip_state()
+            self.__flip_state()
         self.state.update(keys, dt)  # Wywołanie update stanu, gdzie odbywa się rozgrywka i rysowanie
 
-    def event_loop(self):  # W petli
+    def __event_loop(self) -> None:  # W petli
         """Checks events and send events to the current state"""
         for event in pygame.event.get():  # Sprawdza eventy
             if event.type == pygame.QUIT:
                 self.done = True  # Wyłącza gre, bo wychodzi z main_game_loop
             self.state.get_event(event)  # Przesyła do aktualnego stanu, np. Game() wszystkie eventy
 
-    def main_game_loop(self):
-        # Gra sie wylaczy gdy self.done = True. Czyli w event loop gdy QUIT lub w update gdy self.state.quit
-        # (nie mylic z self.done stanow, ktore koncza stan)
-        while not self.done:
-            delta_time = self.clock.tick(self.data.FRAMERATE)
-            self.event_loop()
-            self.update(delta_time)
-            pygame.display.update()
-
 
 class ShareData:
-    def __init__(self):
+    def __init__(self) -> None:
         self.WIN_SIZE = (1024, 768)
         self.FRAMERATE = 80
         self.SCREEN = pygame.display.set_mode(self.WIN_SIZE)
@@ -100,21 +100,21 @@ class ShareData:
         self.level = 8
         self.max_level = 8
         self.hp = None
-        self.gunfire_upgrade = 0
-        self.hp_upgrade = 0
-        self.speed_upgrade = 0
+        self.gunfire_upgrade = 3
+        self.hp_upgrade = 1
+        self.speed_upgrade = 3
         self.player_spaceship_style = 'player1'
 
     @property
-    def GFX(self):
+    def GFX(self) -> dict:
         return self.__GFX
 
     @property
-    def SFX(self):
+    def SFX(self) -> dict:
         return self.__SFX
 
     @property
-    def enemies_args(self):
+    def enemies_args(self) -> dict:
         return self.__enemies_args
 
     def __load_images(self) -> None:
@@ -140,6 +140,7 @@ class ShareData:
         """Loads level enemies from pickle file"""
         with open('game_levels.pickle', 'rb') as handle:
             self.__enemies_args = pickle.load(handle)
+            #print(self.__enemies_args)
 
 
 pygame.init()

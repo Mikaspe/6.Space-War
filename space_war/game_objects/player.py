@@ -32,10 +32,10 @@ class Player(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect(center=(self.data.WIN_SIZE[0]/2, self.data.WIN_SIZE[1]-75))
 
-    def get_event(self, event):
+    def get_event(self, event: pygame.event) -> None:
         pass
 
-    def update(self, keys, dt):
+    def update(self, keys: pygame.key, dt: int) -> None:
         # updates current spaceship image with proper direction(left, right or stop)
         self.image = self.textures[f'{self.style}-{self.direction}']
 
@@ -71,7 +71,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.clamp_ip(self.data.SCREEN_RECT)  # Keep spaceship model on screen when x pos is too low or high
         self.projectiles.update(dt)
 
-    def draw(self):
+    def draw(self) -> None:
         self.data.SCREEN.blit(self.image, self.rect)
         self.projectiles.draw(self.data.SCREEN)
 

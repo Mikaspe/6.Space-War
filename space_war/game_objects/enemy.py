@@ -6,7 +6,9 @@ from space_war.game_objects.projectile import Projectile
 
 
 class Enemy(pygame.sprite.Sprite):
-    """Enemy spaceship object"""
+    """Enemy spaceship object.
+    Called in 'state_game' module.
+    """
     def __init__(self, data, pos_x: int, pos_y: int, style: int, direction: str = 'right') -> None:
         super().__init__()
         self.data = data
@@ -22,31 +24,35 @@ class Enemy(pygame.sprite.Sprite):
 
         if style == 1:
             self.hp = 1
-            self.shoot_ratio = 500
+            self.shoot_ratio = 300
         elif style == 2:
             self.hp = 5
             self.shoot_ratio = 160
         elif style == 3:
             self.hp = 3
-            self.shoot_ratio = 100
+            self.shoot_ratio = 300
         elif style == 4:
-            self.hp = 400
+            self.hp = 10#400
             self.shoot_ratio = 120
             self.speed = 0.2
 
+        self.ball_delay = 2000
+        self.timer = 0
         self.played_berserker_sound = False
 
-    def update(self, dt) -> None:
-        """Moving enemy in specified direction with defined speed(self.speed).
-        Called when pygame event is 'ENEMYMOVE'.
+    def update(self, dt: int) -> None:
+        """Moving enemy in left or right direction with defined speed(self.speed).
+        Called in 'state_game' module.
         """
         if self.direction == 'left':
             self.rect.x -= round(self.speed * dt)
         elif self.direction == 'right':
             self.rect.x += round(self.speed * dt)
 
-    def projectile_generation(self, dt):
-        """Generating enemy projectiles with definied probability."""
+    def projectile_generation(self, dt: int) -> list:
+        """Generating enemy projectiles with definied probability.
+        Called in 'state_game' module.
+        """
         projectiles = []
         if self.style < 4:
             if random.randint(1, self.shoot_ratio) == 1:
@@ -59,11 +65,12 @@ class Enemy(pygame.sprite.Sprite):
                     projectile = Projectile(self.rect.centerx + 24, self.rect.centery + 20, 'enemy3')
                     projectiles.append(projectile)
         elif self.style == 4:
-            if self.hp > 3000:
-                if random.randint(1, self.shoot_ratio) == 1:
+            if self.hp > 300:
+                if random.randint(1, self.shoot_ratio) == 1 and pygame.time.get_ticks()-self.timer > self.ball_delay:
                     self.data.SFX['ball'].play()
                     projectile = Projectile(self.rect.centerx, self.rect.centery + 100, 'enemy-ball')
                     projectiles.append(projectile)
+                    self.timer = pygame.time.get_ticks()
                 elif random.randint(1, self.shoot_ratio) == 1:
                     self.data.SFX['laser-enemy'].play()
                     projectile = Projectile(self.rect.centerx - 155, self.rect.centery, 'enemy-smallball')
@@ -87,18 +94,18 @@ class Enemy(pygame.sprite.Sprite):
 
         return projectiles
 
-    def __boss_berserker(self, dt):
-        """Boss sequence in berserker mode"""
+    def __boss_berserker(self, dt: int) -> list:
+        """Boss sequence in berserker mode."""
         if not self.played_berserker_sound:
             self.data.SFX['enemy-berserker'].play()
             self.data.SFX['enemy-berserker2'].play()
-            self.timer = 0
+            self.timer = 0  # to może dać wyżej w konstruktorze? !!
             self.timer2 = 0
             self.played_berserker_sound = True
 
         self.timer += dt
         self.timer2 += dt
-        self.speed = 0.4
+        self.speed = 0.5
         projectiles = []
 
         if 2000 < self.timer < 8000:

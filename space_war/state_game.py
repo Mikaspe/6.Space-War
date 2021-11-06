@@ -9,7 +9,7 @@ from game_objects.explosion import Explosion
 
 
 class Game(State):
-    def __init__(self, data):
+    def __init__(self, data) -> None:
         self.data = data
         State.__init__(self)
         self.next = 'end'
@@ -19,10 +19,10 @@ class Game(State):
         self.enemy_projectiles = pygame.sprite.Group()
         self.animations = pygame.sprite.Group()
 
-    def cleanup(self):  # Wywołane raz przed przejsciem do next stanu
+    def cleanup(self) -> None:  # Wywołane raz przed przejsciem do next stanu
         pass  # Tutaj nie dalem czyszczenia bo po przejsciu w pause czyscilo
 
-    def startup(self):  # Wywołane raz na początku tego stanu
+    def startup(self) -> None:  # Wywołane raz na początku tego stanu
         if self.previous != 'pause':
             self.enemies.empty()
             self.enemy_projectiles.empty()
@@ -38,7 +38,7 @@ class Game(State):
             self.timer_heart_beating = 0
             self.played_lowhp_sound = False
 
-    def get_event(self, event):  # Zbiera eventy z control i reaguje na nie w swoj sposob
+    def get_event(self, event: pygame.event) -> None:  # Zbiera eventy z control i reaguje na nie w swoj sposob
         self.player.get_event(event)
 
         if event.type == pygame.KEYDOWN:
@@ -49,7 +49,7 @@ class Game(State):
         # if event.type == MOVE:  # UWAGA, tutaj jest opcja przesłania evantu do każdego obiektu enemy i tam wykonanie move
         #     self.enemies.update()
 
-    def update(self, keys, dt):  # Updatuje to co sie dzieje w tym stanie
+    def update(self, keys: pygame.key, dt: int) -> None:  # Updatuje to co sie dzieje w tym stanie
 
         if self.data.hp > 0 and self.enemies:
             self.player.update(keys, dt)
@@ -58,6 +58,7 @@ class Game(State):
             self.__enemy_projectiles_gen(dt)
             self.__enemy_projectiles_remove()
             self.__player_projectiles_remove()
+            self.__draw(dt)  # Rysuje
         else:
             self.next = 'end'
             self.done = True
@@ -66,9 +67,7 @@ class Game(State):
             self.next = 'end'
             self.done = True
 
-        self.draw(dt)  # Rysuje
-
-    def draw(self, dt):  # Rysowanie
+    def __draw(self, dt: int) -> None:  # Rysowanie
         self.data.SCREEN.blit(self.data.GFX[f'background{self.data.level}'], (0, 0))
         self.player.draw()
         # Explosion animation
@@ -81,6 +80,9 @@ class Game(State):
         self.__draw_current_level()
         self.__draw_player_hearts(dt)
 
+        if self.data.level == 8 and self.enemies.has():
+            self.__draw_boss_healthbar()
+
     def __draw_current_level(self) -> None:
         """Draws current level in top-right corner"""
         font = pygame.font.SysFont('swiss721', 17)
@@ -89,7 +91,7 @@ class Game(State):
         text_level_rect.center = (self.data.WIN_SIZE[0] - 20, 15)
         self.data.SCREEN.blit(text_level, text_level_rect)
 
-    def __draw_player_hearts(self, dt):
+    def __draw_player_hearts(self, dt: int) -> None:
 
         if self.data.hp > 1:
             for heart in range(self.data.hp):
@@ -105,7 +107,7 @@ class Game(State):
                 self.data.SFX['low-hp'].play()
                 self.played_lowhp_sound = True
 
-    def __keep_enemies_in_window(self):
+    def __keep_enemies_in_window(self) -> None:
         # Changing enemies move direction when farthest reaches self.border
         enemies_lst = self.enemies.sprites()
         enemies_lst.sort(key=operator.attrgetter('rect.x'))
@@ -116,13 +118,13 @@ class Game(State):
             for enemy in self.enemies:
                 enemy.direction = 'left'
 
-    def __enemy_projectiles_gen(self, dt):
+    def __enemy_projectiles_gen(self, dt: int) -> None:
         for enemy in self.enemies:
             self.enemy_projectiles.add(enemy.projectile_generation(dt))
 
         self.enemy_projectiles.update(dt)
 
-    def __enemy_projectiles_remove(self):
+    def __enemy_projectiles_remove(self) -> None:
         for projectile in self.enemy_projectiles:
             if projectile.rect.top > self.data.WIN_SIZE[1]:
                 self.enemy_projectiles.remove(projectile)
@@ -140,7 +142,7 @@ class Game(State):
                     self.enemy_projectiles.remove(projectile)
                     self.data.hp -= 1
 
-    def __player_projectiles_remove(self):
+    def __player_projectiles_remove(self) -> None:
         for projectile in self.player.projectiles:
             for enemy in self.enemies:
                 if pygame.sprite.collide_mask(enemy, projectile):
@@ -158,4 +160,7 @@ class Game(State):
                             enemy.speed += 0.01
                     break
 
-
+    def __draw_boss_healthbar(self) -> None:
+        frame_rect = pygame.Rect((0, 10), (self.enemies.sprites()[0].hp, 3))
+        frame_rect.centerx = self.data.SCREEN_RECT.centerx
+        pygame.draw.rect(self.data.SCREEN, (200, 0, 0), frame_rect, 2)

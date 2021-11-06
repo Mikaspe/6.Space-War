@@ -13,7 +13,7 @@ class Projectile(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect(center=(pos_x, pos_y))
 
-    def update(self, dt) -> None:
+    def update(self, dt: int) -> None:
         """Moving projectile with defined speed.
         Called when pygame event is 'PROJECTILEMOVE'.
         """
@@ -35,6 +35,6 @@ class Projectile(pygame.sprite.Sprite):
         elif self.style == 'enemy4':
             self.rect.y += self.base_projectile_speed * dt
         elif self.style == 'enemy-ball':
-            self.rect.y += (self.base_projectile_speed - 0.25) * dt
+            self.rect.y += (self.base_projectile_speed - 0.23) * dt
         elif self.style == 'enemy-smallball':
-            self.rect.y += (self.base_projectile_speed - 0.15) * dt
+            self.rect.y += (self.base_projectile_speed - 0.10) * dt

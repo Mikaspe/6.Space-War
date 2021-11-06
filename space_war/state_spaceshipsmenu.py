@@ -8,7 +8,7 @@ class Spaceshipsmenu(State, MenuManager):
     """Upgrade menu is displayed after finishing each level.
     Player can upgrade one of the abilities"""
 
-    def __init__(self, data):
+    def __init__(self, data) -> None:
         self.data = data
         State.__init__(self)
         MenuManager.__init__(self, self.data.menu_frame_width, ['Spaceship1', 'Spaceship2', 'Spaceship3'])
@@ -35,13 +35,13 @@ class Spaceshipsmenu(State, MenuManager):
 
         self.lst_text_rect = [self.spacehip1_rect, self.spacehip2_rect, self.spacehip3_rect]
 
-    def cleanup(self):  # Wywołane raz przed przejsciem do next stanu
+    def cleanup(self) -> None:  # Wywołane raz przed przejsciem do next stanu
         pass
 
-    def startup(self):  # Wywołane raz na początku tego stanu
-        self.startup_menu()
+    def startup(self) -> None:  # Wywołane raz na początku tego stanu
+        self.startup_menu(initial_menu_pos=int(self.data.player_spaceship_style[-1])-1)
 
-    def get_event(self, event):  # Zbiera eventy z control i reaguje na nie w swoj sposob
+    def get_event(self, event: pygame.event) -> None:  # Zbiera eventy z control i reaguje na nie w swoj sposob
         self.click = False
         # if event.type == pygame.QUIT:
         #     self.quit = True
@@ -60,7 +60,7 @@ class Spaceshipsmenu(State, MenuManager):
             if event.button == 1:
                 self.click = True
 
-    def update(self, keys, dt):  # Updatuje to co sie dzieje w tym stanie
+    def update(self, keys: pygame.key, dt: int) -> None:  # Updatuje to co sie dzieje w tym stanie
         self.draw()
         self.update_menu()
         if self.next == 'Spaceship1':
@@ -71,11 +71,11 @@ class Spaceshipsmenu(State, MenuManager):
             self.data.player_spaceship_style = 'player3'
         self.next = 'mainmenu'
 
-    def draw(self):  # Rysowanie
+    def draw(self) -> None:  # Rysowanie
         self.data.SCREEN.blit(self.data.GFX[f'background1'], (0, 0))
         self.data.SCREEN.blit(self.text_spaceship, self.text_rect)
 
-    def draw_menu(self):
+    def draw_menu(self) -> None:
         for option_pos in range(self.num_of_options):
             if self.current_menu_pos == option_pos:
                 self.data.SCREEN.blit(self.data.GFX[f'player{option_pos+1}-choosen'], eval(f'self.spacehip{option_pos+1}_rect'))

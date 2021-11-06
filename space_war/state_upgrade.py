@@ -7,28 +7,28 @@ from menu_manager import MenuManager
 class Upgrade(State, MenuManager):
     """Upgrade menu is displayed after finishing each level.
     Player can upgrade one of the abilities"""
-    def __init__(self, data):
+    def __init__(self, data) -> None:
         self.data = data
         State.__init__(self)
         MenuManager.__init__(self, 290, ['GUNFIRE', 'HEALTH', 'SPEED'], xpos_menu_offset=-50)
         self.next_list = ['gunfire_upg', 'health_upg', 'speed_upg']
         self.initial_menu_pos = 0
 
-    def cleanup(self):  # Wywołane raz przed przejsciem do next stanu
+    def cleanup(self) -> None:  # Wywołane raz przed przejsciem do next stanu
         pass
 
-    def startup(self):  # Wywołane raz na początku tego stanu
+    def startup(self) -> None:  # Wywołane raz na początku tego stanu
         self.startup_menu(initial_menu_pos=self.initial_menu_pos)
-        self.draw()
+        self.__draw()
 
-    def get_event(self, event):  # Zbiera eventy z control i reaguje na nie w swoj sposob
+    def get_event(self, event: pygame.event) -> None:  # Zbiera eventy z control i reaguje na nie w swoj sposob
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 self.quit = True
 
         self.get_event_menu(event)
 
-    def update(self, keys, dt):  # Updatuje to co sie dzieje w tym stanie
+    def update(self, keys: pygame.key, dt: int) -> None:  # Updatuje to co sie dzieje w tym stanie
         self.update_menu()
         if self.done:
             self.initial_menu_pos = 0
@@ -54,7 +54,7 @@ class Upgrade(State, MenuManager):
                     self.next = 'upgrade'
                     self.initial_menu_pos = 2
 
-    def draw(self):  # Rysowanie
+    def __draw(self) -> None:  # Rysowanie
         self.data.SCREEN.blit(self.data.GFX[f'background{self.data.level}'], (0, 0))
 
         self.upgrade_point_rect = pygame.Rect((0, 0), (15, 15*1.61))

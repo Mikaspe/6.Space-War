@@ -1,15 +1,17 @@
+import pygame
+
 from state import State
 
 
 class End(State):
-    def __init__(self, data):
+    def __init__(self, data) -> None:  # !!!!!!!!!!!!!!! tutaj typ data
         State.__init__(self)
         self.data = data
 
-    def cleanup(self):  # Wywołane raz przed przejsciem do next stanu
+    def cleanup(self) -> None:  # Wywołane raz przed przejsciem do next stanu
         pass
 
-    def startup(self):  # Wywołane raz na początku tego stanu
+    def startup(self) -> None:  # Wywołane raz na początku tego stanu
 
         if self.data.hp <= 0:
             self.data.SFX['game-over'].play()
@@ -32,15 +34,15 @@ class End(State):
         self.text_title_rect = self.text_title.get_rect(center=self.data.SCREEN_RECT.center)
         self.timer = 0
 
-    def get_event(self, event):  # Zbiera eventy z control i reaguje na nie w swoj sposob
+    def get_event(self, event: pygame.event) -> None:  # Zbiera eventy z control i reaguje na nie w swoj sposob
         pass
 
-    def update(self, keys, dt):  # Updatuje to co sie dzieje w tym stanie
-        self.draw()
+    def update(self, keys: pygame.key, dt: int) -> None:  # Updatuje to co sie dzieje w tym stanie
+        self.__draw()
 
         self.timer += dt
         if self.timer >= self.sound_length_ms:
             self.done = True
 
-    def draw(self):  # Rysowanie
+    def __draw(self) -> None:  # Rysowanie
         self.data.SCREEN.blit(self.text_title, self.text_title_rect)
