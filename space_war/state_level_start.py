@@ -3,7 +3,7 @@ import pygame
 from state import State
 
 
-class Start(State):
+class LevelStart(State):
     def __init__(self, data) -> None:
         self.data = data
         State.__init__(self)

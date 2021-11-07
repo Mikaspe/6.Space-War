@@ -4,6 +4,13 @@ import pygame
 class Projectile(pygame.sprite.Sprite):
     """Projectile object"""
     def __init__(self, pos_x: int, pos_y: int, style: str) -> None:
+        """
+        Parameters:
+            pos_x: x position where projectile will apear
+            pos_y: y position where projectile will apear
+            style: projectile type
+        """
+        
         super().__init__()
 
         self.style = style
@@ -15,7 +22,7 @@ class Projectile(pygame.sprite.Sprite):
 
     def update(self, dt: int) -> None:
         """Moving projectile with defined speed.
-        Called when pygame event is 'PROJECTILEMOVE'.
+        Called in update method in the state_game module.
         """
         speed_x_ratio = 0.3
         if self.style == 'player':

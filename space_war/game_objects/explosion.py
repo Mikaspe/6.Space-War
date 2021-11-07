@@ -6,6 +6,11 @@ import pygame
 class Explosion(pygame.sprite.Sprite):
     """Explosion animation."""
     def __init__(self, pos_x: int, pos_y: int) -> None:
+        """
+        Parameters:
+            pos_x: x position where explosion animation will apear
+            pos_y: y position where explosion animation will apear
+        """
         super().__init__()
 
         self.sprites = []
@@ -21,14 +26,14 @@ class Explosion(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=(pos_x, pos_y))
 
     def animate(self) -> None:
-        """Change flag value which allows updates of animation image.
+        """Changes flag value which allows updates of animation image.
         Called when enemy spaceship has been destroyed in the 'state_game' module.
         """
         self.is_animating = True
 
     def update(self, speed_of_animation: float = 1) -> None:
         """Updates current explosion frame. Each call updates 'self.image' sprite with next frame image.
-        Called in 'draw_game' method.
+        Called in 'draw_game' method in the 'state_game' module.
 
         Parameters:
             speed_of_animation: Speed of changing frames(default=1). For example if speed_of_animation=0.5 frame

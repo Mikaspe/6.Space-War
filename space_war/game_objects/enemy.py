@@ -10,6 +10,14 @@ class Enemy(pygame.sprite.Sprite):
     Called in 'state_game' module.
     """
     def __init__(self, data, pos_x: int, pos_y: int, style: int, direction: str = 'right') -> None:
+        """
+        Parameters:
+            data:
+            pos_x: x position where spaceship will apear
+            pos_y: y position where spaceship will apear
+            style: enemy spaceship type(1-4)
+            direction: initial spaceship move direction
+        """
         super().__init__()
         self.data = data
 
@@ -41,8 +49,11 @@ class Enemy(pygame.sprite.Sprite):
         self.played_berserker_sound = False
 
     def update(self, dt: int) -> None:
-        """Moving enemy in left or right direction with defined speed(self.speed).
+        """Moving enemy in left or right direction(self.direction) with defined speed(self.speed).
         Called in 'state_game' module.
+
+        Parameters:
+            dt: delta time
         """
         if self.direction == 'left':
             self.rect.x -= round(self.speed * dt)
@@ -50,8 +61,11 @@ class Enemy(pygame.sprite.Sprite):
             self.rect.x += round(self.speed * dt)
 
     def projectile_generation(self, dt: int) -> list:
-        """Generating enemy projectiles with definied probability.
+        """Generating enemy projectiles with definied probability(self.shoot_ratio).
         Called in 'state_game' module.
+
+        Parameters:
+            dt: delta time
         """
         projectiles = []
         if self.style < 4:
@@ -95,7 +109,13 @@ class Enemy(pygame.sprite.Sprite):
         return projectiles
 
     def __boss_berserker(self, dt: int) -> list:
-        """Boss sequence in berserker mode."""
+        """Boss sequence in berserker mode.
+        Starts when enemy hp is low enough.
+
+        Parameters:
+            dt: delta time
+        """
+
         if not self.played_berserker_sound:
             self.data.SFX['enemy-berserker'].play()
             self.data.SFX['enemy-berserker2'].play()

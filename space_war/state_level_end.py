@@ -3,7 +3,7 @@ import pygame
 from state import State
 
 
-class End(State):
+class LevelEnd(State):
     def __init__(self, data) -> None:  # !!!!!!!!!!!!!!! tutaj typ data
         State.__init__(self)
         self.data = data

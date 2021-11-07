@@ -3,6 +3,12 @@ import pygame
 
 class MenuManager:
     def __init__(self, frame_width: int, options: list, xpos_menu_offset: int = 0) -> None:  # Teoretycznei nie musiz tego wysylac do nadklasy bo to jest nadklasa
+        """
+        Parameters:
+            frame_width: width of the menu frame
+            options: list with menu items to display
+            xpos_menu_offset: offset for items position in the frame menu(when 0 text is centered)
+        """
         # ale za to jest bardziej jawne
         self.options = options
 
@@ -30,6 +36,10 @@ class MenuManager:
         pass
 
     def startup_menu(self,  initial_menu_pos: int = 0) -> None:  # Wywołane raz na początku tego stanu
+        """
+        Parameters:
+            initial_menu_pos: ??? pisać?
+        """
         self.current_menu_pos = initial_menu_pos
         self.click = False
 

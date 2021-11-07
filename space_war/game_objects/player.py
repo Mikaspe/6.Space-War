@@ -7,7 +7,14 @@ from space_war.game_objects.projectile import Projectile
 
 class Player(pygame.sprite.Sprite):
     """Player's spaceship object"""
-    def __init__(self, data, style: str, hp_base: int = 3, speed_base: float = 0.4, shoot_delay: float = 20) -> None:
+    def __init__(self, data, style: str, hp_base: int = 3, speed_base: float = 0.4) -> None:
+        """
+        Parameters:
+            data:
+            style: type of player spaceship('player1', 'player2' or 'player3')
+            hp_base: base player health points
+            speed_base: base speed of moving player spaceship
+        """
         super().__init__()
         self.data = data
 
@@ -21,7 +28,7 @@ class Player(pygame.sprite.Sprite):
 
         self.projectiles = pygame.sprite.Group()
         self.timer = 0.0
-        self.shoot_delay = shoot_delay
+        self.shoot_delay = None
         self.add_laser = False
 
         self.textures = {}
@@ -110,7 +117,10 @@ class Player(pygame.sprite.Sprite):
 
     def change_spaceship(self, style: str) -> None:
         """Changes spacheship model.
-        Called when player decide to change model in 'Spaceship choose' menu before game""" # doc_string do zmiany
+        Called when player decide to change model in 'Spaceship choose' menu before game
+        Parameters:
+            style: type of player spaceship('player1', 'player2' or 'player3')
+        """
         self.style = style
         self.image = self.textures[f'{self.style}-{self.direction}']
         self.mask = pygame.mask.from_surface(self.image)

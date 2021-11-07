@@ -6,8 +6,8 @@ import pickle
 
 from state_mainmenu import MainMenu
 from state_game import Game
-from state_start import Start
-from state_end import End
+from state_level_start import LevelStart
+from state_level_end import LevelEnd
 from state_pause import Pause
 from state_upgrade import Upgrade
 from state_spaceshipsmenu import Spaceshipsmenu
@@ -16,6 +16,11 @@ from state_spaceshipsmenu import Spaceshipsmenu
 class Control:
     """Control and switch between game states."""
     def __init__(self, start_state: str) -> None:
+        """
+        Parameters:
+            start_state: initial state
+        """
+
         self.done = False  # When True game closes
         self.clock = pygame.time.Clock()
 
@@ -23,10 +28,10 @@ class Control:
         # All game states
         self.state_dict = {
             'mainmenu': MainMenu(self.data),
-            'start': Start(self.data),
+            'start': LevelStart(self.data),
             'game': Game(self.data),
             'pause': Pause(self.data),
-            'end': End(self.data),
+            'end': LevelEnd(self.data),
             'upgrade': Upgrade(self.data),
             'spaceshipsmenu': Spaceshipsmenu(self.data)
         }
@@ -44,7 +49,7 @@ class Control:
             pygame.display.update()
 
     def __flip_state(self) -> None:  # Przerzuca stan z poprzedniego na kolejny
-        """Changes current state to another."""
+        """Changes current state to the another."""
         self.state.done = False  # Resetuje flage ktora sprawiła wywołanie flipa
         previous, self.state_name = self.state_name, self.state.next  # Podmiana starego stanu na nowy
         self.state.cleanup()  # Czyści poprzedni stan
@@ -53,7 +58,10 @@ class Control:
         self.state.startup()  # Uruchamia nowy stan, jego startup
 
     def __update(self, dt: int) -> None:  # W petli. Słuzy do updatowania samego controla jak i aktualnego stanu
-        """Updates 'Control' and current state"""
+        """Updates 'Control' and current state(calls update method in the current state object)
+            Parameters:
+                dt: delta time
+        """
         keys = pygame.key.get_pressed()
         if self.state.quit:  # Jezeli atrybut quit aktualnego stanu jest True to self.done Controla to True wiec wychodzi z pelti i wyłącza gre
             self.done = True
@@ -70,6 +78,7 @@ class Control:
 
 
 class ShareData:
+    """Data object with settings shared in the project"""
     def __init__(self) -> None:
         self.WIN_SIZE = (1024, 768)
         self.FRAMERATE = 80
@@ -118,7 +127,7 @@ class ShareData:
         return self.__enemies_args
 
     def __load_images(self) -> None:
-        """Loads images"""
+        """Loads game images"""
         print(os.listdir())
         for img in os.listdir('../resources/img/Other'):
             if img.endswith('.png'):
@@ -132,12 +141,12 @@ class ShareData:
                 f'../resources/img/player/{img}')  # => surface
 
     def __load_sounds(self) -> None:
-        """Loads sounds"""
+        """Loads game sounds"""
         for sound in os.listdir('../resources/sounds'):
             self.__SFX[sound.replace('.wav', '')] = pygame.mixer.Sound(f'../resources/sounds/{sound}')  # => sound
 
     def __load_level_enemies(self) -> None:
-        """Loads level enemies from pickle file"""
+        """Loads level enemies from the pickle file"""
         with open('game_levels.pickle', 'rb') as handle:
             self.__enemies_args = pickle.load(handle)
             #print(self.__enemies_args)
