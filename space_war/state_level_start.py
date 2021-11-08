@@ -4,6 +4,7 @@ from state import State
 
 
 class LevelStart(State):
+    """Display level text and play sound effect before each level"""
     def __init__(self, data) -> None:
         self.data = data
         State.__init__(self)

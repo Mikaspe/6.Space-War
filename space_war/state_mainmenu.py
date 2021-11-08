@@ -5,12 +5,11 @@ from menu_manager import MenuManager
 
 
 class MainMenu(State, MenuManager):
-    """Upgrade menu is displayed after finishing each level.
-    Player can upgrade one of the abilities"""
+    """Game main menu"""
     def __init__(self, data) -> None:
         self.data = data
         State.__init__(self)
-        MenuManager.__init__(self, self.data.menu_frame_width, ['Start', 'Spaceship', 'Exit'])
+        MenuManager.__init__(self, ['Start', 'Spaceship', 'Exit'])
 
         self.next_list = ['start', 'spaceshipsmenu', 'quit']
 

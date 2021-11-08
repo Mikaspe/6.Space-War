@@ -5,13 +5,12 @@ from menu_manager import MenuManager
 
 
 class Spaceshipsmenu(State, MenuManager):
-    """Upgrade menu is displayed after finishing each level.
-    Player can upgrade one of the abilities"""
+    """Option in main menu where player can change spaceship image"""
 
     def __init__(self, data) -> None:
         self.data = data
         State.__init__(self)
-        MenuManager.__init__(self, self.data.menu_frame_width, ['Spaceship1', 'Spaceship2', 'Spaceship3'])
+        MenuManager.__init__(self, ['Spaceship1', 'Spaceship2', 'Spaceship3'])
         self.next_list = ['Spaceship1', 'Spaceship2', 'Spaceship3']
 
         # Title

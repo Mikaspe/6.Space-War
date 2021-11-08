@@ -5,10 +5,11 @@ from menu_manager import MenuManager
 
 
 class Pause(State, MenuManager):
+    """Pauses game and displays pause menu"""
     def __init__(self, data) -> None:
         self.data = data
         State.__init__(self)
-        MenuManager.__init__(self, self.data.menu_frame_width, ['Continue', 'Main menu', 'Exit'])  # Rozmiar okna dać do stałej
+        MenuManager.__init__(self, ['Continue', 'Main menu', 'Exit'])  # Rozmiar okna dać do stałej
 
         self.next_list = ['game', 'mainmenu', 'quit']
 

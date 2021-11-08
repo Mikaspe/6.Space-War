@@ -6,11 +6,11 @@ from menu_manager import MenuManager
 
 class Upgrade(State, MenuManager):
     """Upgrade menu is displayed after finishing each level.
-    Player can upgrade one of the abilities"""
+    Player can upgrade one of the abilities(gunfire, health or speed). Maximum upgrade points of one ability is 3."""
     def __init__(self, data) -> None:
         self.data = data
         State.__init__(self)
-        MenuManager.__init__(self, 290, ['GUNFIRE', 'HEALTH', 'SPEED'], xpos_menu_offset=-50)
+        MenuManager.__init__(self, ['GUNFIRE', 'HEALTH', 'SPEED'], frame_width=290, xpos_menu_offset=-50)
         self.next_list = ['gunfire_upg', 'health_upg', 'speed_upg']
         self.initial_menu_pos = 0
 

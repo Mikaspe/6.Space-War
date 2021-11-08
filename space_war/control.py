@@ -36,10 +36,12 @@ class Control:
             'spaceshipsmenu': Spaceshipsmenu(self.data)
         }
 
-        self.state_name = start_state  # Name of current state
-        self.state = self.state_dict[self.state_name]  # Instance of current state
+        self.state_name = start_state  # Name of a current state
+        self.state = self.state_dict[self.state_name]  # Instance of a current state
 
     def main_game_loop(self) -> None:
+        """Main game loop breaks and closes the game when state !!!!!!!!!!! inaczej
+        """
         # Gra sie wylaczy gdy self.done = True. Czyli w event loop gdy QUIT lub w update gdy self.state.quit
         # (nie mylic z self.done stanow, ktore koncza stan)
         while not self.done:
@@ -48,70 +50,72 @@ class Control:
             self.__update(delta_time)
             pygame.display.update()
 
-    def __flip_state(self) -> None:  # Przerzuca stan z poprzedniego na kolejny
-        """Changes current state to the another."""
-        self.state.done = False  # Resetuje flage ktora sprawiła wywołanie flipa
-        previous, self.state_name = self.state_name, self.state.next  # Podmiana starego stanu na nowy
-        self.state.cleanup()  # Czyści poprzedni stan
-        self.state = self.state_dict[self.state_name]  # Podmienia aktualny stan na nowy
-        self.state.previous = previous  # Podmienia self.previous
-        self.state.startup()  # Uruchamia nowy stan, jego startup
+    def __event_loop(self) -> None:
+        """Checks and passes events to the current state.
+        Called in the main_game_loop method.
+        """
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:  # True when user clicks close window button
+                self.done = True  # Close the game
+            self.state.get_event(event)  # Pass event to the current state
 
     def __update(self, dt: int) -> None:  # W petli. Słuzy do updatowania samego controla jak i aktualnego stanu
-        """Updates 'Control' and current state(calls update method in the current state object)
+        """Updates 'Control' object and current state(calls update method in the current state object)
             Parameters:
-                dt: delta time
+                dt: delta time in ms
         """
         keys = pygame.key.get_pressed()
-        if self.state.quit:  # Jezeli atrybut quit aktualnego stanu jest True to self.done Controla to True wiec wychodzi z pelti i wyłącza gre
+        if self.state.quit:  # Quits the game when the atribiute self.quit of the current state is True
             self.done = True
-        elif self.state.done:  # Jeżeli atrybut done aktualnego stanu jest True to Control przerzuca stan na kolejny
+        elif self.state.done:  # Flips state when the atribiute self.done of the current state is True
             self.__flip_state()
-        self.state.update(keys, dt)  # Wywołanie update stanu, gdzie odbywa się rozgrywka i rysowanie
+        self.state.update(keys, dt)  # .update is main method of each state
 
-    def __event_loop(self) -> None:  # W petli
-        """Checks events and send events to the current state"""
-        for event in pygame.event.get():  # Sprawdza eventy
-            if event.type == pygame.QUIT:
-                self.done = True  # Wyłącza gre, bo wychodzi z main_game_loop
-            self.state.get_event(event)  # Przesyła do aktualnego stanu, np. Game() wszystkie eventy
+    def __flip_state(self) -> None:
+        """Changes current state to the next one."""
+        self.state.done = False  # Resets a flag which caused a call of __flip_state
+        # Name of current state is now previous, changes current state name to the new one
+        previous, self.state_name = self.state_name, self.state.next
+        self.state.cleanup()  # Cleans previous state
+        self.state = self.state_dict[self.state_name]  # Set current state to the next one
+        self.state.previous = previous  # Memory of the previous state name in the new, current state
+        self.state.startup()  # Calls startup method in the new current state
 
 
 class ShareData:
-    """Data object with settings shared in the project"""
+    """Data object with settings and data shared in the project"""
     def __init__(self) -> None:
+        pygame.init()
         self.WIN_SIZE = (1024, 768)
         self.FRAMERATE = 80
-        self.SCREEN = pygame.display.set_mode(self.WIN_SIZE)
+        self.SCREEN = pygame.display.set_mode(self.WIN_SIZE)  # Display surface which'll be drawn
         pygame.display.set_caption('Space-War')
-        self.SCREEN_RECT = self.SCREEN.get_rect()
-        self.MOVE_RATIO = 30
-        self.BORDER = 60
-        # self.START_TIME = 140  # Time of 'intro' before each level
-        # self.START_BOSS = 350  # Time of 'intro' before boss level
-        self.END_TIME = 180  # Time of 'outro' after each level
-        pygame.init()  ## !! TUTAJ !?
-        self.FONT = pygame.font.Font('../resources/fonts/OpenSans-Bold.ttf', 100)
-        self.menu_frame_width = 150*1.61
+        self.SCREEN_RECT = self.SCREEN.get_rect()  # Store rectangular coordinates of the SCREEN
 
-        self.__GFX = {}
-        self.__SFX = {}
-        pygame.init()  # OGARNĄĆ TO !!!!!!!!
-        pygame.mixer.set_num_channels(50)
-        # Dictionary where key is a game level, values are tuples with parameters(x, y, style)
-        # used for creating each 'Enemy' spaceship object
+        # Move ratio of the object in game like player and enemy spaceship, projectiles etc.
+        # Should be constant and not be confused with speed of the objects which can change during the game.
+        self.MOVE_RATIO = 30
+        self.BORDER = 60  # Right and left border for moving enemies
+
+        self.FONT = pygame.font.Font('../resources/fonts/OpenSans-Bold.ttf', 100)  # Text font in level start and end
+        self.__GFX = {}  # Images and animations
+        self.__SFX = {}  # Sounds
+        pygame.mixer.set_num_channels(50)  # Number of sound channels
+
+        # Dictionary where key is a game level, values are tuples with parameters(x_pos, y_pos, style) used for
+        # creating each 'Enemy' spaceship object
         self.__enemies_args = {}
 
-        self.__load_images()
-        self.__load_sounds()
-        self.__load_level_enemies()
+        self.__load_images()  # Loads images from directory
+        self.__load_sounds()  # Loads sound from directory
+        self.__load_level_enemies()  # Loads enemie spaceship composition for each level from pickle file
 
-        self.level = 8
+        self.level = 1  # Current game level
         self.max_level = 8
         self.hp = None
-        self.gunfire_upgrade = 3
+        self.gunfire_upgrade = 1
         self.hp_upgrade = 1
-        self.speed_upgrade = 3
+        self.speed_upgrade = 1
         self.player_spaceship_style = 'player1'
 
     @property
@@ -127,29 +131,21 @@ class ShareData:
         return self.__enemies_args
 
     def __load_images(self) -> None:
-        """Loads game images"""
-        print(os.listdir())
-        for img in os.listdir('../resources/img/Other'):
-            if img.endswith('.png'):
-                self.__GFX[img.replace('.png', '')] = pygame.image.load(
-                    f'../resources/img/Other/{img}')  # => surface
-        for img in os.listdir('../resources/img/Background'):
-            self.__GFX[img.replace('.png', '')] = pygame.image.load(
-                f'../resources/img/background/{img}')  # => surface
-        for img in os.listdir('../resources/img/player'):
-            self.__GFX[img.replace('.png', '')] = pygame.image.load(
-                f'../resources/img/player/{img}')  # => surface
+        """Loads game images from directories"""
+        for folder_name in ('Player', 'Background', 'Other'):
+            for img in os.listdir(f'../resources/img/{folder_name}'):
+                self.__GFX[img.replace('.png', '')] = pygame.image.load(f'../resources/img/{folder_name}/{img}')
 
     def __load_sounds(self) -> None:
-        """Loads game sounds"""
+        """Loads game sounds from directory"""
         for sound in os.listdir('../resources/sounds'):
-            self.__SFX[sound.replace('.wav', '')] = pygame.mixer.Sound(f'../resources/sounds/{sound}')  # => sound
+            self.__SFX[sound.replace('.wav', '')] = pygame.mixer.Sound(f'../resources/sounds/{sound}')
 
     def __load_level_enemies(self) -> None:
-        """Loads level enemies from the pickle file"""
+        """Loads enemie spaceship composition for each level from pickle file"""
         with open('game_levels.pickle', 'rb') as handle:
+            # Dictionary where key is a game level, values are tuples with parameters(x_pos, y_pos, style)
             self.__enemies_args = pickle.load(handle)
-            #print(self.__enemies_args)
 
 
 pygame.init()

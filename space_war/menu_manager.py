@@ -2,7 +2,7 @@ import pygame
 
 
 class MenuManager:
-    def __init__(self, frame_width: int, options: list, xpos_menu_offset: int = 0) -> None:  # Teoretycznei nie musiz tego wysylac do nadklasy bo to jest nadklasa
+    def __init__(self, options: list, frame_width: int = 242, xpos_menu_offset: int = 0) -> None:  # Teoretycznei nie musiz tego wysylac do nadklasy bo to jest nadklasa
         """
         Parameters:
             frame_width: width of the menu frame
