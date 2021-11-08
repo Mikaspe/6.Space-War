@@ -152,7 +152,7 @@ class Game(State):
                         self.data.SFX['hit'].play()
                     elif enemy.hp == 0:
                         self.data.SFX['destroyed'].play()
-                        self.explosion = Explosion(*enemy.rect.center)
+                        self.explosion = Explosion(self.data, *enemy.rect.center)
                         self.explosion.animate()
                         self.animations.add(self.explosion)
                         self.enemies.remove(enemy)

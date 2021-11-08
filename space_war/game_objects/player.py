@@ -1,5 +1,3 @@
-import os
-
 import pygame
 
 from space_war.game_objects.projectile import Projectile
@@ -31,11 +29,7 @@ class Player(pygame.sprite.Sprite):
         self.shoot_delay = None
         self.add_laser = False
 
-        self.textures = {}
-        for img in os.listdir('../resources/img/Player'):  # Loading all player spaceships images
-            self.textures[img.replace('.png', '')] = pygame.image.load(f'../resources/img/player/{img}').convert_alpha()
-
-        self.image = self.textures[f'{self.style}-{self.direction}']
+        self.image = self.data.GFX[f'{self.style}-{self.direction}']
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect(center=(self.data.WIN_SIZE[0]/2, self.data.WIN_SIZE[1]-75))
 
@@ -43,8 +37,8 @@ class Player(pygame.sprite.Sprite):
         pass
 
     def update(self, keys: pygame.key, dt: int) -> None:
-        # updates current spaceship image with proper direction(left, right or stop)
-        self.image = self.textures[f'{self.style}-{self.direction}']
+        # Updates current spaceship image with proper direction(left, right or stop)
+        self.image = self.data.GFX[f'{self.style}-{self.direction}']
 
         if keys[pygame.K_RIGHT]:
             self.direction = 'right'
@@ -63,12 +57,12 @@ class Player(pygame.sprite.Sprite):
                 self.add_laser = False
                 self.timer = pygame.time.get_ticks()
                 self.data.SFX['laser-player'].play()
-                projectile = Projectile(self.rect.centerx, self.rect.top, 'player')
+                projectile = Projectile(self.data, self.rect.centerx, self.rect.top, 'player')
                 self.projectiles.add(projectile)
                 if self.weapon_style == 1:
-                    projectile = Projectile(self.rect.centerx - 5, self.rect.top, 'player-l')
+                    projectile = Projectile(self.data, self.rect.centerx - 5, self.rect.top, 'player-l')
                     self.projectiles.add(projectile)
-                    projectile = Projectile(self.rect.centerx + 4, self.rect.top, 'player-r')
+                    projectile = Projectile(self.data, self.rect.centerx + 4, self.rect.top, 'player-r')
                     self.projectiles.add(projectile)
 
         for projectile in self.projectiles:
@@ -122,7 +116,7 @@ class Player(pygame.sprite.Sprite):
             style: type of player spaceship('player1', 'player2' or 'player3')
         """
         self.style = style
-        self.image = self.textures[f'{self.style}-{self.direction}']
+        self.image = self.data.GFX[f'{self.style}-{self.direction}']
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect(center=(self.data.WIN_SIZE[0]/2, self.data.WIN_SIZE[1]-75))
 

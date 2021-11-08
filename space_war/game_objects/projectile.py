@@ -3,7 +3,7 @@ import pygame
 
 class Projectile(pygame.sprite.Sprite):
     """Projectile object"""
-    def __init__(self, pos_x: int, pos_y: int, style: str) -> None:
+    def __init__(self, data, pos_x: int, pos_y: int, style: str) -> None:
         """
         Parameters:
             pos_x: x position where projectile will apear
@@ -16,7 +16,7 @@ class Projectile(pygame.sprite.Sprite):
         self.style = style
         self.base_projectile_speed = 0.4
 
-        self.image = pygame.image.load(f'../resources/img/projectile/projectile-{self.style}.png').convert_alpha()
+        self.image = data.GFX[f'projectile-{self.style}']
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect(center=(pos_x, pos_y))
 

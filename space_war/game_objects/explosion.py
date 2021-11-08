@@ -1,11 +1,9 @@
-import os
-
 import pygame
 
 
 class Explosion(pygame.sprite.Sprite):
     """Explosion animation."""
-    def __init__(self, pos_x: int, pos_y: int) -> None:
+    def __init__(self, data, pos_x: int, pos_y: int) -> None:
         """
         Parameters:
             pos_x: x position where explosion animation will apear
@@ -13,17 +11,11 @@ class Explosion(pygame.sprite.Sprite):
         """
         super().__init__()
 
-        self.sprites = []
-        self.is_animating = False
-
-        for animation in os.listdir('../resources/animations'):
-            for frame in os.listdir(f'../resources/animations/{animation}'):
-                self.sprites.append(pygame.image.load(f'../resources/animations/{animation}/{frame}'))  # => surface
-
-        self.current_sprite = 4
-        self.image = self.sprites[self.current_sprite]
-
-        self.rect = self.image.get_rect(center=(pos_x, pos_y))
+        self.sprites = data.GFX['explosion']  # List with all animation frame images
+        self.is_animating = False  # Flag which allows updates of animation image when True
+        self.current_sprite = 4  # Initial animation frame number
+        self.image = self.sprites[self.current_sprite]  # Initial animation frame image
+        self.rect = self.image.get_rect(center=(pos_x, pos_y))  # Rectangular coordinates of animation image
 
     def animate(self) -> None:
         """Changes flag value which allows updates of animation image.
@@ -41,7 +33,7 @@ class Explosion(pygame.sprite.Sprite):
         """
         if self.is_animating:
             self.image = self.sprites[int(self.current_sprite)]
-            self.current_sprite += speed_of_animation  # Here is possible to change speed of animation, ex. = 0.5
+            self.current_sprite += speed_of_animation
 
             if self.current_sprite >= len(self.sprites):
                 self.current_sprite = 0

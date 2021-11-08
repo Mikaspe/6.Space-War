@@ -21,7 +21,7 @@ class Control:
             start_state: initial state
         """
 
-        self.done = False  # When True game closes
+        self.done = False  # When True Control instance is done and game closes
         self.clock = pygame.time.Clock()
 
         self.data = ShareData()
@@ -85,17 +85,12 @@ class Control:
 class ShareData:
     """Data object with settings and data shared in the project"""
     def __init__(self) -> None:
-        pygame.init()
+        #pygame.init()
         self.WIN_SIZE = (1024, 768)
         self.FRAMERATE = 80
         self.SCREEN = pygame.display.set_mode(self.WIN_SIZE)  # Display surface which'll be drawn
         pygame.display.set_caption('Space-War')
         self.SCREEN_RECT = self.SCREEN.get_rect()  # Store rectangular coordinates of the SCREEN
-
-        # Move ratio of the object in game like player and enemy spaceship, projectiles etc.
-        # Should be constant and not be confused with speed of the objects which can change during the game.
-        self.MOVE_RATIO = 30
-        self.BORDER = 60  # Right and left border for moving enemies
 
         self.FONT = pygame.font.Font('../resources/fonts/OpenSans-Bold.ttf', 100)  # Text font in level start and end
         self.__GFX = {}  # Images and animations
@@ -113,10 +108,10 @@ class ShareData:
         self.level = 1  # Current game level
         self.max_level = 8
         self.hp = None
+        self.player_spaceship_style = 'player1'
         self.gunfire_upgrade = 1
         self.hp_upgrade = 1
         self.speed_upgrade = 1
-        self.player_spaceship_style = 'player1'
 
     @property
     def GFX(self) -> dict:
@@ -131,10 +126,19 @@ class ShareData:
         return self.__enemies_args
 
     def __load_images(self) -> None:
-        """Loads game images from directories"""
-        for folder_name in ('Player', 'Background', 'Other'):
+        """Loads game images and animations from directories"""
+        for folder_name in ('Player', 'Enemy', 'Projectile', 'Background', 'Other'):
             for img in os.listdir(f'../resources/img/{folder_name}'):
-                self.__GFX[img.replace('.png', '')] = pygame.image.load(f'../resources/img/{folder_name}/{img}')
+                if img.startswith(('player', 'enemy', 'projectile')):
+                    self.__GFX[img.replace('.png', '')] = pygame.image.load(f'../resources/img/{folder_name}/{img}').convert_alpha()
+                else:
+                    self.__GFX[img.replace('.png', '')] = pygame.image.load(f'../resources/img/{folder_name}/{img}')
+
+        for animation in os.listdir('../resources/animations'):
+            frames = []
+            for frame in os.listdir(f'../resources/animations/{animation}'):
+                frames.append(pygame.image.load(f'../resources/animations/{animation}/{frame}'))  # => surface
+            self.__GFX[animation.replace('.png', '')] = frames
 
     def __load_sounds(self) -> None:
         """Loads game sounds from directory"""
