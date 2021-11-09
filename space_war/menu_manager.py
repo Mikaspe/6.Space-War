@@ -39,7 +39,7 @@ class MenuManager:
 
     def startup_menu(self,  initial_menu_pos: int = 0) -> None:
         """Updates initial menu position and resets 'click' flag.
-        Called in 'startup' method in a subclass objects.
+        Called in 'startup' method in a subclass object.
 
         Parameters:
             initial_menu_pos: Initial menu highlighted option in menu(default=0 -> first option)
@@ -71,28 +71,34 @@ class MenuManager:
             if event.button == 1:
                 self.click = True
 
-    def update_menu(self) -> None:  # Updatuje to co sie dzieje w tym stanie
+    def update_menu(self) -> None:
+        """Menu navigation.
+        Called in 'update' method in a subclass objects.
+        """
         mx, my = pygame.mouse.get_pos()
 
-        for option_pos in range(self.num_of_options):
-            if self.lst_text_rect[option_pos].collidepoint((mx, my)):
+        for option_pos in range(self.num_of_options):  # Mouse menu navigation
+            if self.lst_text_rect[option_pos].collidepoint((mx, my)):  # Colission between mouse pointer and menu option
                 self.current_menu_pos = option_pos
             if self.current_menu_pos == option_pos:
-                if self.click:
-                    if self.next_list[option_pos] == 'quit':  # Last options is always Quit
+                if self.click:  # Click by mouse or Enter
+                    if self.next_list[option_pos] == 'quit':  # Quit and close window
                         self.quit = True
-                    else:
+                    else:  # Menu option selected
                         self.next = self.next_list[option_pos]
                         self.done = True
                         self.data.SFX['menu-select'].play()
 
-        if self.current_menu_pos != self.menu_pos_memory:
+        if self.current_menu_pos != self.menu_pos_memory:  # Change position sound
             self.menu_pos_memory = self.current_menu_pos
             self.data.SFX['menu-switch'].play()
 
         self.draw_menu()
 
-    def draw_menu(self) -> None:  # Rysowanie
+    def draw_menu(self) -> None:
+        """Draws menu frame and options.
+        Called in 'update_menu' method.
+        """
         pygame.draw.rect(self.data.SCREEN, (200, 200, 200), self.frame_rect, 5)
         for option_pos in range(self.num_of_options):
             if self.current_menu_pos == option_pos:
