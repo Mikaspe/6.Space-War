@@ -2,51 +2,60 @@ import pygame
 
 
 class MenuManager:
-    def __init__(self, options: list, frame_width: int = 242, xpos_menu_offset: int = 0) -> None:  # Teoretycznei nie musiz tego wysylac do nadklasy bo to jest nadklasa
+    """MenuManager is a superclass for states which use menu navigation."""
+    def __init__(self, options: list, frame_width: int = 242, xpos_menu_offset: int = 0) -> None:
         """
         Parameters:
-            frame_width: width of the menu frame
             options: list with menu items to display
-            xpos_menu_offset: offset for items position in the frame menu(when 0 text is centered)
+            frame_width: width of the menu frame(default=242)
+            xpos_menu_offset: offset for items position in the frame menu(default=0 -> text is centered)
         """
-        # ale za to jest bardziej jawne
-        self.options = options
 
+        self.options = options
         self.num_of_options = len(self.options)
         self.current_menu_pos = self.menu_pos_memory = 0
-        self.frame_rect = pygame.Rect((0, 0), (frame_width, self.num_of_options*51))
+        self.frame_rect = pygame.Rect((0, 0), (frame_width, self.num_of_options*51))  # Rectangular coordinates of frame
         self.frame_rect.center = self.data.SCREEN_RECT.center
         font_size = 39
         font = pygame.font.Font('freesansbold.ttf', font_size)
         self.lst_text_normal = []
         self.lst_text_highlighted = []
         self.lst_text_rect = []
-        self.y_offset = 2/3 * font_size#1/len(options) * self.frame_rect.h
-        for option in self.options:
+        self.y_offset = 2/3 * font_size
+        for option in self.options:  # Rendering options and storing them in lists
             text_normal = font.render(option, True, (200, 200, 200))
             self.lst_text_normal.append(text_normal)
             self.lst_text_highlighted.append(font.render(option, True, (100, 200, 200)))
             rect = text_normal.get_rect(center=self.frame_rect.midtop)
             rect.x += xpos_menu_offset
             rect.y += self.y_offset
-            self.lst_text_rect.append(rect)
+            self.lst_text_rect.append(rect)  # Rectangular coordinates of each option
             self.y_offset += 1/self.num_of_options * self.frame_rect.h
 
-    def cleanup(self) -> None:  # Wywołane raz przed przejsciem do next stanu
+        self.click = False
+
+    def cleanup(self) -> None:
         pass
 
-    def startup_menu(self,  initial_menu_pos: int = 0) -> None:  # Wywołane raz na początku tego stanu
-        """
+    def startup_menu(self,  initial_menu_pos: int = 0) -> None:
+        """Updates initial menu position and resets 'click' flag.
+        Called in 'startup' method in a subclass objects.
+
         Parameters:
-            initial_menu_pos: ??? pisać?
+            initial_menu_pos: Initial menu highlighted option in menu(default=0 -> first option)
         """
         self.current_menu_pos = initial_menu_pos
         self.click = False
 
-    def get_event_menu(self, event: pygame.event) -> None:  # Zbiera eventy z control i reaguje na nie w swoj sposob
-        self.click = False
-        # if event.type == pygame.QUIT:
-        #     self.quit = True
+    def get_event_menu(self, event: pygame.event) -> None:
+        """Menu event handling
+        Called in 'get_event' method in a subclass objects.
+
+        Parameters:
+            event: PyGame events
+        """
+        self.click = False  # Resets click flag
+
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN:
                 self.click = True
