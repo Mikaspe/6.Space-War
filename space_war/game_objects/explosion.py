@@ -2,10 +2,11 @@ import pygame
 
 
 class Explosion(pygame.sprite.Sprite):
-    """Explosion animation."""
+    """Explosion animation used when enemy spaceship is destroyed"""
     def __init__(self, data, pos_x: int, pos_y: int) -> None:
         """
         Parameters:
+            data: game data object
             pos_x: x position where explosion animation will apear
             pos_y: y position where explosion animation will apear
         """

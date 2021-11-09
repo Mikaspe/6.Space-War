@@ -2,10 +2,11 @@ import pygame
 
 
 class Projectile(pygame.sprite.Sprite):
-    """Projectile object"""
+    """Projectile object shot by player or enemy."""
     def __init__(self, data, pos_x: int, pos_y: int, style: str) -> None:
         """
         Parameters:
+            data: game data object
             pos_x: x position where projectile will apear
             pos_y: y position where projectile will apear
             style: projectile type
@@ -17,12 +18,15 @@ class Projectile(pygame.sprite.Sprite):
         self.base_projectile_speed = 0.4
 
         self.image = data.GFX[f'projectile-{self.style}']
-        self.mask = pygame.mask.from_surface(self.image)
-        self.rect = self.image.get_rect(center=(pos_x, pos_y))
+        self.mask = pygame.mask.from_surface(self.image)  # Useful for fast pixel perfect collision detection
+        self.rect = self.image.get_rect(center=(pos_x, pos_y))  # Rectangular coordinates of projectile
 
     def update(self, dt: int) -> None:
         """Moving projectile with defined speed.
-        Called in update method in the state_game module.
+        Called in 'update' method in the 'Game' object('state_game' module) or in 'Player' object('player' module)
+
+        Parameters:
+            dt: delta time in ms
         """
         speed_x_ratio = 0.3
         if self.style == 'player':
