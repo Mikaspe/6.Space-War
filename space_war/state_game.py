@@ -9,48 +9,58 @@ from game_objects.explosion import Explosion
 
 
 class Game(State):
+    """Actual game state. Called in 'Control' class in the control module."""
     def __init__(self, data) -> None:
-        self.data = data
         State.__init__(self)
+        self.data = data
         self.next = 'end'
 
-        self.player = Player(self.data, 'player1')
-        self.enemies = pygame.sprite.Group()
-        self.enemy_projectiles = pygame.sprite.Group()
-        self.animations = pygame.sprite.Group()
+        self.player = Player(self.data, 'player1')  # Player spaceship object
+        self.enemies = pygame.sprite.Group()  # Group of all enemie spaceships
+        self.enemy_projectiles = pygame.sprite.Group()  # Group of all enemie projectiles
+        self.animations = pygame.sprite.Group()  # Group of all current animations
 
-    def cleanup(self) -> None:  # Wywołane raz przed przejsciem do next stanu
-        pass  # Tutaj nie dalem czyszczenia bo po przejsciu w pause czyscilo
+    def cleanup(self) -> None:
+        pass
 
-    def startup(self) -> None:  # Wywołane raz na początku tego stanu
+    def startup(self) -> None:
+        """Called once when state begins."""
         if self.previous != 'pause':
-            self.enemies.empty()
-            self.enemy_projectiles.empty()
-            self.player.projectiles.empty()
-            self.animations.empty()
+            self.enemies.empty()  # Removing all enemies
+            self.enemy_projectiles.empty()  # Removing all enemy projectiles
+            self.player.projectiles.empty()  # Removing all player projectiles
+            self.animations.empty()  # Removing all animations
             self.player.hp_update()
             self.player.speed_update()
             self.player.gunfire_update()
-            self.player.gunfire_update()
-            self.player.style = self.data.player_spaceship_style
-            self.enemies.add(*[Enemy(self.data, *enemy_arg) for enemy_arg in
-                               self.data.enemies_args[self.data.level]])  # Można uprościć aby było bardziej czytelne
-            self.timer_heart_beating = 0
+            self.player.style = self.data.player_spaceship_style  # Player spaceship model
+
+            # Generating enemy spaceship from data
+            for enemy_arg in self.data.enemies_args[self.data.level]:
+                self.enemies.add(Enemy(self.data, *enemy_arg))  # enemy_arg is a tuple(x_pos, y_pos, style)
+
+            self.timer_heart_beating = 0  # Timer for heart 'beating' when player hp is low
             self.played_lowhp_sound = False
 
-    def get_event(self, event: pygame.event) -> None:  # Zbiera eventy z control i reaguje na nie w swoj sposob
-        self.player.get_event(event)
+    def get_event(self, event: pygame.event) -> None:
+        """Events handling passed as argument by 'Control' object.
 
+        Parameters:
+            event: PyGame events
+        """
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
+            if event.key == pygame.K_ESCAPE:  # Pause game
                 self.next = 'pause'
                 self.done = True
+        self.player.get_event(event)
 
-        # if event.type == MOVE:  # UWAGA, tutaj jest opcja przesłania evantu do każdego obiektu enemy i tam wykonanie move
-        #     self.enemies.update()
+    def update(self, keys: pygame.key, dt: int) -> None:
+        """Main game processing.
 
-    def update(self, keys: pygame.key, dt: int) -> None:  # Updatuje to co sie dzieje w tym stanie
-
+        Parameters:
+            keys: state of all keyboard buttons
+            dt: delta time in ms
+        """
         if self.data.hp > 0 and self.enemies:
             self.player.update(keys, dt)
             self.enemies.update(dt)
@@ -58,16 +68,21 @@ class Game(State):
             self.__enemy_projectiles_gen(dt)
             self.__enemy_projectiles_remove()
             self.__player_projectiles_remove()
-            self.__draw(dt)  # Rysuje
+            self.__draw(dt)
         else:
             self.next = 'end'
             self.done = True
 
-        if keys[pygame.K_n]:
+        if keys[pygame.K_n]:  # Testing                                                                      !!!!!!!!
             self.next = 'end'
             self.done = True
 
-    def __draw(self, dt: int) -> None:  # Rysowanie
+    def __draw(self, dt: int) -> None:
+        """Draws game objects on the screen.
+
+        Parameters:
+            dt: delta time in ms
+        """
         self.data.SCREEN.blit(self.data.GFX[f'background{self.data.level}'], (0, 0))
         self.player.draw()
         # Explosion animation
@@ -84,7 +99,7 @@ class Game(State):
             self.__draw_boss_healthbar()
 
     def __draw_current_level(self) -> None:
-        """Draws current level in top-right corner"""
+        """Draws current level('level/max_level') in the top-right corner."""
         font = pygame.font.SysFont('swiss721', 17)
         text_level = font.render(f'{self.data.level}/{self.data.max_level}', True, (200, 200, 200))
         text_level_rect = text_level.get_rect()
@@ -92,47 +107,56 @@ class Game(State):
         self.data.SCREEN.blit(text_level, text_level_rect)
 
     def __draw_player_hearts(self, dt: int) -> None:
+        """Draws player health points as hearts in the top-left corner.
 
+        Parameters:
+            dt: delta time in ms
+        """
         if self.data.hp > 1:
             for heart in range(self.data.hp):
                 self.data.SCREEN.blit(self.data.GFX['heart'], (heart * 12 - 4, 5))
         elif self.data.hp == 1:
-            self.timer_heart_beating += dt
-            if self.timer_heart_beating < 200:
-                self.data.SCREEN.blit(self.data.GFX['heart'], (-4, 5))
-            elif self.timer_heart_beating > 400:
-                self.timer_heart_beating = 0
-
             if not self.played_lowhp_sound:
                 self.data.SFX['low-hp'].play()
                 self.played_lowhp_sound = True
 
+            self.timer_heart_beating += dt
+            if self.timer_heart_beating < 200:  # Heart image recurrently appears and disapears
+                self.data.SCREEN.blit(self.data.GFX['heart'], (-4, 5))
+            elif self.timer_heart_beating > 400:
+                self.timer_heart_beating = 0
+
     def __keep_enemies_in_window(self) -> None:
-        # Changing enemies move direction when farthest reaches self.border
+        """Changing enemies move direction when farthest reaches definied border."""
         enemies_lst = self.enemies.sprites()
         enemies_lst.sort(key=operator.attrgetter('rect.x'))
-        if enemies_lst[0].rect.left < 0:
+        if enemies_lst[0].rect.left < 0:  # Enemie reaches left border
             for enemy in self.enemies:
                 enemy.direction = 'right'
-        elif enemies_lst[-1].rect.right > self.data.WIN_SIZE[0]:
+        elif enemies_lst[-1].rect.right > self.data.WIN_SIZE[0]:  # Enemie reaches right border
             for enemy in self.enemies:
                 enemy.direction = 'left'
 
     def __enemy_projectiles_gen(self, dt: int) -> None:
+        """Generation of projectiles shot by enemies.
+
+        Parameters:
+            dt: delta time in ms
+        """
         for enemy in self.enemies:
             self.enemy_projectiles.add(enemy.projectile_generation(dt))
-
         self.enemy_projectiles.update(dt)
 
     def __enemy_projectiles_remove(self) -> None:
+        """Removing enemy projectiles when out of the screen or strike player spaceship."""
         for projectile in self.enemy_projectiles:
-            if projectile.rect.top > self.data.WIN_SIZE[1]:
+            if projectile.rect.top > self.data.WIN_SIZE[1]:  # Projectile out of the screen
                 self.enemy_projectiles.remove(projectile)
-            if pygame.sprite.collide_mask(self.player, projectile):
+            if pygame.sprite.collide_mask(self.player, projectile):  # Projectile strike a player spaceship
                 if projectile.style == 'enemy-ball':
                     self.data.SFX['ball-hit'].play()
                     self.enemy_projectiles.remove(projectile)
-                    self.data.hp -= 1
+                    self.data.hp -= 2
                 elif projectile.style == 'enemy-smallbal':
                     self.data.SFX['ball-hit'].play()
                     self.enemy_projectiles.remove(projectile)
@@ -143,6 +167,7 @@ class Game(State):
                     self.data.hp -= 1
 
     def __player_projectiles_remove(self) -> None:
+        """Removing player projectiles when strike enemy spaceship."""
         for projectile in self.player.projectiles:
             for enemy in self.enemies:
                 if pygame.sprite.collide_mask(enemy, projectile):
@@ -161,6 +186,7 @@ class Game(State):
                     break
 
     def __draw_boss_healthbar(self) -> None:
+        """Draws boss healthbar in the top of the screen."""
         frame_rect = pygame.Rect((0, 10), (self.enemies.sprites()[0].hp, 3))
         frame_rect.centerx = self.data.SCREEN_RECT.centerx
         pygame.draw.rect(self.data.SCREEN, (200, 0, 0), frame_rect, 2)

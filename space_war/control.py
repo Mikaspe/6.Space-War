@@ -14,8 +14,8 @@ from state_spaceshipsmenu import Spaceshipsmenu
 
 
 class Control:
-    """Control and switch between game states."""
-    def __init__(self, start_state: str) -> None:
+    """Control and switch between game states. One state is active at one time."""
+    def __init__(self, start_state: str = 'mainmenu') -> None:
         """
         Parameters:
             start_state: initial state
@@ -69,7 +69,7 @@ class Control:
             self.done = True
         elif self.state.done:  # Flips state when the atribiute self.done of the current state is True
             self.__flip_state()
-        self.state.update(keys, dt)  # .update is common method of each state
+        self.state.update(keys, dt)  # .update is common and main method of each state
 
     def __flip_state(self) -> None:
         """Changes current state to the next one.
@@ -149,12 +149,13 @@ class ShareData:
     def __load_level_enemies(self) -> None:
         """Loads enemie spaceship composition for each level from pickle file"""
         with open('game_levels.pickle', 'rb') as handle:
-            # Dictionary where key is a game level, values are tuples with parameters(x_pos, y_pos, style)
+            # Dictionary where key is a game level, values are tuples with enemy parameters(x_pos, y_pos, style)
             self.__enemies_args = pickle.load(handle)
 
 
 pygame.init()
-app = Control('mainmenu')  # Sets the initial state of the program
+app = Control()  # Sets the initial state of the program
 app.main_game_loop()
+
 pygame.quit()
 sys.exit()
