@@ -48,5 +48,13 @@ class Pause(State, MenuManager):
         """
         self.update_menu()
 
-    def __draw(self) -> None:
-        pass
+    def draw(self,  dt: int) -> None:
+        """Draws pause menu.
+        Called in the '__update' method in 'Control' object('control' module).
+
+        Parameters:
+            dt: delta
+            time in ms
+
+        """
+        self.draw_menu()

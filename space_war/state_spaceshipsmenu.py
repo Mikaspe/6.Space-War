@@ -80,7 +80,6 @@ class Spaceshipsmenu(State, MenuManager):
             keys: state of all keyboard buttons
             dt: delta time in ms
         """
-        self.__draw()
         self.update_menu()
         if self.next == 'Spaceship1':
             self.data.player_spaceship_style = 'player1'
@@ -90,17 +89,22 @@ class Spaceshipsmenu(State, MenuManager):
             self.data.player_spaceship_style = 'player3'
         self.next = 'mainmenu'
 
-    def __draw(self) -> None:
+    def draw(self,  dt: int) -> None:
         """Draws background and title on the screen.
         Called in the update method.
+
+        Parameters:
+            dt: delta time in ms
         """
         self.data.SCREEN.blit(self.data.GFX[f'background1'], (0, 0))
         self.data.SCREEN.blit(self.text_spaceship, self.text_rect)
+        self.draw_menu()
 
     def draw_menu(self) -> None:
-        """Called in superclass 'MenuManager'. Overrides method in superclass.
+        """Called in 'draw' method. Overrides method in 'MenuManager' superclass.
         Draws spaceship image options.
         """
+
         for option_pos in range(self.num_of_options):
             if self.current_menu_pos == option_pos:
                 self.data.SCREEN.blit(self.data.GFX[f'player{option_pos+1}-choosen'], eval(f'self.spacehip{option_pos+1}_rect'))

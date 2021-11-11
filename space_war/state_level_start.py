@@ -49,14 +49,16 @@ class LevelStart(State):
             keys: state of all keyboard buttons
             dt: delta time in ms
         """
-        self.__draw()
         self.timer += dt
         if self.timer >= self.sound_length_ms:  # State is done when sound effect ends
             self.done = True
 
-    def __draw(self) -> None:
+    def draw(self,  dt: int) -> None:
         """Draws game background and level text.
-        Called in the update method.
+        Called in the '__update' method in 'Control' object('control' module).
+
+        Parameters:
+            dt: delta time in ms
         """
         self.data.SCREEN.blit(self.data.GFX[f'background{self.data.level}'], (0, 0))
         self.data.SCREEN.blit(self.text_title, self.text_title_rect)

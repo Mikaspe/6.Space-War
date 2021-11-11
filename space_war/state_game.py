@@ -75,18 +75,18 @@ class Game(State):
             self.__enemy_projectiles_gen(dt)
             self.__enemy_projectiles_remove()
             self.__player_projectiles_remove()
-            self.__draw(dt)
         else:
             self.next = 'end'
             self.done = True
 
-        if keys[pygame.K_n]:  # Testing                                                                      !!!!!!!!
+        if keys[pygame.K_n]:  # For tests only                                                                    !!!!!!!!
             self.next = 'end'
             self.done = True
 
-    def __draw(self, dt: int) -> None:
+    def draw(self, dt: int) -> None:
         """Draws game objects on the screen.
-        Called in the update method.
+        Called in the '__update' method in 'Control' object('control' module).
+
         Parameters:
             dt: delta time in ms
         """

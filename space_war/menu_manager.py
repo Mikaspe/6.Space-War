@@ -93,8 +93,6 @@ class MenuManager:
             self.menu_pos_memory = self.current_menu_pos
             self.data.SFX['menu-switch'].play()
 
-        self.draw_menu()
-
     def draw_menu(self) -> None:
         """Draws menu frame and options.
         Called in 'update_menu' method.

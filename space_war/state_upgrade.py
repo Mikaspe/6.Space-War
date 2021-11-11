@@ -26,7 +26,6 @@ class Upgrade(State, MenuManager):
         """
         self.startup_menu(initial_menu_pos=self.initial_menu_pos)
 
-
     def get_event(self, event: pygame.event) -> None:
         """Events handling passed as argument by 'Control' object.
         Called in the '__event_loop' method in 'Control' object('control' module).
@@ -48,7 +47,6 @@ class Upgrade(State, MenuManager):
             keys: state of all keyboard buttons
             dt: delta time in ms
         """
-        self.__draw()
         self.update_menu()
         if self.done:  # Player has choosen upgrade
             self.initial_menu_pos = 0
@@ -74,12 +72,15 @@ class Upgrade(State, MenuManager):
                     self.next = 'upgrade'
                     self.initial_menu_pos = 2
 
-    def __draw(self) -> None:
+    def draw(self,  dt: int) -> None:
         """Draws background and upgrade points as a rectangles.
-        Called in the update method.
+        Called in the '__update' method in 'Control' object('control' module).
+
+        Parameters:
+            dt: delta time in ms
         """
         self.data.SCREEN.blit(self.data.GFX[f'background{self.data.level}'], (0, 0))
-
+        self.draw_menu()
         self.upgrade_point_rect = pygame.Rect((0, 0), (15, 15*1.61))
         self.upgrade_point_rect.center = (self.frame_rect.centerx + 50, self.lst_text_rect[0].centery)
         self.space_beetwen_points = 20

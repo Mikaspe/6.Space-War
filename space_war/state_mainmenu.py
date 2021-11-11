@@ -48,11 +48,14 @@ class MainMenu(State, MenuManager):
             keys: state of all keyboard buttons
             dt: delta time in ms
         """
-        self.__draw()
         self.update_menu()
 
-    def __draw(self) -> None:
+    def draw(self,  dt: int) -> None:
         """Draws background on the screen.
-        Called in the update method.
+        Called in the '__update' method in 'Control' object('control' module).
+
+        Parameters:
+            dt: delta time in ms
         """
         self.data.SCREEN.blit(self.data.GFX[f'background1'], (0, 0))
+        self.draw_menu()

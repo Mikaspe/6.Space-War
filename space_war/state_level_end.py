@@ -59,13 +59,15 @@ class LevelEnd(State):
             dt: delta time in ms
         """
 
-        self.__draw()
         self.timer += dt
         if self.timer >= self.sound_length_ms:  # State is done when sound effect ends
             self.done = True
 
-    def __draw(self) -> None:
+    def draw(self,  dt: int) -> None:
         """Draws end text on the screen.
-        Called in update method.
+        Called in the '__update' method in 'Control' object('control' module).
+
+        Parameters:
+            dt: delta time in ms
         """
         self.data.SCREEN.blit(self.text_title, self.text_title_rect)

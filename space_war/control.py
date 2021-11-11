@@ -70,6 +70,7 @@ class Control:
         elif self.state.done:  # Flips state when the atribiute self.done of the current state is True
             self.__flip_state()
         self.state.update(keys, dt)  # .update is common and main method of each state
+        self.state.draw(dt)
 
     def __flip_state(self) -> None:
         """Changes current state to the next one.
