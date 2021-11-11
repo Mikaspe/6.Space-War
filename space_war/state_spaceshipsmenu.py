@@ -8,6 +8,10 @@ class Spaceshipsmenu(State, MenuManager):
     """Option in main menu where player can change player spaceship image"""
 
     def __init__(self, data) -> None:
+        """
+        Parameters:
+            data: 'ShareData' object
+        """
         self.data = data
         State.__init__(self)
         MenuManager.__init__(self)

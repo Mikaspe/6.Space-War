@@ -12,7 +12,7 @@ class Enemy(pygame.sprite.Sprite):
     def __init__(self, data, pos_x: int, pos_y: int, style: int, direction: str = 'right') -> None:
         """
         Parameters:
-            data: game data object
+            data: 'ShareData' object
             pos_x: x position where spaceship will apear
             pos_y: y position where spaceship will apear
             style: enemy spaceship type(1-4)

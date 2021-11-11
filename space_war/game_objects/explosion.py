@@ -6,7 +6,7 @@ class Explosion(pygame.sprite.Sprite):
     def __init__(self, data, pos_x: int, pos_y: int) -> None:
         """
         Parameters:
-            data: game data object
+            data: 'ShareData' object
             pos_x: x position where explosion animation will apear
             pos_y: y position where explosion animation will apear
         """

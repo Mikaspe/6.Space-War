@@ -7,6 +7,10 @@ from menu_manager import MenuManager
 class MainMenu(State, MenuManager):
     """Game main menu."""
     def __init__(self, data) -> None:
+        """
+        Parameters:
+            data: 'ShareData' object
+        """
         self.data = data
         State.__init__(self)
         MenuManager.__init__(self)

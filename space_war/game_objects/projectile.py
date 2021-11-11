@@ -6,7 +6,7 @@ class Projectile(pygame.sprite.Sprite):
     def __init__(self, data, pos_x: int, pos_y: int, style: str) -> None:
         """
         Parameters:
-            data: game data object
+            data: 'ShareData' object
             pos_x: x position where projectile will apear
             pos_y: y position where projectile will apear
             style: projectile type

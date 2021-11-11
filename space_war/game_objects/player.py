@@ -5,11 +5,11 @@ from space_war.game_objects.projectile import Projectile
 
 class Player(pygame.sprite.Sprite):
     """Player spaceship object.
-    Called in Game object in 'state_game' module."""
+    Called in the 'Game' object in 'state_game' module."""
     def __init__(self, data, style: str, hp_base: int = 3, speed_base: float = 0.4) -> None:
         """
         Parameters:
-            data: game data object
+            data: 'ShareData' object
             style: type of player spaceship('player1', 'player2' or 'player3')
             hp_base: base player health points(default=3)
             speed_base: base speed of moving player spaceship(default=0.4)

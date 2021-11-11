@@ -8,6 +8,10 @@ class Upgrade(State, MenuManager):
     """Upgrade menu is displayed after finishing each level.
     Player can upgrade one of the abilities(gunfire, health or speed). Maximum upgrade points of one ability is 3."""
     def __init__(self, data) -> None:
+        """
+        Parameters:
+            data: 'ShareData' object
+        """
         self.data = data
         State.__init__(self)
         MenuManager.__init__(self, frame_width=290, xpos_menu_offset=-50)

@@ -11,6 +11,10 @@ from game_objects.explosion import Explosion
 class Game(State):
     """Actual game state. Called in 'Control' object in the control module."""
     def __init__(self, data) -> None:
+        """
+        Parameters:
+            data: 'ShareData' object
+        """
         State.__init__(self)
         self.data = data
         self.next = 'end'

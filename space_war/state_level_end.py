@@ -6,6 +6,10 @@ from state import State
 class LevelEnd(State):
     """Display text and play sound effect after each level"""
     def __init__(self, data) -> None:
+        """
+        Parameters:
+            data: 'ShareData' object
+        """
         State.__init__(self)
         self.data = data
 
