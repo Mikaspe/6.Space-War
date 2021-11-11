@@ -5,7 +5,7 @@ from menu_manager import MenuManager
 
 
 class Spaceshipsmenu(State, MenuManager):
-    """Option in main menu where player can change spaceship image"""
+    """Option in main menu where player can change player spaceship image"""
 
     def __init__(self, data) -> None:
         self.data = data
@@ -34,18 +34,31 @@ class Spaceshipsmenu(State, MenuManager):
 
         self.lst_text_rect = [self.spacehip1_rect, self.spacehip2_rect, self.spacehip3_rect]
 
-    def cleanup(self) -> None:  # Wywołane raz przed przejsciem do next stanu
+    def cleanup(self) -> None:
+        """State cleanup. Called once when current state flips to the next one.
+        Called in the '__flip_state' method in 'Control' object('control' module).
+        """
         pass
 
-    def startup(self) -> None:  # Wywołane raz na początku tego stanu
+    def startup(self) -> None:
+        """State objects preparing. Called once when current state flips to the this one.
+        Called in the '__flip_state' method in 'Control' object('control' module).
+        """
+        # Initial menu position is the last that player has chosen
         self.startup_menu(initial_menu_pos=int(self.data.player_spaceship_style[-1])-1)
 
-    def get_event(self, event: pygame.event) -> None:  # Zbiera eventy z control i reaguje na nie w swoj sposob
-        self.click = False
-        # if event.type == pygame.QUIT:
-        #     self.quit = True
+    def get_event(self, event: pygame.event) -> None:
+        """Events handling passed as argument by 'Control' object.
+        Called in the '__event_loop' method in 'Control' object('control' module).
+
+        Parameters:
+            event: PyGame events
+        """
+        self.click = False  # Resets click flag
+
+        # Menu navigation
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_RETURN:
+            if event.key == pygame.K_RETURN:  # Enter button
                 self.click = True
             if event.key == pygame.K_LEFT:
                 self.current_menu_pos += 1
@@ -59,8 +72,15 @@ class Spaceshipsmenu(State, MenuManager):
             if event.button == 1:
                 self.click = True
 
-    def update(self, keys: pygame.key, dt: int) -> None:  # Updatuje to co sie dzieje w tym stanie
-        self.draw()
+    def update(self, keys: pygame.key, dt: int) -> None:
+        """Main processing of the state.
+        Called in the '__update' method in 'Control' object('control' module).
+
+        Parameters:
+            keys: state of all keyboard buttons
+            dt: delta time in ms
+        """
+        self.__draw()
         self.update_menu()
         if self.next == 'Spaceship1':
             self.data.player_spaceship_style = 'player1'
@@ -70,11 +90,17 @@ class Spaceshipsmenu(State, MenuManager):
             self.data.player_spaceship_style = 'player3'
         self.next = 'mainmenu'
 
-    def draw(self) -> None:  # Rysowanie
+    def __draw(self) -> None:
+        """Draws background and title on the screen.
+        Called in the update method.
+        """
         self.data.SCREEN.blit(self.data.GFX[f'background1'], (0, 0))
         self.data.SCREEN.blit(self.text_spaceship, self.text_rect)
 
     def draw_menu(self) -> None:
+        """Called in superclass 'MenuManager'. Overrides method in superclass.
+        Draws spaceship image options.
+        """
         for option_pos in range(self.num_of_options):
             if self.current_menu_pos == option_pos:
                 self.data.SCREEN.blit(self.data.GFX[f'player{option_pos+1}-choosen'], eval(f'self.spacehip{option_pos+1}_rect'))

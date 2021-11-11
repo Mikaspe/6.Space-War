@@ -21,7 +21,7 @@ class Control:
             start_state: initial state
         """
 
-        self.done = False  # When True Control instance is done and game closes
+        self.done = False  # When True, 'Control' object is done and game closes
         self.clock = pygame.time.Clock()
 
         self.data = ShareData()  # Object with settings and data shared in the project
@@ -127,7 +127,9 @@ class ShareData:
         return self.__enemies_args
 
     def __load_images(self) -> None:
-        """Loads game images and animations from directories"""
+        """Loads game images and animations from directories.
+        Called in the contructor.
+        """
         for folder_name in ('Player', 'Enemy', 'Projectile', 'Background', 'Other'):
             for img in os.listdir(f'../resources/img/{folder_name}'):
                 if img.startswith(('player', 'enemy', 'projectile')):
@@ -142,12 +144,16 @@ class ShareData:
             self.__GFX[animation.replace('.png', '')] = frames
 
     def __load_sounds(self) -> None:
-        """Loads game sounds from directory"""
+        """Loads game sounds from directory
+        Called in the contructor.
+        """
         for sound in os.listdir('../resources/sounds'):
             self.__SFX[sound.replace('.wav', '')] = pygame.mixer.Sound(f'../resources/sounds/{sound}')
 
     def __load_level_enemies(self) -> None:
-        """Loads enemie spaceship composition for each level from pickle file"""
+        """Loads enemie spaceship composition for each level from pickle file.
+        Called in the contructor.
+        """
         with open('game_levels.pickle', 'rb') as handle:
             # Dictionary where key is a game level, values are tuples with enemy parameters(x_pos, y_pos, style)
             self.__enemies_args = pickle.load(handle)

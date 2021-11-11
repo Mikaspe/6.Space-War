@@ -9,7 +9,7 @@ from game_objects.explosion import Explosion
 
 
 class Game(State):
-    """Actual game state. Called in 'Control' class in the control module."""
+    """Actual game state. Called in 'Control' object in the control module."""
     def __init__(self, data) -> None:
         State.__init__(self)
         self.data = data
@@ -21,10 +21,13 @@ class Game(State):
         self.animations = pygame.sprite.Group()  # Group of all current animations
 
     def cleanup(self) -> None:
+        """State cleanup. Called once when current state flips to the next one.
+        Called in the '__flip_state' method in 'Control' object('control' module).
+        """
         pass
 
     def startup(self) -> None:
-        """Called once when current state flips to the this one.
+        """State objects preparing. Called once when current state flips to the this one.
         Called in the '__flip_state' method in 'Control' object('control' module).
         """
         if self.previous != 'pause':
@@ -58,7 +61,7 @@ class Game(State):
         self.player.get_event(event)
 
     def update(self, keys: pygame.key, dt: int) -> None:
-        """Main game processing.
+        """Main processing of the state.
         Called in the '__update' method in 'Control' object('control' module).
 
         Parameters:
@@ -83,7 +86,7 @@ class Game(State):
 
     def __draw(self, dt: int) -> None:
         """Draws game objects on the screen.
-
+        Called in the update method.
         Parameters:
             dt: delta time in ms
         """
@@ -104,7 +107,7 @@ class Game(State):
 
     def __draw_current_level(self) -> None:
         """Draws current level('level/max_level') in the top-right corner.
-        Called in '__draw' method.
+        Called in the '__draw' method.
         """
         font = pygame.font.SysFont('swiss721', 17)
         text_level = font.render(f'{self.data.level}/{self.data.max_level}', True, (200, 200, 200))
@@ -114,7 +117,7 @@ class Game(State):
 
     def __draw_player_hearts(self, dt: int) -> None:
         """Draws player health points as hearts in the top-left corner.
-        Called in '__draw' method.
+        Called in the '__draw' method.
 
         Parameters:
             dt: delta time in ms
@@ -135,7 +138,7 @@ class Game(State):
 
     def __draw_boss_healthbar(self) -> None:
         """Draws boss healthbar in the top of the screen.
-        Called in '__draw' method.
+        Called in the '__draw' method.
         """
         frame_rect = pygame.Rect((0, 10), (self.enemies.sprites()[0].hp, 3))
         frame_rect.centerx = self.data.SCREEN_RECT.centerx
@@ -143,7 +146,7 @@ class Game(State):
 
     def __keep_enemies_in_window(self) -> None:
         """Changing enemies move direction when farthest reaches definied border.
-        Called in 'update' method.
+        Called in  the 'update' method.
         """
         enemies_lst = self.enemies.sprites()
         enemies_lst.sort(key=operator.attrgetter('rect.x'))
@@ -156,7 +159,7 @@ class Game(State):
 
     def __enemy_projectiles_gen(self, dt: int) -> None:
         """Generation of projectiles shot by enemies.
-        Called in 'update' method.
+        Called in the 'update' method.
 
         Parameters:
             dt: delta time in ms
@@ -167,7 +170,7 @@ class Game(State):
 
     def __enemy_projectiles_remove(self) -> None:
         """Removing enemy projectiles when out of the screen or strike player spaceship.
-        Called in 'update' method.
+        Called in the 'update' method.
         """
         for projectile in self.enemy_projectiles:
             if projectile.rect.top > self.data.WIN_SIZE[1]:  # Projectile out of the screen
@@ -188,7 +191,7 @@ class Game(State):
 
     def __player_projectiles_remove(self) -> None:
         """Removing player projectiles when strike enemy spaceship.
-        Called in 'update' method.
+        Called in the 'update' method.
         """
         for projectile in self.player.projectiles:
             for enemy in self.enemies:
