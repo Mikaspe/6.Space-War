@@ -24,7 +24,9 @@ class Game(State):
         pass
 
     def startup(self) -> None:
-        """Called once when state begins."""
+        """Called once when current state flips to the this one.
+        Called in the '__flip_state' method in 'Control' object('control' module).
+        """
         if self.previous != 'pause':
             self.enemies.empty()  # Removing all enemies
             self.enemy_projectiles.empty()  # Removing all enemy projectiles
@@ -44,6 +46,7 @@ class Game(State):
 
     def get_event(self, event: pygame.event) -> None:
         """Events handling passed as argument by 'Control' object.
+        Called in the '__event_loop' method in 'Control' object('control' module).
 
         Parameters:
             event: PyGame events
@@ -56,6 +59,7 @@ class Game(State):
 
     def update(self, keys: pygame.key, dt: int) -> None:
         """Main game processing.
+        Called in the '__update' method in 'Control' object('control' module).
 
         Parameters:
             keys: state of all keyboard buttons
@@ -99,7 +103,9 @@ class Game(State):
             self.__draw_boss_healthbar()
 
     def __draw_current_level(self) -> None:
-        """Draws current level('level/max_level') in the top-right corner."""
+        """Draws current level('level/max_level') in the top-right corner.
+        Called in '__draw' method.
+        """
         font = pygame.font.SysFont('swiss721', 17)
         text_level = font.render(f'{self.data.level}/{self.data.max_level}', True, (200, 200, 200))
         text_level_rect = text_level.get_rect()
@@ -108,6 +114,7 @@ class Game(State):
 
     def __draw_player_hearts(self, dt: int) -> None:
         """Draws player health points as hearts in the top-left corner.
+        Called in '__draw' method.
 
         Parameters:
             dt: delta time in ms
@@ -126,8 +133,18 @@ class Game(State):
             elif self.timer_heart_beating > 400:
                 self.timer_heart_beating = 0
 
+    def __draw_boss_healthbar(self) -> None:
+        """Draws boss healthbar in the top of the screen.
+        Called in '__draw' method.
+        """
+        frame_rect = pygame.Rect((0, 10), (self.enemies.sprites()[0].hp, 3))
+        frame_rect.centerx = self.data.SCREEN_RECT.centerx
+        pygame.draw.rect(self.data.SCREEN, (200, 0, 0), frame_rect, 2)
+
     def __keep_enemies_in_window(self) -> None:
-        """Changing enemies move direction when farthest reaches definied border."""
+        """Changing enemies move direction when farthest reaches definied border.
+        Called in 'update' method.
+        """
         enemies_lst = self.enemies.sprites()
         enemies_lst.sort(key=operator.attrgetter('rect.x'))
         if enemies_lst[0].rect.left < 0:  # Enemie reaches left border
@@ -139,6 +156,7 @@ class Game(State):
 
     def __enemy_projectiles_gen(self, dt: int) -> None:
         """Generation of projectiles shot by enemies.
+        Called in 'update' method.
 
         Parameters:
             dt: delta time in ms
@@ -148,7 +166,9 @@ class Game(State):
         self.enemy_projectiles.update(dt)
 
     def __enemy_projectiles_remove(self) -> None:
-        """Removing enemy projectiles when out of the screen or strike player spaceship."""
+        """Removing enemy projectiles when out of the screen or strike player spaceship.
+        Called in 'update' method.
+        """
         for projectile in self.enemy_projectiles:
             if projectile.rect.top > self.data.WIN_SIZE[1]:  # Projectile out of the screen
                 self.enemy_projectiles.remove(projectile)
@@ -167,7 +187,9 @@ class Game(State):
                     self.data.hp -= 1
 
     def __player_projectiles_remove(self) -> None:
-        """Removing player projectiles when strike enemy spaceship."""
+        """Removing player projectiles when strike enemy spaceship.
+        Called in 'update' method.
+        """
         for projectile in self.player.projectiles:
             for enemy in self.enemies:
                 if pygame.sprite.collide_mask(enemy, projectile):
@@ -185,8 +207,4 @@ class Game(State):
                             enemy.speed += 0.01
                     break
 
-    def __draw_boss_healthbar(self) -> None:
-        """Draws boss healthbar in the top of the screen."""
-        frame_rect = pygame.Rect((0, 10), (self.enemies.sprites()[0].hp, 3))
-        frame_rect.centerx = self.data.SCREEN_RECT.centerx
-        pygame.draw.rect(self.data.SCREEN, (200, 0, 0), frame_rect, 2)
+
