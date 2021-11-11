@@ -10,9 +10,18 @@ class Upgrade(State, MenuManager):
     def __init__(self, data) -> None:
         self.data = data
         State.__init__(self)
-        MenuManager.__init__(self, ['GUNFIRE', 'HEALTH', 'SPEED'], frame_width=290, xpos_menu_offset=-50)
-        self.next_list = ['gunfire_upg', 'health_upg', 'speed_upg']
+        MenuManager.__init__(self, frame_width=290, xpos_menu_offset=-50)
         self.initial_menu_pos = 0
+
+    @property
+    def options(self):
+        """Text of menu options. Used in superclass 'MenuManager'"""
+        return ['GUNFIRE', 'HEALTH', 'SPEED']
+
+    @property
+    def next_list(self):
+        """Logic beyond corresponding menu option."""
+        return ['gunfire_upg', 'health_upg', 'speed_upg']
 
     def cleanup(self) -> None:
         """State cleanup. Called once when current state flips to the next one.

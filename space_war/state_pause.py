@@ -5,13 +5,21 @@ from menu_manager import MenuManager
 
 
 class Pause(State, MenuManager):
-    """Pauses game and displays pause menu"""
+    """Pauses game and displays pause menu."""
     def __init__(self, data) -> None:
         self.data = data
         State.__init__(self)
-        MenuManager.__init__(self, ['Continue', 'Main menu', 'Exit'])
+        MenuManager.__init__(self)
 
-        self.next_list = ['game', 'mainmenu', 'quit']
+    @property
+    def options(self):
+        """Text of menu options. Used in superclass 'MenuManager'"""
+        return ['Continue', 'Main menu', 'Exit']
+
+    @property
+    def next_list(self):
+        """Next states after clicking corresponding menu option."""
+        return ['game', 'mainmenu', 'quit']
 
     def cleanup(self) -> None:
         """State cleanup. Called once when current state flips to the next one.

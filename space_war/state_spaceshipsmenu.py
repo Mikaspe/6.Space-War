@@ -10,8 +10,7 @@ class Spaceshipsmenu(State, MenuManager):
     def __init__(self, data) -> None:
         self.data = data
         State.__init__(self)
-        MenuManager.__init__(self, ['Spaceship1', 'Spaceship2', 'Spaceship3'])
-        self.next_list = ['Spaceship1', 'Spaceship2', 'Spaceship3']
+        MenuManager.__init__(self)
 
         # Title
         font = pygame.font.Font('freesansbold.ttf', 40)
@@ -33,6 +32,16 @@ class Spaceshipsmenu(State, MenuManager):
         self.spacehip3_rect.y = self.data.WIN_SIZE[1]/2
 
         self.lst_text_rect = [self.spacehip1_rect, self.spacehip2_rect, self.spacehip3_rect]
+
+    @property
+    def options(self):
+        """Text of menu options. Used in superclass 'MenuManager'"""
+        return ['Spaceship1', 'Spaceship2', 'Spaceship3']
+
+    @property
+    def next_list(self):
+        """Logic beyond corresponding menu option."""
+        return ['Spaceship1', 'Spaceship2', 'Spaceship3']
 
     def cleanup(self) -> None:
         """State cleanup. Called once when current state flips to the next one.

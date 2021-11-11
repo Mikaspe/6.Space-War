@@ -1,17 +1,17 @@
+from abc import ABC, abstractmethod
+
 import pygame
 
 
-class MenuManager:
+class MenuManager(ABC):
     """MenuManager is a superclass for states which use menu navigation."""
-    def __init__(self, options: list, frame_width: int = 242, xpos_menu_offset: int = 0) -> None:
+    def __init__(self, frame_width: int = 242, xpos_menu_offset: int = 0) -> None:
         """
         Parameters:
-            options: list with menu items to display
             frame_width: width of the menu frame(default=242)
             xpos_menu_offset: offset for items position in the frame menu(default=0 -> text is centered)
         """
 
-        self.options = options
         self.num_of_options = len(self.options)
         self.current_menu_pos = self.menu_pos_memory = 0
         self.frame_rect = pygame.Rect((0, 0), (frame_width, self.num_of_options*51))  # Rectangular coordinates of frame
@@ -33,6 +33,16 @@ class MenuManager:
             self.y_offset += 1/self.num_of_options * self.frame_rect.h
 
         self.click = False
+
+    @property
+    @abstractmethod
+    def options(self):
+        pass
+
+    @property
+    @abstractmethod
+    def next_list(self):
+        pass
 
     def cleanup(self) -> None:
         pass

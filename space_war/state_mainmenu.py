@@ -9,9 +9,17 @@ class MainMenu(State, MenuManager):
     def __init__(self, data) -> None:
         self.data = data
         State.__init__(self)
-        MenuManager.__init__(self, ['Start', 'Spaceship', 'Exit'])
+        MenuManager.__init__(self)
 
-        self.next_list = ['start', 'spaceshipsmenu', 'quit']
+    @property
+    def options(self):
+        """Text of menu options. Used in superclass 'MenuManager'"""
+        return ['Start', 'Spaceship', 'Exit']
+
+    @property
+    def next_list(self):
+        """Next states after clicking corresponding menu option."""
+        return ['start', 'spaceshipsmenu', 'quit']
 
     def cleanup(self) -> None:
         """State cleanup. Called once when current state flips to the next one.
