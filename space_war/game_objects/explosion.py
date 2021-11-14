@@ -39,5 +39,3 @@ class Explosion(pygame.sprite.Sprite):
             if self.current_sprite >= len(self.sprites):
                 self.current_sprite = 0
                 self.is_animating = False
-
-

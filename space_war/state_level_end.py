@@ -13,6 +13,11 @@ class LevelEnd(State):
         State.__init__(self)
         self.data = data
 
+        self.sound_length_ms = None
+        self.text_title = None
+        self.text_title_rect = None
+        self.timer = None
+
     def cleanup(self) -> None:
         """State cleanup. Called once when current state flips to the next one.
         Called in the '__flip_state' method in 'Control' object('control' module).

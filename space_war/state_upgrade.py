@@ -17,6 +17,9 @@ class Upgrade(State, MenuManager):
         MenuManager.__init__(self, frame_width=290, xpos_menu_offset=-50)
         self.initial_menu_pos = 0
 
+        self.upgrade_point_rect = None
+        self.space_beetwen_points = None
+
     @property
     def options(self):
         """Text of menu options. Used in superclass 'MenuManager'"""

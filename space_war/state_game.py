@@ -24,6 +24,9 @@ class Game(State):
         self.enemy_projectiles = pygame.sprite.Group()  # Group of all enemie projectiles
         self.animations = pygame.sprite.Group()  # Group of all current animations
 
+        self.timer_heart_beating = None  # Timer for heart 'beating' when player hp is low
+        self.played_lowhp_sound = None
+
     def cleanup(self) -> None:
         """State cleanup. Called once when current state flips to the next one.
         Called in the '__flip_state' method in 'Control' object('control' module).

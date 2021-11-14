@@ -101,7 +101,7 @@ class ShareData:
 
         # Dictionary where key is a game level, values are tuples with parameters(x_pos, y_pos, style) used for
         # creating each 'Enemy' spaceship object
-        self.__enemies_args = {}
+        self.__ENEMIES_ARGS = {}
 
         self.__load_images()  # Loads images from directory
         self.__load_sounds()  # Loads sound from directory
@@ -111,9 +111,9 @@ class ShareData:
         self.max_level = 8
         self.hp = None
         self.player_spaceship_style = 'player1'
-        self.gunfire_upgrade = 1
-        self.hp_upgrade = 1
-        self.speed_upgrade = 1
+        self.gunfire_upgrade = 0
+        self.hp_upgrade = 0
+        self.speed_upgrade = 0
 
     @property
     def GFX(self) -> dict:
@@ -125,7 +125,7 @@ class ShareData:
 
     @property
     def enemies_args(self) -> dict:
-        return self.__enemies_args
+        return self.__ENEMIES_ARGS
 
     def __load_images(self) -> None:
         """Loads game images and animations from directories.
@@ -157,7 +157,7 @@ class ShareData:
         """
         with open('game_levels.pickle', 'rb') as handle:
             # Dictionary where key is a game level, values are tuples with enemy parameters(x_pos, y_pos, style)
-            self.__enemies_args = pickle.load(handle)
+            self.__ENEMIES_ARGS = pickle.load(handle)
 
 
 pygame.init()

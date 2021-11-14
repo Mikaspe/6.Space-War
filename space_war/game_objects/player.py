@@ -149,4 +149,3 @@ class Player(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)  # Useful for fast pixel perfect collision detection
         # Rectangular coordinates of player spaceship
         self.rect = self.image.get_rect(center=(self.data.WIN_SIZE[0]/2, self.data.WIN_SIZE[1]-75))
-
