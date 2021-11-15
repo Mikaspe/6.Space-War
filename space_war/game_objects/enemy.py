@@ -78,7 +78,7 @@ class Enemy(pygame.sprite.Sprite):
                     projectiles.append(projectile)
                     projectile = Projectile(self.data, self.rect.centerx + 24, self.rect.centery + 20, 'enemy3')
                     projectiles.append(projectile)
-        elif self.style == 4:
+        elif self.style == 4:  # Boss enemy
             if self.hp > 200:
                 if random.randint(1, self.shoot_ratio) == 1 and pygame.time.get_ticks()-self.timer > self.ball_delay:
                     self.data.SFX['ball'].play()

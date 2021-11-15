@@ -13,10 +13,10 @@ class LevelEnd(State):
         State.__init__(self)
         self.data = data
 
-        self.sound_length_ms = None
-        self.text_title = None
-        self.text_title_rect = None
-        self.timer = None
+        self.sound_length_ms = None  # Length of end sound
+        self.text_title = None  # Title of end screen
+        self.text_title_rect = None  # Rectangle of title text
+        self.timer = None  # Timer which measures how long end state is active
 
     def cleanup(self) -> None:
         """State cleanup. Called once when current state flips to the next one.

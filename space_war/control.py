@@ -11,6 +11,7 @@ from state_level_end import LevelEnd
 from state_pause import Pause
 from state_upgrade import Upgrade
 from state_spaceshipsmenu import Spaceshipsmenu
+from state_controls import Controls
 
 
 class Control:
@@ -33,7 +34,8 @@ class Control:
             'pause': Pause(self.data),
             'end': LevelEnd(self.data),
             'upgrade': Upgrade(self.data),
-            'spaceshipsmenu': Spaceshipsmenu(self.data)
+            'spaceshipsmenu': Spaceshipsmenu(self.data),
+            'controls': Controls(self.data)
         }
 
         self.state_name = start_state  # Name of a current state

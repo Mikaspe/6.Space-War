@@ -25,7 +25,7 @@ class Game(State):
         self.animations = pygame.sprite.Group()  # Group of all current animations
 
         self.timer_heart_beating = None  # Timer for heart 'beating' when player hp is low
-        self.played_lowhp_sound = None
+        self.played_lowhp_sound = None  # True when lowhp sound already played
 
     def cleanup(self) -> None:
         """State cleanup. Called once when current state flips to the next one.

@@ -18,12 +18,12 @@ class MainMenu(State, MenuManager):
     @property
     def options(self):
         """Text of menu options. Used in superclass 'MenuManager'"""
-        return ['Start', 'Spaceship', 'Exit']
+        return ['Start', 'Spaceship', 'Controls', 'Exit']
 
     @property
     def next_list(self):
         """Next states after clicking corresponding menu option."""
-        return ['start', 'spaceshipsmenu', 'quit']
+        return ['start', 'spaceshipsmenu', 'controls', 'quit']
 
     def cleanup(self) -> None:
         """State cleanup. Called once when current state flips to the next one.
