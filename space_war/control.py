@@ -242,9 +242,13 @@ class ShareData:
             self.__ENEMIES_ARGS = pickle.load(handle)
 
 
-pygame.init()
-app = Control()  # Sets the initial state of the program
-app.main_game_loop()
+def main():
+    pygame.init()
+    app = Control()  # Sets the initial state of the program
+    app.main_game_loop()
 
-pygame.quit()
-sys.exit()
+    pygame.quit()
+    sys.exit()
+
+
+main()
