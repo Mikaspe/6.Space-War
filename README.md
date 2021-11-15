@@ -13,3 +13,14 @@ Space-war is a 'shoot'em ups' game made with pygame library.
   <img width="512" height="383" src="https://user-images.githubusercontent.com/41167000/135084142-ebdafe48-d6f2-4646-96a9-ffe06e3aa17a.png">
 </p>
 
+#Installation
+
+Install:
+1. Python 3.10: https://www.python.org/downloads/release/python-3100/
+2. Git: https://git-scm.com/
+
+1. Clone repository:
+'$ git clone https://github.com/Mikaspe/6.Space-War'
+
+2. Virtual Environment: '$ pip install --user pipenv' https://pipenv.pypa.io/en/latest/
+3. 
