@@ -112,7 +112,7 @@ class ShareData:
         self.__level = 1  # Current game level
         self.__MAX_LEVEL = 8
 
-        self.hp = None
+        self.__hp = 0
         self.player_spaceship_style = 'player1'
         self.__MAX_UPGRADE = 3
         self.__gunfire_upgrade = 0
@@ -164,6 +164,16 @@ class ShareData:
     @property
     def MAX_LEVEL(self) -> int:
         return self.__MAX_LEVEL
+
+    @property
+    def hp(self) -> int:
+        return self.__hp
+
+    @hp.setter
+    def hp(self, value):
+        if value > 10:
+            raise ValueError(f'Hp must be lower than 10')
+        self.__hp = value
 
     @property
     def MAX_UPGRADE(self) -> int:
