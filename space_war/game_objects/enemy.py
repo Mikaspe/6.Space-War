@@ -25,10 +25,10 @@ class Enemy(pygame.sprite.Sprite):
         self.direction = direction  # Initial moving direction
         self.speed = 0.1
 
-        self.border = 10 if style == 4 else 60  # Left and right border which enemy won't pass
+        self.__border = 10 if style == 4 else 60  # Left and right border which enemy won't pass
         self.image = self.data.GFX[f'enemy{self.style}']
-        self.mask = pygame.mask.from_surface(self.image)  # Useful for fast pixel perfect collision detection
-        self.rect = self.image.get_rect(center=(pos_x + self.border, pos_y + 40))  # Rectangular coordinates of enemy
+        self.__mask = pygame.mask.from_surface(self.image)  # Useful for fast pixel perfect collision detection
+        self.rect = self.image.get_rect(center=(pos_x + self.__border, pos_y + 40))  # Rectangular coordinates of enemy
 
         if style == 1:
             self.hp = 1
@@ -44,9 +44,9 @@ class Enemy(pygame.sprite.Sprite):
             self.shoot_ratio = 120
             self.speed = 0.2
 
-        self.ball_delay = 2000  # Minimum delay beetween boss ball shots
-        self.timer = 0  # Timer used in boss shot sequence
-        self.played_berserker_sound = False
+        self.__ball_delay = 2000  # Minimum delay beetween boss ball shots
+        self.__timer = 0  # Timer used in boss shot sequence
+        self.__played_berserker_sound = False
 
     def update(self, dt: int) -> None:
         """Moving enemy in left or right direction(self.direction) with defined speed(self.speed).
@@ -80,11 +80,11 @@ class Enemy(pygame.sprite.Sprite):
                     projectiles.append(projectile)
         elif self.style == 4:  # Boss enemy
             if self.hp > 200:
-                if random.randint(1, self.shoot_ratio) == 1 and pygame.time.get_ticks()-self.timer > self.ball_delay:
+                if random.randint(1, self.shoot_ratio) == 1 and pygame.time.get_ticks()-self.__timer > self.__ball_delay:
                     self.data.SFX['ball'].play()
                     projectile = Projectile(self.data, self.rect.centerx, self.rect.centery + 100, 'enemy-ball')
                     projectiles.append(projectile)
-                    self.timer = pygame.time.get_ticks()
+                    self.__timer = pygame.time.get_ticks()
                 elif random.randint(1, self.shoot_ratio) == 1:
                     self.data.SFX['laser-enemy'].play()
                     projectile = Projectile(self.data, self.rect.centerx - 155, self.rect.centery, 'enemy-smallball')
@@ -116,25 +116,25 @@ class Enemy(pygame.sprite.Sprite):
             dt: delta time in ms
         """
 
-        if not self.played_berserker_sound:
+        if not self.__played_berserker_sound:
             self.data.SFX['enemy-berserker'].play()
             self.data.SFX['enemy-berserker2'].play()
-            self.timer = 0  # Timer used for sequences parts
+            self.__timer = 0  # Timer used for sequences parts
             self.timer2 = 0  # Timer used for delay between shoots in sequences
-            self.played_berserker_sound = True
+            self.__played_berserker_sound = True
 
-        self.timer += dt
+        self.__timer += dt
         self.timer2 += dt
         self.speed = 0.5
         projectiles = []
 
-        if 2000 < self.timer < 8000:
+        if 2000 < self.__timer < 8000:
             if self.timer2 > 600:
                 self.timer2 = 0
                 self.data.SFX['ball'].play()
                 projectile = Projectile(self.data, self.rect.centerx, self.rect.centery + 100, 'enemy-ball')
                 projectiles.append(projectile)
-        elif 8500 < self.timer < 15000:
+        elif 8500 < self.__timer < 15000:
             if self.timer2 > 400:
                 self.timer2 = 0
                 self.data.SFX['laser-enemy'].play()
@@ -142,7 +142,7 @@ class Enemy(pygame.sprite.Sprite):
                 projectiles.append(projectile)
                 projectile = Projectile(self.data, self.rect.centerx + 155, self.rect.centery, 'enemy-smallball')
                 projectiles.append(projectile)
-        elif 16000 < self.timer < 30000:
+        elif 16000 < self.__timer < 30000:
             if self.timer2 < 1000:
                 self.data.SFX['laser-enemy'].play()
                 projectile = Projectile(self.data, self.rect.centerx - 120, self.rect.centery - 105, 'enemy4')
@@ -151,7 +151,7 @@ class Enemy(pygame.sprite.Sprite):
                 projectiles.append(projectile)
             elif self.timer2 > 2000:
                 self.timer2 = 0
-        elif self.timer > 30000:
-            self.timer = 0
+        elif self.__timer > 30000:
+            self.__timer = 0
 
         return projectiles

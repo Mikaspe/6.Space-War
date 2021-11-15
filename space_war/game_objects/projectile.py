@@ -3,7 +3,7 @@ import pygame
 
 class Projectile(pygame.sprite.Sprite):
     """Projectile object shot by player or enemy."""
-    def __init__(self, data, pos_x: int, pos_y: int, style: str) -> None:
+    def __init__(self, data, pos_x: int, pos_y: int, style: str, base_projectile_speed: float = 0.4) -> None:
         """
         Parameters:
             data: 'ShareData' object
@@ -15,7 +15,7 @@ class Projectile(pygame.sprite.Sprite):
         super().__init__()
 
         self.style = style
-        self.base_projectile_speed = 0.4
+        self.__base_projectile_speed = base_projectile_speed
 
         self.image = data.GFX[f'projectile-{self.style}']
         self.mask = pygame.mask.from_surface(self.image)  # Useful for fast pixel perfect collision detection
@@ -30,22 +30,22 @@ class Projectile(pygame.sprite.Sprite):
         """
         speed_x_ratio = 0.3
         if self.style == 'player':
-            self.rect.y -= self.base_projectile_speed * dt
+            self.rect.y -= self.__base_projectile_speed * dt
         elif self.style == 'player-l':
-            self.rect.y -= self.base_projectile_speed * dt
-            self.rect.x -= round(self.base_projectile_speed * speed_x_ratio * dt)
+            self.rect.y -= self.__base_projectile_speed * dt
+            self.rect.x -= round(self.__base_projectile_speed * speed_x_ratio * dt)
         elif self.style == 'player-r':
-            self.rect.y -= self.base_projectile_speed * dt
-            self.rect.x += round(self.base_projectile_speed * speed_x_ratio * dt)
+            self.rect.y -= self.__base_projectile_speed * dt
+            self.rect.x += round(self.__base_projectile_speed * speed_x_ratio * dt)
         elif self.style == 'enemy1':
-            self.rect.y += self.base_projectile_speed * dt
+            self.rect.y += self.__base_projectile_speed * dt
         elif self.style == 'enemy2':
-            self.rect.y += (self.base_projectile_speed - 0.1) * dt
+            self.rect.y += (self.__base_projectile_speed - 0.1) * dt
         elif self.style == 'enemy3':
-            self.rect.y += self.base_projectile_speed * dt
+            self.rect.y += self.__base_projectile_speed * dt
         elif self.style == 'enemy4':
-            self.rect.y += self.base_projectile_speed * dt
+            self.rect.y += self.__base_projectile_speed * dt
         elif self.style == 'enemy-ball':
-            self.rect.y += (self.base_projectile_speed - 0.23) * dt
+            self.rect.y += (self.__base_projectile_speed - 0.23) * dt
         elif self.style == 'enemy-smallball':
-            self.rect.y += (self.base_projectile_speed - 0.10) * dt
+            self.rect.y += (self.__base_projectile_speed - 0.10) * dt

@@ -17,16 +17,16 @@ class Upgrade(State, MenuManager):
         MenuManager.__init__(self, frame_width=290, xpos_menu_offset=-50)
         self.initial_menu_pos = 0
 
-        self.upgrade_point_rect = None  # Each upgrade point will be drawn as a small rectangle(filled or empty)
-        self.space_beetwen_points = None  # Space between upgrade points
+        self.__upgrade_point_rect = None  # Each upgrade point will be drawn as a small rectangle(filled or empty)
+        self.__space_beetwen_points = None  # Space between upgrade points
 
     @property
-    def options(self):
+    def options(self) -> list:
         """Text of menu options. Used in superclass 'MenuManager'"""
         return ['GUNFIRE', 'HEALTH', 'SPEED']
 
     @property
-    def next_list(self):
+    def next_list(self) -> list:
         """Logic beyond corresponding menu option."""
         return ['gunfire_upg', 'health_upg', 'speed_upg']
 
@@ -67,21 +67,21 @@ class Upgrade(State, MenuManager):
         if self.done:  # Player has choosen upgrade
             self.initial_menu_pos = 0
             if self.next == 'gunfire_upg':
-                if self.data.gunfire_upgrade < 3:
+                if self.data.gunfire_upgrade < self.data.MAX_UPGRADE:
                     self.data.gunfire_upgrade += 1
                     self.next = 'start'
                 else:  # Current gunfire upgrade is max, calls again upgrade menu
                     self.next = 'upgrade'
                     self.initial_menu_pos = 0
             elif self.next == 'health_upg':
-                if self.data.hp_upgrade < 3:
+                if self.data.hp_upgrade < self.data.MAX_UPGRADE:
                     self.data.hp_upgrade += 1
                     self.next = 'start'
                 else:  # Current helath upgrade is max, calls again upgrade menu
                     self.next = 'upgrade'
                     self.initial_menu_pos = 1
             elif self.next == 'speed_upg':
-                if self.data.speed_upgrade < 3:
+                if self.data.speed_upgrade < self.data.MAX_UPGRADE:
                     self.data.speed_upgrade += 1
                     self.next = 'start'
                 else:  # Current speed upgrade is max, calls again upgrade menu
@@ -97,20 +97,20 @@ class Upgrade(State, MenuManager):
         """
         self.data.SCREEN.blit(self.data.GFX[f'background{self.data.level}'], (0, 0))
         self.draw_menu()
-        self.upgrade_point_rect = pygame.Rect((0, 0), (15, 15*1.61))
-        self.upgrade_point_rect.center = (self.frame_rect.centerx + 50, self.lst_text_rect[0].centery)
-        self.space_beetwen_points = 20
+        self.__upgrade_point_rect = pygame.Rect((0, 0), (15, 15 * 1.61))
+        self.__upgrade_point_rect.center = (self.frame_rect.centerx + 50, self.lst_text_rect[0].centery)
+        self.__space_beetwen_points = 20
 
         i = 0
         for upgrade in (self.data.gunfire_upgrade, self.data.hp_upgrade, self.data.speed_upgrade):
-            self.upgrade_point_rect.centery = self.lst_text_rect[i].centery
+            self.__upgrade_point_rect.centery = self.lst_text_rect[i].centery
             i += 1
             for col in range(1, 4):
-                self.upgrade_point_rect.x += self.space_beetwen_points
+                self.__upgrade_point_rect.x += self.__space_beetwen_points
                 if col <= upgrade:  # Fill rectangle if upgrade point already reached
-                    pygame.draw.rect(self.data.SCREEN, (200, 200, 200), self.upgrade_point_rect)
+                    pygame.draw.rect(self.data.SCREEN, (200, 200, 200), self.__upgrade_point_rect)
                 else:  # Empty rectangle if upgrade point not reached
-                    pygame.draw.rect(self.data.SCREEN, (200, 200, 200), self.upgrade_point_rect, 5)
+                    pygame.draw.rect(self.data.SCREEN, (200, 200, 200), self.__upgrade_point_rect, 3)
             else:
-                self.upgrade_point_rect.x -= self.space_beetwen_points * 3
+                self.__upgrade_point_rect.centerx = self.frame_rect.centerx + 50
 

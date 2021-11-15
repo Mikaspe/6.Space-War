@@ -16,12 +16,12 @@ class Pause(State, MenuManager):
         MenuManager.__init__(self)
 
     @property
-    def options(self):
+    def options(self) -> list:
         """Text of menu options. Used in superclass 'MenuManager'"""
         return ['Continue', 'Main menu', 'Exit']
 
     @property
-    def next_list(self):
+    def next_list(self) -> list:
         """Next states after clicking corresponding menu option."""
         return ['game', 'mainmenu', 'quit']
 

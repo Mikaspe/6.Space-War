@@ -14,23 +14,23 @@ class MenuManager(ABC):
 
         self.num_of_options = len(self.options)
         self.current_menu_pos = self.menu_pos_memory = 0
-        self.frame_rect = pygame.Rect((0, 0), (frame_width, self.num_of_options*51))  # Rectangular coordinates of frame
+        self.frame_rect = pygame.Rect((0, 0), (frame_width, self.num_of_options * 51))  # Rectangular coordinates of frame
         self.frame_rect.center = self.data.SCREEN_RECT.center
         font_size = 39
         font = pygame.font.Font('freesansbold.ttf', font_size)
-        self.lst_text_normal = []
-        self.lst_text_highlighted = []
+        self.__lst_text_normal = []
+        self.__lst_text_highlighted = []
         self.lst_text_rect = []
-        self.y_offset = 2/3 * font_size
+        y_offset = 2/3 * font_size
         for option in self.options:  # Rendering options and storing them in lists
             text_normal = font.render(option, True, (200, 200, 200))
-            self.lst_text_normal.append(text_normal)
-            self.lst_text_highlighted.append(font.render(option, True, (100, 200, 200)))
+            self.__lst_text_normal.append(text_normal)
+            self.__lst_text_highlighted.append(font.render(option, True, (100, 200, 200)))
             rect = text_normal.get_rect(center=self.frame_rect.midtop)
             rect.x += xpos_menu_offset
-            rect.y += self.y_offset
+            rect.y += y_offset
             self.lst_text_rect.append(rect)  # Rectangular coordinates of each option
-            self.y_offset += 1/self.num_of_options * self.frame_rect.h
+            y_offset += 1 / self.num_of_options * self.frame_rect.h
 
         self.click = False
 
@@ -76,7 +76,7 @@ class MenuManager(ABC):
             if event.key == pygame.K_UP:
                 self.current_menu_pos -= 1
                 if self.current_menu_pos == -1:
-                    self.current_menu_pos = self.num_of_options-1
+                    self.current_menu_pos = self.num_of_options - 1
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
                 self.click = True
@@ -110,9 +110,9 @@ class MenuManager(ABC):
         pygame.draw.rect(self.data.SCREEN, (200, 200, 200), self.frame_rect, 5)
         for option_pos in range(self.num_of_options):
             if self.current_menu_pos == option_pos:
-                self.data.SCREEN.blit(self.lst_text_highlighted[option_pos], self.lst_text_rect[option_pos])
+                self.data.SCREEN.blit(self.__lst_text_highlighted[option_pos], self.lst_text_rect[option_pos])
             else:
-                self.data.SCREEN.blit(self.lst_text_normal[option_pos], self.lst_text_rect[option_pos])
+                self.data.SCREEN.blit(self.__lst_text_normal[option_pos], self.lst_text_rect[option_pos])
 
 
 

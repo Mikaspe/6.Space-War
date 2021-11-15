@@ -4,7 +4,7 @@ from state import State
 
 
 class Controls(State):
-    """Display game controls"""
+    """Displays game controls"""
     def __init__(self, data) -> None:
         """
         Parameters:
@@ -14,19 +14,19 @@ class Controls(State):
         State.__init__(self)
         self.next = 'mainmenu'
 
-        controls_title_font = pygame.font.Font('../resources/fonts/OpenSans-Bold.ttf', 70)
-        self.text_title = controls_title_font.render('Game controls:', False, (255, 255, 255))
-        self.text_title_rect = self.text_title.get_rect(center=(self.data.SCREEN_RECT.centerx, 150))
+        __controls_title_font = pygame.font.Font('../resources/fonts/OpenSans-Bold.ttf', 70)
+        self.text_title = __controls_title_font.render('Game controls:', False, (255, 255, 255))
+        self.__text_title_rect = self.text_title.get_rect(center=(self.data.SCREEN_RECT.centerx, 150))
 
-        self.spacebar_rect = self.data.GFX['spacebar'].get_rect(center=(self.data.SCREEN_RECT.centerx - 150, 400))
-        self.arrows_rect = self.data.GFX['arrows'].get_rect(center=(self.data.SCREEN_RECT.centerx + 150, 400))
+        self.__spacebar_rect = self.data.GFX['spacebar'].get_rect(center=(self.data.SCREEN_RECT.centerx - 150, 400))
+        self.__arrows_rect = self.data.GFX['arrows'].get_rect(center=(self.data.SCREEN_RECT.centerx + 150, 400))
 
-        controls_text_font = pygame.font.Font('../resources/fonts/OpenSans-Bold.ttf', 40)
-        self.text_fire = controls_text_font.render('FIRE', False, (255, 255, 255))
-        self.text_fire_rect = self.text_fire.get_rect(center=(self.spacebar_rect.centerx, self.spacebar_rect.centery+50))
+        __controls_text_font = pygame.font.Font('../resources/fonts/OpenSans-Bold.ttf', 40)
+        self.__text_fire = __controls_text_font.render('FIRE', False, (255, 255, 255))
+        self.__text_fire_rect = self.__text_fire.get_rect(center=(self.__spacebar_rect.centerx, self.__spacebar_rect.centery + 50))
 
-        self.text_movement = controls_text_font.render('MOVEMENT', False, (255, 255, 255))
-        self.text_movement_rect = self.text_movement.get_rect(center=(self.arrows_rect.centerx, self.arrows_rect.centery+50))
+        self.__text_movement = __controls_text_font.render('MOVEMENT', False, (255, 255, 255))
+        self.__text_movement_rect = self.__text_movement.get_rect(center=(self.__arrows_rect.centerx, self.__arrows_rect.centery + 50))
 
     def cleanup(self) -> None:
         """State cleanup. Called once when current state flips to the next one.
@@ -59,20 +59,19 @@ class Controls(State):
             keys: state of all keyboard buttons
             dt: delta time in ms
         """
-    pass
+        pass
 
     def draw(self,  dt: int) -> None:
-        """Draws game background and level text.
+        """Draws game background and game controls.
         Called in the '__update' method in 'Control' object('control' module).
 
         Parameters:
             dt: delta time in ms
         """
         self.data.SCREEN.blit(self.data.GFX[f'background{self.data.level}'], (0, 0))
-        self.data.SCREEN.blit(self.text_title, self.text_title_rect)
+        self.data.SCREEN.blit(self.text_title, self.__text_title_rect)
 
-        self.data.SCREEN.blit(self.data.GFX['spacebar'], self.spacebar_rect)
-        self.data.SCREEN.blit(self.data.GFX['arrows'], self.arrows_rect)
-        self.data.SCREEN.blit(self.text_fire, self.text_fire_rect)
-        self.data.SCREEN.blit(self.text_movement, self.text_movement_rect)
-
+        self.data.SCREEN.blit(self.data.GFX['spacebar'], self.__spacebar_rect)
+        self.data.SCREEN.blit(self.data.GFX['arrows'], self.__arrows_rect)
+        self.data.SCREEN.blit(self.__text_fire, self.__text_fire_rect)
+        self.data.SCREEN.blit(self.__text_movement, self.__text_movement_rect)

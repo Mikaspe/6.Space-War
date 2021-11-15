@@ -18,32 +18,32 @@ class Spaceshipsmenu(State, MenuManager):
 
         # Title
         font = pygame.font.Font('freesansbold.ttf', 40)
-        self.text_spaceship = font.render('Choose spaceship:', True, (200, 200, 200))
-        self.text_rect = self.text_spaceship.get_rect()
-        self.text_rect.center = self.data.WIN_SIZE[0]/2, self.data.WIN_SIZE[1]/2 - 60
+        self.__text_spaceship = font.render('Choose spaceship:', True, (200, 200, 200))
+        self.__text_rect = self.__text_spaceship.get_rect()
+        self.__text_rect.center = self.data.WIN_SIZE[0] / 2, self.data.WIN_SIZE[1] / 2 - 60
 
         # Spaceships
-        self.spacehip1_rect = self.data.GFX['player1-choosen'].get_rect()
-        self.spacehip1_rect.x = self.data.WIN_SIZE[0]/2 - 50
-        self.spacehip1_rect.y = self.data.WIN_SIZE[1]/2
+        self._spacehip1_rect = self.data.GFX['player1-choosen'].get_rect()
+        self._spacehip1_rect.x = self.data.WIN_SIZE[0] / 2 - 50
+        self._spacehip1_rect.y = self.data.WIN_SIZE[1] / 2
 
-        self.spacehip2_rect = self.data.GFX['player2-choosen'].get_rect()
-        self.spacehip2_rect.x = self.data.WIN_SIZE[0]/2 - 200
-        self.spacehip2_rect.y = self.data.WIN_SIZE[1]/2
+        self._spacehip2_rect = self.data.GFX['player2-choosen'].get_rect()
+        self._spacehip2_rect.x = self.data.WIN_SIZE[0] / 2 - 200
+        self._spacehip2_rect.y = self.data.WIN_SIZE[1] / 2
 
-        self.spacehip3_rect = self.data.GFX['player3-choosen'].get_rect()
-        self.spacehip3_rect.x = self.data.WIN_SIZE[0]/2 + 100
-        self.spacehip3_rect.y = self.data.WIN_SIZE[1]/2
+        self._spacehip3_rect = self.data.GFX['player3-choosen'].get_rect()
+        self._spacehip3_rect.x = self.data.WIN_SIZE[0] / 2 + 100
+        self._spacehip3_rect.y = self.data.WIN_SIZE[1] / 2
 
-        self.lst_text_rect = [self.spacehip1_rect, self.spacehip2_rect, self.spacehip3_rect]
+        self.lst_text_rect = [self._spacehip1_rect, self._spacehip2_rect, self._spacehip3_rect]
 
     @property
-    def options(self):
+    def options(self) -> list:
         """Text of menu options. Used in superclass 'MenuManager'"""
         return ['Spaceship1', 'Spaceship2', 'Spaceship3']
 
     @property
-    def next_list(self):
+    def next_list(self) -> list:
         """Logic beyond corresponding menu option."""
         return ['Spaceship1', 'Spaceship2', 'Spaceship3']
 
@@ -110,7 +110,7 @@ class Spaceshipsmenu(State, MenuManager):
             dt: delta time in ms
         """
         self.data.SCREEN.blit(self.data.GFX[f'background1'], (0, 0))
-        self.data.SCREEN.blit(self.text_spaceship, self.text_rect)
+        self.data.SCREEN.blit(self.__text_spaceship, self.__text_rect)
         self.draw_menu()
 
     def draw_menu(self) -> None:
@@ -120,6 +120,6 @@ class Spaceshipsmenu(State, MenuManager):
 
         for option_pos in range(self.num_of_options):
             if self.current_menu_pos == option_pos:
-                self.data.SCREEN.blit(self.data.GFX[f'player{option_pos+1}-choosen'], eval(f'self.spacehip{option_pos+1}_rect'))
+                self.data.SCREEN.blit(self.data.GFX[f'player{option_pos+1}-choosen'], eval(f'self._spacehip{option_pos+1}_rect'))
             else:
-                self.data.SCREEN.blit(self.data.GFX[f'player{option_pos+1}-stop'], eval(f'self.spacehip{option_pos+1}_rect'))
+                self.data.SCREEN.blit(self.data.GFX[f'player{option_pos+1}-stop'], eval(f'self._spacehip{option_pos+1}_rect'))

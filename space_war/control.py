@@ -90,13 +90,13 @@ class Control:
 class ShareData:
     """Data object with settings and data shared in the project."""
     def __init__(self) -> None:
-        self.WIN_SIZE = (1024, 768)
-        self.FRAMERATE = 80
-        self.SCREEN = pygame.display.set_mode(self.WIN_SIZE)  # Display surface which'll be drawn
+        self.__WIN_SIZE = (1024, 768)
+        self.__FRAMERATE = 80
+        self.__SCREEN = pygame.display.set_mode(self.WIN_SIZE)  # Display surface which'll be drawn
         pygame.display.set_caption('Space-War')  # Caption of the window
-        self.SCREEN_RECT = self.SCREEN.get_rect()  # Store rectangular coordinates of the SCREEN
+        self.__SCREEN_RECT = self.SCREEN.get_rect()  # Store rectangular coordinates of the SCREEN
 
-        self.FONT = pygame.font.Font('../resources/fonts/OpenSans-Bold.ttf', 100)  # Text font in level start and end
+        self.__FONT = pygame.font.Font('../resources/fonts/OpenSans-Bold.ttf', 100)  # Text font in level start and end
         self.__GFX = {}  # Images and animations
         self.__SFX = {}  # Sounds
         pygame.mixer.set_num_channels(50)  # Number of sound channels
@@ -109,13 +109,35 @@ class ShareData:
         self.__load_sounds()  # Loads sound from directory
         self.__load_level_enemies()  # Loads enemie spaceships composition for each level from pickle file
 
-        self.level = 1  # Current game level
-        self.max_level = 8
+        self.__level = 1  # Current game level
+        self.__MAX_LEVEL = 8
+
         self.hp = None
         self.player_spaceship_style = 'player1'
-        self.gunfire_upgrade = 0
-        self.hp_upgrade = 0
-        self.speed_upgrade = 0
+        self.__MAX_UPGRADE = 3
+        self.__gunfire_upgrade = 0
+        self.__hp_upgrade = 0
+        self.__speed_upgrade = 0
+
+    @property
+    def WIN_SIZE(self) -> tuple:
+        return self.__WIN_SIZE
+
+    @property
+    def FRAMERATE(self) -> int:
+        return self.__FRAMERATE
+
+    @property
+    def SCREEN(self) -> pygame.Surface:
+        return self.__SCREEN
+
+    @property
+    def SCREEN_RECT(self) -> pygame.Rect:
+        return self.__SCREEN_RECT
+
+    @property
+    def FONT(self) -> pygame.font:
+        return self.__FONT
 
     @property
     def GFX(self) -> dict:
@@ -128,6 +150,54 @@ class ShareData:
     @property
     def enemies_args(self) -> dict:
         return self.__ENEMIES_ARGS
+
+    @property
+    def level(self) -> int:
+        return self.__level
+
+    @level.setter
+    def level(self, value) -> None:
+        if value < 1 or value > self.MAX_LEVEL:
+            raise ValueError(f'Level must be between 1 and {self.MAX_LEVEL}(max_level)')
+        self.__level = value
+
+    @property
+    def MAX_LEVEL(self) -> int:
+        return self.__MAX_LEVEL
+
+    @property
+    def MAX_UPGRADE(self) -> int:
+        return self.__MAX_UPGRADE
+
+    @property
+    def gunfire_upgrade(self) -> int:
+        return self.__gunfire_upgrade
+
+    @gunfire_upgrade.setter
+    def gunfire_upgrade(self, value):
+        if value < 0 or value > self.MAX_UPGRADE:
+            raise ValueError(f'Gunfire upgrade must be between 1 and {self.MAX_UPGRADE}(max_upgrade)')
+        self.__gunfire_upgrade = value
+
+    @property
+    def hp_upgrade(self) -> int:
+        return self.__hp_upgrade
+
+    @hp_upgrade.setter
+    def hp_upgrade(self, value):
+        if value < 0 or value > self.MAX_UPGRADE:
+            raise ValueError(f'Hp upgrade must be between 1 and {self.MAX_UPGRADE}(max_upgrade)')
+        self.__hp_upgrade = value
+
+    @property
+    def speed_upgrade(self) -> int:
+        return self.__speed_upgrade
+
+    @speed_upgrade.setter
+    def speed_upgrade(self, value):
+        if value < 0 or value > self.MAX_UPGRADE:
+            raise ValueError(f'Speed upgrade must be between 1 and {self.MAX_UPGRADE}(max_upgrade)')
+        self.__speed_upgrade = value
 
     def __load_images(self) -> None:
         """Loads game images and animations from directories.

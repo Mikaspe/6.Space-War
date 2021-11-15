@@ -18,17 +18,17 @@ class Player(pygame.sprite.Sprite):
         self.data = data
 
         self.style = style
-        self.hp_base = hp_base
+        self.__hp_base = hp_base
         self.data.hp = hp_base
-        self.speed_base = speed_base
+        self.__speed_base = speed_base
         self.speed = speed_base
         self.direction = 'stop'
         self.weapon_style = 0
 
         self.projectiles = pygame.sprite.Group()
-        self.timer = 0.0  # Used for delay between player projectiles
-        self.shoot_delay = None  # Delay between projectiles in ms
-        self.add_laser = False  # Allow to shot new projectile when True
+        self.__timer = 0.0  # Used for delay between player projectiles
+        self.__shoot_delay = None  # Delay between projectiles in ms
+        self.__add_laser = False  # Allow to shot new projectile when True
 
         self.image = self.data.GFX[f'{self.style}-{self.direction}']
         self.mask = pygame.mask.from_surface(self.image)  # Useful for fast pixel perfect collision detection
@@ -75,13 +75,13 @@ class Player(pygame.sprite.Sprite):
             dt: delta time in ms
             keys: state of all keyboard buttons
         """
-        if pygame.time.get_ticks() - self.timer > self.shoot_delay:
-            self.add_laser = True  # Flag allow to add new projectile
+        if pygame.time.get_ticks() - self.__timer > self.__shoot_delay:
+            self.__add_laser = True  # Flag allow to add new projectile
 
         if keys[pygame.K_SPACE]:
-            if self.add_laser:
-                self.add_laser = False
-                self.timer = pygame.time.get_ticks()
+            if self.__add_laser:
+                self.__add_laser = False
+                self.__timer = pygame.time.get_ticks()
                 self.data.SFX['laser-player'].play()
                 projectile = Projectile(self.data, self.rect.centerx, self.rect.top, 'player')
                 self.projectiles.add(projectile)
@@ -108,27 +108,27 @@ class Player(pygame.sprite.Sprite):
         """Updates player shoot ratio and weapon style depending on actual 'gunfire_upgrade' level.
         Called before each game level."""
         if self.data.gunfire_upgrade == 0:
-            self.shoot_delay = 500
+            self.__shoot_delay = 500
             self.weapon_style = 0
         elif self.data.gunfire_upgrade == 1:
-            self.shoot_delay = 350
+            self.__shoot_delay = 350
             self.weapon_style = 0
         elif self.data.gunfire_upgrade == 2:
-            self.shoot_delay = 200
+            self.__shoot_delay = 200
             self.weapon_style = 0
         elif self.data.gunfire_upgrade == 3:
-            self.shoot_delay = 350
+            self.__shoot_delay = 350
             self.weapon_style = 1
 
     def hp_update(self) -> None:
         """Updates player HP.
         Called before each game level."""
-        self.data.hp = self.hp_base + self.data.hp_upgrade
+        self.data.hp = self.__hp_base + self.data.hp_upgrade
 
     def speed_update(self) -> None:
         """Updates player speed.
         Called before each game level."""
-        self.speed = self.speed_base + 0.15*self.data.speed_upgrade
+        self.speed = self.__speed_base + 0.15 * self.data.speed_upgrade
 
     def reset(self) -> None:
         """Resets all upgrades.
