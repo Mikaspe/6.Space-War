@@ -5,8 +5,6 @@ All levels are stored in one dictionary, where key is number of the level, and v
 
 import pickle
 
-from .control import ShareData
-
 
 def level_gen() -> None:
 
