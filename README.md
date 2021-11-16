@@ -19,6 +19,7 @@ I. Install:
   1. Python 3.10: https://www.python.org/downloads/release/python-3100/
   2. Git: https://git-scm.com/
 II. Shell:
+
   1. Clone repository:
     '$ git clone https://github.com/Mikaspe/6.Space-War'
   2. Switch to the project directory '6.Space-war'
