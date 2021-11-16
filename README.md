@@ -27,4 +27,4 @@ II. Shell:
   3. Virtual Environment: '$ pip install --user pipenv' https://pipenv.pypa.io/en/latest/ 
   4. '$ pipenv shell'
   5. '$ pipenv install'
-  6. '$ py space_war/control.py'
+  6. '$ py run.py'
