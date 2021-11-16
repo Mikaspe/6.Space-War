@@ -2,10 +2,10 @@ import operator
 
 import pygame
 
-from state import State
-from game_objects.player import Player
-from game_objects.enemy import Enemy
-from game_objects.explosion import Explosion
+from .state import State
+from .game_objects.player import Player
+from .game_objects.enemy import Enemy
+from .game_objects.explosion import Explosion
 
 
 class Game(State):

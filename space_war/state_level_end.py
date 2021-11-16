@@ -1,6 +1,6 @@
 import pygame
 
-from state import State
+from .state import State
 
 
 class LevelEnd(State):

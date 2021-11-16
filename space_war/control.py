@@ -4,14 +4,14 @@ import os
 import pygame
 import pickle
 
-from state_mainmenu import MainMenu
-from state_game import Game
-from state_level_start import LevelStart
-from state_level_end import LevelEnd
-from state_pause import Pause
-from state_upgrade import Upgrade
-from state_spaceshipsmenu import Spaceshipsmenu
-from state_controls import Controls
+from .state_mainmenu import MainMenu
+from .state_game import Game
+from .state_level_start import LevelStart
+from .state_level_end import LevelEnd
+from .state_pause import Pause
+from .state_upgrade import Upgrade
+from .state_spaceshipsmenu import Spaceshipsmenu
+from .state_controls import Controls
 
 
 class Control:
@@ -96,7 +96,7 @@ class ShareData:
         pygame.display.set_caption('Space-War')  # Caption of the window
         self.__SCREEN_RECT = self.SCREEN.get_rect()  # Store rectangular coordinates of the SCREEN
 
-        self.__FONT = pygame.font.Font('../resources/fonts/OpenSans-Bold.ttf', 100)  # Text font in level start and end
+        self.__FONT = pygame.font.Font('./resources/fonts/OpenSans-Bold.ttf', 100)  # Text font in level start and end
         self.__GFX = {}  # Images and animations
         self.__SFX = {}  # Sounds
         pygame.mixer.set_num_channels(50)  # Number of sound channels
@@ -214,30 +214,30 @@ class ShareData:
         Called in the contructor.
         """
         for folder_name in ('Player', 'Enemy', 'Projectile', 'Background', 'Other'):
-            for img in os.listdir(f'../resources/img/{folder_name}'):
+            for img in os.listdir(f'./resources/img/{folder_name}'):
                 if img.startswith(('player', 'enemy', 'projectile')):
-                    self.__GFX[img.replace('.png', '')] = pygame.image.load(f'../resources/img/{folder_name}/{img}').convert_alpha()
+                    self.__GFX[img.replace('.png', '')] = pygame.image.load(f'./resources/img/{folder_name}/{img}').convert_alpha()
                 else:
-                    self.__GFX[img.replace('.png', '')] = pygame.image.load(f'../resources/img/{folder_name}/{img}')
+                    self.__GFX[img.replace('.png', '')] = pygame.image.load(f'./resources/img/{folder_name}/{img}')
 
-        for animation in os.listdir('../resources/animations'):
+        for animation in os.listdir('./resources/animations'):
             frames = []
-            for frame in os.listdir(f'../resources/animations/{animation}'):
-                frames.append(pygame.image.load(f'../resources/animations/{animation}/{frame}'))
+            for frame in os.listdir(f'./resources/animations/{animation}'):
+                frames.append(pygame.image.load(f'./resources/animations/{animation}/{frame}'))
             self.__GFX[animation.replace('.png', '')] = frames
 
     def __load_sounds(self) -> None:
         """Loads game sounds from directory
         Called in the contructor.
         """
-        for sound in os.listdir('../resources/sounds'):
-            self.__SFX[sound.replace('.wav', '')] = pygame.mixer.Sound(f'../resources/sounds/{sound}')
+        for sound in os.listdir('./resources/sounds'):
+            self.__SFX[sound.replace('.wav', '')] = pygame.mixer.Sound(f'./resources/sounds/{sound}')
 
     def __load_level_enemies(self) -> None:
         """Loads enemie spaceship composition for each level from pickle file.
         Called in the contructor.
         """
-        with open('game_levels.pickle', 'rb') as handle:
+        with open('space_war/game_levels.pickle', 'rb') as handle:
             # Dictionary where key is a game level, values are tuples with enemy parameters(x_pos, y_pos, style)
             self.__ENEMIES_ARGS = pickle.load(handle)
 

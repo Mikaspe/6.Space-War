@@ -1,7 +1,7 @@
 import pygame
 
-from state import State
-from menu_manager import MenuManager
+from .state import State
+from .menu_manager import MenuManager
 
 
 class Pause(State, MenuManager):
