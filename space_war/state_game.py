@@ -86,10 +86,6 @@ class Game(State):
             self.next = 'end'
             self.done = True
 
-        if keys[pygame.K_n]:  # For tests only                                                                    !!!!!!!!
-            self.next = 'end'
-            self.done = True
-
     def draw(self, dt: int) -> None:
         """Draws game objects on the screen.
         Called in the '__update' method in 'Control' object('control' module).
@@ -109,7 +105,7 @@ class Game(State):
         self.__draw_current_level()
         self.__draw_player_hearts(dt)
 
-        if self.data.level == 8 and self.__enemies.has():
+        if self.data.level == 8 and len(self.__enemies) > 0:
             self.__draw_boss_healthbar()
 
     def __draw_current_level(self) -> None:

@@ -114,10 +114,10 @@ class ShareData:
 
         self.__hp = 0
         self.player_spaceship_style = 'player1'
-        self.__MAX_UPGRADE = 3
+        self.__MAX_UPGRADE = 0
         self.__gunfire_upgrade = 0
         self.__hp_upgrade = 0
-        self.__speed_upgrade = 0
+        self.__speed_upgrade = 3
 
     @property
     def WIN_SIZE(self) -> tuple:
