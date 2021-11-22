@@ -18,24 +18,17 @@ class Explosion(pygame.sprite.Sprite):
         self.image = self.sprites[self.current_sprite]  # Initial animation frame image
         self.rect = self.image.get_rect(center=(pos_x, pos_y))  # Rectangular coordinates of animation image
 
-    def animate(self) -> None:
-        """Changes flag value which allows updates of animation image.
-        Called when enemy spaceship has been destroyed in the 'state_game' module.
-        """
-        self.is_animating = True
-
     def update(self, speed_of_animation: float = 1) -> None:
         """Updates current explosion frame. Each call updates 'self.image' sprite with next frame image.
         Called in 'draw_game' method in the 'state_game' module.
 
         Parameters:
             speed_of_animation: Speed of changing frames(default=1). For example if speed_of_animation=0.5 frame
-                                changes after 2 calls.
+                                changes after 2 calls. If speed_of_animation>1 some of frames'll be skipped.
         """
-        if self.is_animating:
-            self.image = self.sprites[int(self.current_sprite)]
-            self.current_sprite += speed_of_animation
+        self.image = self.sprites[int(self.current_sprite)]
+        self.current_sprite += speed_of_animation
 
-            if self.current_sprite >= len(self.sprites):
-                self.current_sprite = 0
-                self.is_animating = False
+        if self.current_sprite >= len(self.sprites):
+            # Removes the Sprite from '__animations' sprites group in the 'state_game' module, so it's not more update
+            self.kill()

@@ -86,9 +86,6 @@ class Game(State):
             self.next = 'end'
             self.done = True
 
-        if keys[pygame.K_n]:  # Used for tests
-            self.done = True
-
     def draw(self, dt: int) -> None:
         """Draws game objects on the screen.
         Called in the '__update' method in 'Control' object('control' module).
@@ -99,8 +96,7 @@ class Game(State):
         self.data.SCREEN.blit(self.data.GFX[f'background{self.data.level}'], (0, 0))
         self.__player.draw()
         # Explosion animation
-        for animation in self.__animations:
-            animation.update(1.6)
+        self.__animations.update(1.6)  # Updates each explosion animation with 1.6 speed
         self.__animations.draw(self.data.SCREEN)  # Draw all explosion animations
 
         self.__enemies.draw(self.data.SCREEN)
@@ -208,9 +204,7 @@ class Game(State):
                         self.data.SFX['hit'].play()
                     elif enemy.hp == 0:
                         self.data.SFX['destroyed'].play()
-                        self.explosion = Explosion(self.data, *enemy.rect.center)
-                        self.explosion.animate()
-                        self.__animations.add(self.explosion)
+                        self.__animations.add(Explosion(self.data, *enemy.rect.center))  # Explosion animations
                         self.__enemies.remove(enemy)
                         for enemy in self.__enemies:  # Speed of enemies increase when number of them decrease
                             enemy.speed += 0.01
