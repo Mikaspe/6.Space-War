@@ -86,6 +86,9 @@ class Game(State):
             self.next = 'end'
             self.done = True
 
+        if keys[pygame.K_n]:  # Used for tests
+            self.done = True
+
     def draw(self, dt: int) -> None:
         """Draws game objects on the screen.
         Called in the '__update' method in 'Control' object('control' module).
