@@ -240,15 +240,3 @@ class ShareData:
         with open('space_war/game_levels.pickle', 'rb') as handle:
             # Dictionary where key is a game level, values are tuples with enemy parameters(x_pos, y_pos, style)
             self.__ENEMIES_ARGS = pickle.load(handle)
-
-
-def main():
-    pygame.init()
-    app = Control()  # Sets the initial state of the program
-    app.main_game_loop()
-
-    pygame.quit()
-    sys.exit()
-
-
-main()

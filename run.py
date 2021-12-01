@@ -1,4 +1,4 @@
-from space_war.control import main
+from space_war.space_war import main
 
 
 main()
