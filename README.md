@@ -22,9 +22,9 @@ I. Install:
 II. Shell:
 
   1. Clone repository:
-    '$ git clone https://github.com/Mikaspe/6.Space-War'
-  2. Switch to the project folder '6.Space-war'
-  3. Virtual Environment: '$ pip install --user pipenv' https://pipenv.pypa.io/en/latest/ 
-  4. '$ pipenv shell'
-  5. '$ pipenv install'
-  6. '$ py run.py'
+    "$ git clone https://github.com/Mikaspe/6.Space-War"
+  2. Switch to the project folder "6.Space-war"
+  3. Virtual Environment: "$ pip install --user pipenv", more information: https://pipenv.pypa.io/en/latest/ 
+  4. "$ pipenv shell"
+  5. "$ pipenv install"
+  6. "$ py run.py"
